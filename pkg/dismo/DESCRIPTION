@@ -4,7 +4,7 @@ Title: Spatial prediction
 Version: 0.0.1
 Date: 12-December-2009
 Depends: methods, raster
-Suggests: RODBC, ROCR
+Suggests: RODBC, ROCR, rgdal
 Author: Robert Hijmans
 Maintainer: <r.hijmans@gmail.com>
 Description: Spatial modeling functions

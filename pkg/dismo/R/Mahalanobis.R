@@ -4,26 +4,60 @@
 # Version 0.1
 # Licence GPL v3
 
+setClass('Mahalanobis',
+	contains = 'matrix',
+	representation (
+	),	
+	prototype (	
+	),
+	validity = function(object)	{
+		return(TRUE)
+	}
+)
 
-if (!isGeneric("mahala")) {
-	setGeneric("mahala", function(p, x,...)
-		standardGeneric("mahala"))
+
+if (!isGeneric("mahal")) {
+	setGeneric("mahal", function(x, p, ...)
+		standardGeneric("mahal"))
 }	
 
+setMethod('mahal', signature(x='Raster', p='matrix'), 
+	function(x, p, ...) {
+		m <- xyValues(x, p)
+		new('Mahalanobis', as.matrix(m))
+	}
+)
 
-.MAH <- function(x, y) {
-	S <- var(x)
-	apply(data.frame(y), 1, FUN=function(z) min( mahalanobis(x, z, S)))
-}
+setMethod('mahal', signature(x='matrix', p='missing'), 
+	function(x, p, ...) {
+		new('Mahalanobis', x)
+	}
+)
+
+setMethod('mahal', signature(x='Raster', p='Spatial'), 
+	function(x, p, ...) {
+		mahal(x, coordinates(p), ...)
+	}
+)
 
 
-setMethod('mahala', signature(p='matrix',x='RasterStackBrick'), 
-	function(p, x, ext=NULL, filename='', progress='', ...) {
-		obs <- xyValues(x, p)
+setMethod('predict', signature(object='Mahalanobis'), 
+function(object, x, ext=NULL, filename='', progress='', ...) {
+
+	if (! (extends(class(x), 'Raster')) ) {
+		if (! all(colnames(object) %in% colnames(x)) ) {
+			stop('missing variables in x ')
+		}
+		x <- x[ , colnames(object),drop=FALSE]
+		S <- var(object)
+		mah <- 1 - apply(data.frame(x), 1, FUN=function(z) min( mahalanobis(object, z, S)))
+		return(mah)
+		
+	} else {
+	
 		out <- raster(x)
-
 		if (canProcessInMemory(out, 2)) {
-			inmem=TRUE
+			inmem <- TRUE
 			v <- matrix(NA, ncol=nrow(out), nrow=ncol(out))
 		} else {
 			inmem <- FALSE
@@ -33,10 +67,14 @@ setMethod('mahala', signature(p='matrix',x='RasterStackBrick'),
 			}
 		}
 
+		object <- as.matrix(object)
+		S <- var(object)
+		cn <- colnames(object)
 		pb <- pbCreate(nrow(out), type=progress)
 		for (r in 1:nrow(out)) {
 			vals <- getValues(x, r)
-			mah <- .MAH(obs, vals)
+			vals <- vals[,cn,drop=FALSE]
+			mah <- 1 - apply(data.frame(vals), 1, FUN=function(z) min( mahalanobis(object, z, S)))
 			if (inmem) {
 				v[,r] <- mah
 			} else {
@@ -54,12 +92,4 @@ setMethod('mahala', signature(p='matrix',x='RasterStackBrick'),
 		pbClose(pb)
 		return(out)
 	}
-)
-
-
-setMethod('mahala', signature(p='Spatial', x='Raster'), 
-	function(p, x, ...) {
-		mahala(coordinates(p), x, ...)
-	}
-)
-
+})

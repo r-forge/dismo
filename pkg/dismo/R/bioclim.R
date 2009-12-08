@@ -5,8 +5,8 @@
 # Licence GPL v3
 
 setClass('Bioclim',
+	contains = 'matrix',
 	representation (
-		x = 'matrix'
 	),	
 	prototype (	
 	),
@@ -16,7 +16,32 @@ setClass('Bioclim',
 )
 
 
-.PR <- function(x, y) {
+if (!isGeneric("bioclim")) {
+	setGeneric("bioclim", function(x, p, ...)
+		standardGeneric("bioclim"))
+}	
+
+setMethod('bioclim', signature(x='Raster', p='matrix'), 
+	function(x, p, ...) {
+		m <- xyValues(x, p)
+		bc <- new('Bioclim', as.matrix(m))
+		bc
+	}
+)
+
+setMethod('bioclim', signature(x='matrix', p='missing'), 
+	function(x, p, ...) {
+		new('Bioclim', x)
+	}
+)
+
+setMethod('bioclim', signature(x='Raster', p='Spatial'), 
+	function(x, p, ...) {
+		bioclim(x, coordinates(p), ...)
+	}
+)
+
+.percRank <- function(x, y) {
 	x <- sort(as.vector(na.omit(x)))
 	y <- data.frame(y)
 	b <- apply(y, 1, FUN=function(z)sum(x<z))
@@ -28,17 +53,26 @@ setClass('Bioclim',
 }
 
 
-if (!isGeneric("bioclim")) {
-	setGeneric("bioclim", function(p, x,...)
-		standardGeneric("bioclim"))
-}	
+setMethod('predict', signature(object='Bioclim'), 
+function(object, x, ext=NULL, filename='', progress='', ...) {
 
+	if (! (extends(class(x), 'Raster')) ) {
+		if (! all(colnames(object) %in% colnames(x)) ) {
+			stop('missing variables in x ')
+		}
+		ln <- colnames(object)
+		bc <- matrix(ncol=length(ln), nrow=nrow(x))
+		for (i in 1:ncol(bc)) {
+			bc[,i] <- .percRank(object[,ln[i]], x[,ln[i]])
+		}
+		return( apply(bc, 1, min) )
 
-setMethod('bioclim', signature(p='matrix',x='RasterStackBrick'), 
-	function(p, x, ext=NULL, filename='', progress='', ...) {
-		obs <- xyValues(x, p)
+	} else {
+		if (! all(colnames(object) %in% layerNames(x)) ) {
+			stop('missing variables in Raster object')
+		}
+		
 		out <- raster(x)
-
 		if (canProcessInMemory(out, 2)) {
 			inmem=TRUE
 			v <- matrix(NA, ncol=nrow(out), nrow=ncol(out))
@@ -50,12 +84,13 @@ setMethod('bioclim', signature(p='matrix',x='RasterStackBrick'),
 			}
 		}
 
+		ln <- colnames(object)
 		bc <- matrix(ncol=nlayers(x), nrow=ncol(x))
 		pb <- pbCreate(nrow(out), type=progress)
 		for (r in 1:nrow(out)) {
-			vals <- getValues(x, r)
-			for (i in 1:ncol(bc)) {
-				bc[,i] <- .PR(obs[,i], vals[,i])
+			vals <- getValues(x, r, names=TRUE)
+			for (i in 1:length(ln)) {
+				bc[,i] <- .percRank(object[,ln[i]], vals[,ln[i]])
 			}
 			if (inmem) {
 				v[,r] <- apply(bc, 1, min)
@@ -74,12 +109,6 @@ setMethod('bioclim', signature(p='matrix',x='RasterStackBrick'),
 		pbClose(pb)
 		return(out)
 	}
-)
+})
 
-
-setMethod('bioclim', signature(p='Spatial', x='RasterStackBrick'), 
-	function(p, x, ...) {
-		bioclim(coordinates(p), x, ...)
-	}
-)
 
