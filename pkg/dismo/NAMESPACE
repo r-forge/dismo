@@ -1,2 +1,3 @@
 importFrom("graphics", "plot")
+importFrom("stats", "predict")
 exportPattern("^[^\\.]")
