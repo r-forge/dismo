@@ -17,7 +17,7 @@ pointValues <- function(stack, p, a, uniquecells=TRUE, na.rm=TRUE) {
 	cell <- na.omit(cell)
 	if (length(cell) < np) {
 		frac <- length(cell) / np
-		warning("presence points on raster=", frac," times total" )
+		warning("points on raster=", frac," times total" )
 	}
 	if (uniquecells) {
 		nc <- length(cell)
