@@ -14,13 +14,13 @@ gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE) {
 		nodes <- getNodeSet(doc, "//to:TaxonOccurrence")
 		if(length(nodes) == 0)   return(data.frame())
 		varNames <- c("continent", "country", "stateProvince", "county", "locality",  "decimalLatitude", "decimalLongitude", "coordinateUncertaintyInMeters", "maximumElevationInMeters", "minimumElevationInMeters", "maximumDepthInMeters", "minimumDepthInMeters", "institutionCode", "collectionCode", "catalogNumber",  "basisOfRecordString", "collector", "earliestDateCollected", "latestDateCollected",  "gbifNotes")
-		dims = c(length(nodes), length(varNames)) 
+		dims <- c(length(nodes), length(varNames)) 
    # create an empty data frame with as many rows and columns as needed.
-		ans = as.data.frame(replicate(dims[2], rep(as.character(NA), dims[1]), simplify = FALSE), stringsAsFactors = FALSE)
-		names(ans) = varNames
+		ans <- as.data.frame(replicate(dims[2], rep(as.character(NA), dims[1]), simplify = FALSE), stringsAsFactors = FALSE)
+		names(ans) <- varNames
     # Fill in the rows based on the names.
 		for(i in seq(length = dims[1])) 
-			ans[i, varNames] = xmlSApply(nodes[[i]], xmlValue)[varNames]
+			ans[i, varNames] <- xmlSApply(nodes[[i]], xmlValue)[varNames]
 
 		nodes <- getNodeSet(doc, "//to:Identification")
 		varNames <- c("taxonName")
