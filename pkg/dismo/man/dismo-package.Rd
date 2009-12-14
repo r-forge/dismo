@@ -19,16 +19,12 @@ License: \tab GPL 3\cr
 LazyLoad: \tab yes\cr
 }
 
-~ ~ An overview of how to use the package, including the most important ~~
-~~ functions ~~
 }
 \author{
 Robert J. Hijmans
 }
 
-\references{
 
-}
 \keyword{ package }
 \keyword{ spatial }
 
