@@ -1,0 +1,12 @@
+Package: diversity
+Type: Package
+Title: Diversity
+Version: 0.1.1
+Date: 2008-10-07
+Depends: methods, raster
+Suggests: RODBC, rgdal
+Author: Robert Hijmans
+Maintainer: <r.hijmans@gmail.com>
+Description: Biodiversity and niche modeling functions
+License: GPL (>=3)
+LazyLoad: yes
