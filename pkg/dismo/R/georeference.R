@@ -12,7 +12,7 @@
 	if (class(p) == 'SpatialPoints' | class(p) == 'SpatialPointsDataFrame') {
 		if (isLatLon(p)) { latlon <- TRUE 
 		} else {
-			if (projection(x)!='NA') {
+			if (projection(p)!='NA') {
 				stop('points are projected')
 			}
 		}
@@ -79,7 +79,6 @@ biogeomancer <- function(country='', adm1='', adm2='', locality='') {
 
 alt <- function(lonlat) {
 	lonlat <- .pointsToMatrix(lonlat)
-
 	theurl <- paste("http://ws.geonames.org/srtm3?lat=", lonlat[,2], "&lng=", lonlat[,2], sep='')
 	elevation <- scan(theurl, what='character', quiet=TRUE)
 	if (elevation < -32000) { elevation <- NA }
@@ -88,7 +87,7 @@ alt <- function(lonlat) {
 
 
 country <- function(lonlat, radius=0) {
-	cnts <- .getData('ISO3')
+	cnts <- getData('ISO3')
 	lonlat <- .pointsToMatrix(lonlat)
 
 	res <- matrix(ncol=3,nrow=length(lonlat[,1]))

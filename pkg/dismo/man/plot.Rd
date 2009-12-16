@@ -1,43 +1,33 @@
 \name{plot}
-\alias{plot}
+
+\docType{methods}
+
+\alias{plot,ConfusionMatrix','ANY'-method}
 
 \title{
 plot
 }
+
 \description{
 .. description ...
 }
-\usage{
-plot(x, y, ...)
-}
- 
-\arguments{
-  \item{x}{
-%%     ~~Describe \code{x} here~~
-}
-  \item{y}{
-%%     ~~Describe \code{y} here~~
-}
-  \item{\dots}{
-%%     ~~Describe \code{\dots} here~~
-}
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
-\value{
- 
 
+
+\section{Methods}{
+\describe{
  
- 
- 
+\code{plot(x, ...)}
+  
+}
+}
+
+
+\value{
 }
 
 \author{
 Robert J. Hijmans
 }
-
-
 
 
 \keyword{spatial}

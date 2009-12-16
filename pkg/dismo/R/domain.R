@@ -8,6 +8,7 @@
 setClass('Domain',
 	contains = 'matrix',
 	representation (
+		range='vector'
 	),	
 	prototype (	
 	),
@@ -27,13 +28,18 @@ setMethod('domain', signature(x='Raster', p='matrix'),
 	function(x, p, ...) {
 		m <- xyValues(x, p)
 		d <- new('Domain', as.matrix(m))
+		r <- apply(x, 2, FUN=function(x){range(x, na.rm=TRUE)})
+		d@range <-  abs(r[2,] - r[1,])
 		d
 	}
 )
 
 setMethod('domain', signature(x='matrix', p='missing'), 
 	function(x, p, ...) {
-		new('Domain', x)
+		d <- new('Domain', x)
+		r <- apply(x, 2, FUN=function(x){range(x, na.rm=TRUE)})
+		d@range <-  abs(r[2,] - r[1,])
+		d
 	}
 )
 
@@ -44,14 +50,12 @@ setMethod('domain', signature(x='Raster', p='Spatial'),
 )
 
 
-
-
 .domdist <- function(x, y) {
-	r <- range(x, na.rm=TRUE)
-	r <- r[2]-r[1]
-	d <- apply(data.frame(y), 1, FUN=function(z)min(abs(x-z)/r))
+	r <- x@range
+	d <- apply(data.frame(y), 1, FUN=function(z)(abs(x-z)/r))
+	d <- min(apply(d, 1, mean))
 	d[which(d > 1)] <- 1
-	d
+	1-d
 }
 
 
@@ -97,9 +101,9 @@ function(object, x, ext=NULL, filename='', progress='', ...) {
 				dom[,i] <- .domdist(object[,ln[i]], vals[,ln[i]])
 			}
 			if (inmem) {
-				v[,r] <- 1 - apply(dom, 1, max)
+				v[,r] <- dom
 			} else {
-				out <- setValues(out, 1 - apply(dom, 1, max))
+				out <- setValues(out, dom)
 				out <- writeRaster(out, filename, ...)
 			}
 			pbStep(pb, r) 

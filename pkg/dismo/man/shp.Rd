@@ -4,36 +4,27 @@
 \title{
 read a shapefile
 }
+
 \description{
-.. description ...
+Simple wrapper around readOGR (rgdal package)
 }
+
+
 \usage{
 shp(filename)
 }
  
 \arguments{
-  \item{filename}{
-%%     ~~Describe \code{filename} here~~
+  \item{filename}{shapefile name}
 }
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
+
 \value{
- 
- 
- 
- 
- 
+Spatial*DataFrame 
 }
-
-
 
 \author{
 Robert J. Hijmans
 }
-
-
 
 \keyword{spatial}
 

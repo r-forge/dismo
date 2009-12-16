@@ -5,7 +5,7 @@
 # Licence GPL v3
 
 gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE, download=TRUE, getAlt=TRUE, feedback=3) {
-
+	
 	if (! require(XML)) { stop('You need to install the XML package to use this function') }
 
 	gbifxmlToDataFrame <- function(s) {
@@ -35,6 +35,7 @@ gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE, downlo
 	}
 
 
+	if (sp) geo <- TRUE
 
     spec <- paste('scientificname=', trim(genus),'+', trim(species), sep='')
 	if (geo) { cds <- '&coordinatestatus=true' 
@@ -55,7 +56,7 @@ gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE, downlo
 		}
 	}
 	if (! download) { return(invisible(NULL)) }
-	
+
     iter <- n %/% 1000
 	first <- TRUE
     for (group in 0:iter) {
@@ -99,9 +100,21 @@ gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE, downlo
 	z[,'lat'] <- as.numeric(z[,'lat'])
 	
 	if (removeZeros) {
-		z <- subset(z, z[,'lon'] != 0 & z[,'lat'] !=0 )
+		if (geo) {
+			z <- subset(z, z[,'lon'] != 0 & z[,'lat'] !=0 )
+		} else {
+			i <- z[,'lon']== 0 | z[,'lat']==0
+			z[i,'lat'] <- NA 
+			z[i,'lon'] <- NA 
+		}
 	} else {
-		z <- subset(z, !(z[,'lon'] == 0 & z[,'lat'] == 0) )
+		if (geo) {
+			z <- subset(z, !(z[,'lon'] == 0 & z[,'lat'] == 0) )
+		} else {
+			i <- z[,'lon']== 0 & z[,'lat']==0
+			z[i,'lat'] <- NA 
+			z[i,'lon'] <- NA 
+		}
 	}
 		
 	if (getAlt) {
