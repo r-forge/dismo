@@ -2,7 +2,6 @@
 
 \docType{methods}
 
-\alias{predict}
 \alias{predict,Bioclim-method}
 \alias{predict,Domain-method}
 \alias{predict,Mahalanobis-method}
@@ -11,16 +10,6 @@
 
 \description{
 Make a RasterLayer with a prediction based on a model object. Provide a Raster* object with the independent variables. The layerNames in the RasterStack should include those expected by the model. 
-}
-
-\usage{
-predict(object, ...) 
-}
-
-
-\arguments{
-  \item{object}{a RasterStack, RasterBrick or RasterLayer object}
-  \item{...}{Additional arguments. See below, under Methods}  
 }
 
 \section{Methods}{

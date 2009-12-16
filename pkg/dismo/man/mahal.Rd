@@ -1,44 +1,40 @@
 \name{mahal}
 \alias{mahal}
+\alias{mahal,Raster,Spatial-method}
+\alias{mahal,Raster,matrix-method}
+\alias{mahal,matrix,missing-method}
+
 
 \title{
 Mahalanobis model
 }
+
 \description{
 .. description ...
 }
+
 \usage{
 mahal(x, p, ...)
 }
  
 \arguments{
-  \item{x}{
-%%     ~~Describe \code{x} here~~
+  \item{x}{ Raster* object or matrix}
+  \item{p}{ two column matrix or SpatialPoints* object}
+  \item{...}{ Additional arguments }
 }
-  \item{p}{
-%%     ~~Describe \code{p} here~~
-}
-  \item{\dots}{
-%%     ~~Describe \code{\dots} here~~
-}
-}
+
 \details{
-%%  ~~ If necessary, more details than the description above ~~
 }
+
+
 \value{
- 
- 
- 
- 
- 
+A RasterLayer or (if x is a matrix), a vector.
 }
 
 
 \author{
 Robert J. Hijmans
 }
-
-
 
 
 \keyword{spatial}
