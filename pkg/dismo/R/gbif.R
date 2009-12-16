@@ -4,9 +4,9 @@
 # Version 0.1
 # Licence GPL v3
 
-gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE) {
+gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE, download=TRUE, getAlt=TRUE, feedback=3) {
 
-	if (! require(XML)) { stop() }
+	if (! require(XML)) { stop('You need to install the XML package to use this function') }
 
 	gbifxmlToDataFrame <- function(s) {
 		# this sub-funciton was hacked from xmlToDataFrame in the XML package by Duncan Temple Lang
@@ -20,7 +20,7 @@ gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE) {
 		names(ans) <- varNames
     # Fill in the rows based on the names.
 		for(i in seq(length = dims[1])) 
-			ans[i, varNames] <- xmlSApply(nodes[[i]], xmlValue)[varNames]
+			ans[i,] <- xmlSApply(nodes[[i]], xmlValue)[varNames]
 
 		nodes <- getNodeSet(doc, "//to:Identification")
 		varNames <- c("taxonName")
@@ -29,7 +29,7 @@ gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE) {
 		names(tax) = varNames
     # Fill in the rows based on the names.
 		for(i in seq(length = dims[1])) 
-			tax[i, varNames] = xmlSApply(nodes[[i]], xmlValue)[varNames]
+			tax[i,] = xmlSApply(nodes[[i]], xmlValue)[varNames]
 
 		cbind(tax, ans)
 	}
@@ -44,29 +44,44 @@ gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE) {
     x <- readLines(url, warn=FALSE)
     x <- x[substr(x, 1, 20) == "<gbif:summary totalM"]
     n <- as.integer(unlist(strsplit(x, '\"'))[2])
+	
     if (n==0) {
         cat('no occurrences found\n')
         return(invisible(NULL))
     } else {
-		cat(n, 'occurrences found\n')
-		flush.console()
+		if (feedback > 0) {
+			cat(n, 'occurrences found\n')
+			flush.console()
+		}
 	}
+	if (! download) { return(invisible(NULL)) }
+	
     iter <- n %/% 1000
 	first <- TRUE
     for (group in 0:iter) {
         start <- group * 1000
-        if (group == iter) { end <- n } else { end <- start + 999 }
-        cat('downloading records', start+1, 'to', end+1, '\n')
-        flush.console()
-        aurl <- paste(base, 'list?', spec, '&format=darwin&startindex=', start, cds, sep='')
-		s <- readLines(aurl, warn=FALSE)
-		
-        test <- try(zz <- gbifxmlToDataFrame(s), silent=TRUE)
-		if (class(test) == 'try-error') {
-		# sofar the only unacceptable character found
-			s <- sub("\002", "", s)
-			zz <- gbifxmlToDataFrame(s)
+		if (feedback > 1) {
+			if (group == iter) { end <- n-1 } else { end <- start + 999 }
+			if (group == 0) { cat('downloading: 1-', end+1, sep='')  
+			} else { 
+				cat('-', end+1, sep='')   
+				if (group %% 10 == 0  |  group == iter ) { cat('\n') }
+			}
+			flush.console()
 		}
+		start <- format(start, scientific=FALSE)
+		
+        aurl <- paste(base, 'list?', spec, '&format=darwin&startindex=', start, cds, sep='')
+		#s <- readLines(aurl, warn=FALSE)
+		
+		zz <- gbifxmlToDataFrame(aurl)
+		
+        #test <- try(zz <- gbifxmlToDataFrame(s), silent=TRUE)
+		#if (class(test) == 'try-error') {
+		#	s <- sub("\002", "", s)
+		#	zz <- gbifxmlToDataFrame(s)
+		#}
+		
 		if (first) {
 			z <- zz
 			first <- FALSE
@@ -78,6 +93,8 @@ gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE) {
 	d <- as.Date(Sys.time())
 	z <- cbind(z, d)
 	names(z) <- c("species", "continent", "country", "adm1", "adm2", "locality", "lat", "lon", "coordUncertaintyM", "maxElevationM", "minElevationM", "maxDepthM", "minDepthM", "institution", "collection", "catalogNumber",  "basisOfRecord", "collector", "earliestDateCollected", "latestDateCollected",  "gbifNotes", "downloadDate")
+	z[,'lon'] <- gsub(',', '.', z[,'lon'])
+	z[,'lat'] <- gsub(',', '.', z[,'lat'])
 	z[,'lon'] <- as.numeric(z[,'lon'])
 	z[,'lat'] <- as.numeric(z[,'lat'])
 	
@@ -87,13 +104,40 @@ gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE) {
 		z <- subset(z, !(z[,'lon'] == 0 & z[,'lat'] == 0) )
 	}
 		
-	if (sp & geo) {
-		if (dim(z)[1] > 0)
-		coordinates(z) <- ~lon+lat
+	if (getAlt) {
+		altfun <- function(x) {
+					a <- mean(as.numeric(unlist(strsplit( gsub('-', ' ', gsub('m', '', ( gsub(",", "", gsub('\"', "", x))))),' ')), silent=TRUE), na.rm=TRUE)
+					a[a==0] <- NA
+					mean(a, na.rm=TRUE)
+				}
+
+		#elev <- apply(z[,c("maxElevationM", "minElevationM")], 1, FUN=altfun)
+		#depth <- -1 * apply(z[,c("maxDepthM", "minDepthM")], 1, FUN=altfun)
+		#alt <- apply(cbind(elev, depth), 1, FUN=function(x)mean(x, na.rm=TRUE))
+		
+		if (feedback<3) {
+			w <- options('warn')
+			options(warn=-1)
+		}
+		
+		alt <- apply(z[,c("maxElevationM", "minElevationM", "maxDepthM", "minDepthM")], 1, FUN=altfun)
+		
+		if (feedback<3) options(warn=w)
+	
+		z <- cbind(z[,c("species", "continent", "country", "adm1", "adm2", "locality", "lat", "lon", "coordUncertaintyM")], 
+		alt, 
+		z[ ,c("institution", "collection", "catalogNumber",  "basisOfRecord", "collector", "earliestDateCollected", "latestDateCollected",  "gbifNotes", "downloadDate", "maxElevationM", "minElevationM", "maxDepthM", "minDepthM")])
 	}
+	
+	if (sp & geo) {
+		i <- z[!(is.na(z[,'lon'] | is.na(z[,'lat']))), ]
+		if (dim(z)[1] > 0)
+			coordinates(z) <- ~lon+lat
+	}
+
 	return(z)
 }
 
 #sa <- gbif('solanum')
-#sa <- gbif('solanum', 'acaule', sp=TRUE)
+#sa <- gbif('solanum', 'tuberosum')
 
