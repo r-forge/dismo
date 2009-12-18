@@ -51,7 +51,7 @@ gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE, downlo
         return(invisible(NULL))
     } else {
 		if (feedback > 0) {
-			cat(n, 'occurrences found\n')
+			cat(genus, species, ':', n, 'occurrences found\n')
 			flush.console()
 		}
 	}
@@ -63,16 +63,14 @@ gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE, downlo
         start <- group * 1000
 		if (feedback > 1) {
 			if (group == iter) { end <- n-1 } else { end <- start + 999 }
-			if (group == 0) { cat('downloading: 1-', end+1, sep='')  
-			} else { 
-				cat('-', end+1, sep='')   
-				if (group %% 10 == 0  |  group == iter ) { cat('\n') }
-			}
+			if (group == 0) { cat('1-', end+1, sep='')  
+			} else { cat('-', end+1, sep='')  }
+			if ((group != 0 & group %% 20 == 0)  |  group == iter ) { cat('\n') }
 			flush.console()
 		}
 		start <- format(start, scientific=FALSE)
 		
-        aurl <- paste(base, 'list?', spec, '&format=darwin&startindex=', start, cds, sep='')
+        aurl <- paste(base, 'list?', spec, '&mode=processed&format=darwin&startindex=', start, cds, sep='')
 		#s <- readLines(aurl, warn=FALSE)
 		
 		zz <- gbifxmlToDataFrame(aurl)
