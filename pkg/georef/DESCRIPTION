@@ -6,6 +6,6 @@ Date: 2009-12-18
 Depends: raster, XML
 Author: Robert J. Hijmans & Jacob van Etten
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com> 
-Description: Functions for georeferencing locality descriptions and assessing coordinate data quality. This includes access to online databases to look up and verify information.
+Description: Georeferencing locality descriptions and assessing coordinate data quality. This includes access to online databases to look up and verify information.
 License: GPL (>=3)
 LazyLoad: yes
