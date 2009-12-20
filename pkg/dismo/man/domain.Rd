@@ -2,7 +2,9 @@
 \alias{domain}
 \alias{domain,Raster,Spatial-method}
 \alias{domain,Raster,matrix-method}
+\alias{domain,Raster,data.frame-method}
 \alias{domain,matrix,missing-method}
+\alias{domain,data.frame,missing-method}
 
 
 \title{

@@ -27,10 +27,20 @@ if (!isGeneric("domain")) {
 setMethod('domain', signature(x='Raster', p='matrix'), 
 	function(x, p, ...) {
 		m <- xyValues(x, p)
-		d <- new('Domain', as.matrix(m))
-		r <- apply(x, 2, FUN=function(x){range(x, na.rm=TRUE)})
-		d@range <-  abs(r[2,] - r[1,])
-		d
+		domain(m)
+	}
+)
+
+setMethod('domain', signature(x='Raster', p='data.frame'), 
+	function(x, p, ...) {
+		m <- xyValues(x, p)
+		domain(m)
+	}
+)
+
+setMethod('domain', signature(x='data.frame', p='missing'), 
+	function(x, p, ...) {
+		domain(as.matrix(x))
 	}
 )
 
@@ -45,7 +55,8 @@ setMethod('domain', signature(x='matrix', p='missing'),
 
 setMethod('domain', signature(x='Raster', p='Spatial'), 
 	function(x, p, ...) {
-		domain(x, coordinates(p), ...)
+		m <- xyValues(x, p)
+		domain(m)
 	}
 )
 

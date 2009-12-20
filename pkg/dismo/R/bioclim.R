@@ -7,6 +7,8 @@
 setClass('Bioclim',
 	contains = 'matrix',
 	representation (
+		min='vector',
+		max='vector'
 	),	
 	prototype (	
 	),
@@ -21,40 +23,57 @@ if (!isGeneric("bioclim")) {
 		standardGeneric("bioclim"))
 }	
 
-setMethod('bioclim', signature(x='Raster', p='matrix'), 
+
+setMethod('bioclim', signature(x='matrix', p='missing'), 
 	function(x, p, ...) {
-		m <- xyValues(x, p)
-		bc <- new('Bioclim', as.matrix(m))
+		bc <- new('Bioclim', x)
+		bc@min <- apply(bc, 2, min)
+		bc@max <- apply(bc, 2, max)
 		bc
 	}
 )
 
-setMethod('bioclim', signature(x='matrix', p='missing'), 
+setMethod('bioclim', signature(x='data.frame', p='missing'), 
 	function(x, p, ...) {
-		new('Bioclim', x)
+		bioclim(as.matrix(x), p)
+	}
+)
+
+setMethod('bioclim', signature(x='Raster', p='matrix'), 
+	function(x, p, ...) {
+		m <- xyValues(x, p)
+		bioclim(m)
+	}
+)
+
+setMethod('bioclim', signature(x='Raster', p='data.frame'), 
+	function(x, p, ...) {
+		m <- xyValues(x, p)
+		bioclim(m)
 	}
 )
 
 setMethod('bioclim', signature(x='Raster', p='Spatial'), 
 	function(x, p, ...) {
-		bioclim(x, coordinates(p), ...)
+		m <- xyValues(x, coordinates(p))
+		bioclim(m)
 	}
 )
 
-.percRank <- function(x, y) {
-	x <- sort(as.vector(na.omit(x)))
-	y <- data.frame(y)
-	b <- apply(y, 1, FUN=function(z)sum(x<z))
-	t <- apply(y, 1, FUN=function(z)sum(x==z))
-	r <- (b + 0.5 * t)/length(x)
-	i <- which(r > 0.5)
-	r[i] <- 1-r[i]
-	r * 2
-}
-
-
 setMethod('predict', signature(object='Bioclim'), 
-function(object, x, ext=NULL, filename='', progress='', ...) {
+function(object, x, ext=NULL, filename='', progress='', test=TRUE, ...) {
+
+	percRank <- function(x, y) {
+		x <- sort(as.vector(na.omit(x)))
+		y <- data.frame(y)
+		b <- apply(y, 1, FUN=function(z)sum(x<z))
+		t <- apply(y, 1, FUN=function(z)sum(x==z))
+		r <- (b + 0.5 * t)/length(x)
+		i <- which(r > 0.5)
+		r[i] <- 1-r[i]
+		r * 2
+	}
+
 
 	if (! (extends(class(x), 'Raster')) ) {
 		if (! all(colnames(object) %in% colnames(x)) ) {
@@ -63,7 +82,7 @@ function(object, x, ext=NULL, filename='', progress='', ...) {
 		ln <- colnames(object)
 		bc <- matrix(ncol=length(ln), nrow=nrow(x))
 		for (i in 1:ncol(bc)) {
-			bc[,i] <- .percRank(object[,ln[i]], x[,ln[i]])
+			bc[,i] <- percRank(object[,ln[i]], x[,ln[i]])
 		}
 		return( apply(bc, 1, min) )
 
@@ -85,12 +104,20 @@ function(object, x, ext=NULL, filename='', progress='', ...) {
 		}
 
 		ln <- colnames(object)
-		bc <- matrix(ncol=nlayers(x), nrow=ncol(x))
 		pb <- pbCreate(nrow(out), type=progress)
+		
+	if (test) {
+		nc <- ncol(out)
+		bbc <- matrix(0, ncol=nlayers(x), nrow=ncol(x))
 		for (r in 1:nrow(out)) {
+			bc <- bbc
 			vals <- getValues(x, r, names=TRUE)
-			for (i in 1:length(ln)) {
-				bc[,i] <- .percRank(object[,ln[i]], vals[,ln[i]])
+			na <- as.vector(attr(na.omit(vals), 'na.action'))
+			bc[na] <- NA
+			i <- (apply(t(vals) >= object@min, 2, all) & apply(t(vals) <= object@max, 2, all))
+			i[is.na(i)] <- FALSE
+			for (j in 1:length(ln)) {
+				bc[i,j] <- percRank( object[ ,ln[j]], vals[i, ln[j]] )
 			}
 			if (inmem) {
 				v[,r] <- apply(bc, 1, min)
@@ -100,6 +127,25 @@ function(object, x, ext=NULL, filename='', progress='', ...) {
 			}
 			pbStep(pb, r) 
 		} 
+
+	} else {
+		for (r in 1:nrow(out)) {
+			bc <- matrix(ncol=nlayers(x), nrow=ncol(x))
+			vals <- getValues(x, r, names=TRUE)
+			for (i in 1:length(ln)) {
+				bc[,i] <- percRank(object[,ln[i]], vals[,ln[i]])
+			}
+			if (inmem) {
+				v[,r] <- apply(bc, 1, min)
+			} else {
+				out <- setValues(out, apply(bc, 1, min))
+				out <- writeRaster(out, filename, ...)
+			}
+			pbStep(pb, r) 
+		} 
+		
+	}
+	
 		if (inmem) {
 			out <- setValues(out, as.vector(v))
 			if (filename != '') {
@@ -109,6 +155,60 @@ function(object, x, ext=NULL, filename='', progress='', ...) {
 		pbClose(pb)
 		return(out)
 	}
-})
+}
+)
 
 
+
+setMethod("plot", signature(x='Bioclim', y='missing'), 
+	function(x, a=1, b=2, p=0.9, ...) {
+	
+		myquantile <- function(x, p) {
+			p <- min(1, max(0, p))
+			x <- sort(as.vector(na.omit(x)))
+			if (p == 0) return(x[1])
+			if (p == 1) return(x[length(x)])
+			i = (length(x)-1) * p + 1
+			ti <- trunc(i)
+			below = x[ti]
+			above = x[ti+1]
+			below + (above-below)*(i-ti)  
+		}
+	
+		p <- min(1,  max(0, p))
+		if (p > 0.5) p <- 1 - p
+		p <- p / 2
+		prd <- predict(x, x)
+		i <- prd > p & prd < (1-p)
+		plot(x[,a], x[,b], xlab=colnames(x)[a], ylab=colnames(x)[b], cex=0)
+		type=6
+		x1 <- quantile(x[,a], probs=p, type=type)	
+		x2 <- quantile(x[,a], probs=1-p, type=type)	
+		y1 <- quantile(x[,b], probs=p, type=type)	
+		y2 <- quantile(x[,b], probs=1-p, type=type)	
+#		x1 <- myquantile(x[,a], p)	
+#		x2 <- myquantile(x[,a], 1-p)	
+#		y1 <- myquantile(x[,b], p)	
+#		y2 <- myquantile(x[,b], 1-p)	
+		polygon(rbind(c(x1,y1), c(x1,y2), c(x2,y2), c(x2,y1), c(x1,y1)), border='blue', lwd=2)
+		points(x[i,a], x[i,b], xlab=colnames(r)[a], ylab=colnames(r)[b], col='green' )
+		points(x[!i,a], x[!i,b], col='red', pch=3)
+	}
+)
+
+setMethod("plot", signature(x='Bioclim', y='numeric'), 
+	function(x, y=1, ...) {
+		plot(sort(x[,y]), ...)
+	}
+)
+
+if (!isGeneric("points")) {
+	setGeneric("points", function(x, ...)
+		standardGeneric("points"))
+}	
+
+setMethod("points", signature(x='Bioclim'), 
+	function(x, y=2, ...) {
+		points(sort(x[,y]), ...)
+	}
+)
