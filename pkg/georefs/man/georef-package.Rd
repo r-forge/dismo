@@ -14,26 +14,20 @@ More about what it does (maybe more than one line)
 
 \details{
 \tabular{ll}{
-Package: \tab georef\cr
+Package: \tab georefs\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2008-10-21\cr
-License: \tab What license is it under?\cr
+Version: \tab 0.1\cr
+Date: \tab 2008-12-18\cr
+License: \tab GPL (>=3)\cr
 LazyLoad: \tab yes\cr
 }
 
 }
 \author{
-Who wrote it
-
-Maintainer: Who to complain to <yourfault@somewhere.net>
+Robert J. Hijmans and Jacob van Etten
 }
-\references{
 
-}
+
 \keyword{ package }
 \keyword{ spatial }
 
-\examples{
-
-}
