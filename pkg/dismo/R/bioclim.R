@@ -35,7 +35,7 @@ setMethod('bioclim', signature(x='matrix', p='missing'),
 
 setMethod('bioclim', signature(x='data.frame', p='missing'), 
 	function(x, p, ...) {
-		bioclim(as.matrix(x), p)
+		bioclim(as.matrix(x))
 	}
 )
 

@@ -32,6 +32,10 @@ setClass('ConfusionMatrix',
 
 
 confusion <- function(x, t) {
+	x <- na.omit(x)
+	if (length(x[,1]) == 0) {
+		return(  new('ConfusionMatrix') )
+	}
 	p <- subset(x, x[,1] == 1)[,2]
 	np <- length(p)
 	n <- subset(x, x[,1] == 0)[,2]
