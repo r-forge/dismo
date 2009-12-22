@@ -61,17 +61,18 @@ setMethod('domain', signature(x='Raster', p='Spatial'),
 )
 
 
-.domdist <- function(x, y) {
-	r <- x@range
-	d <- apply(data.frame(y), 1, FUN=function(z)(abs(x-z)/r))
-	d <- min(apply(d, 1, mean))
-	d[which(d > 1)] <- 1
-	1-d
-}
-
 
 setMethod('predict', signature(object='Domain'), 
 function(object, x, ext=NULL, filename='', progress='', ...) {
+
+	domdist <- function(xx, ii, y) {
+		r <- xx@range[i]
+		xx <- xx[,i]
+		d <- apply(data.frame(y), 1, FUN=function(z)(abs(xx-z)/r))
+		d <- apply(d, 2, mean)
+		d[which(d > 1)] <- 1
+		1-d
+	}
 		
 	if (! (extends(class(x), 'Raster')) ) {
 		if (! all(colnames(object) %in% colnames(x)) ) {
@@ -81,9 +82,9 @@ function(object, x, ext=NULL, filename='', progress='', ...) {
 		dom <- matrix(ncol=length(colnames(object)), nrow=nrow(x))
 		ln <- colnames(object)
 		for (i in 1:ncol(dom)) {
-			dom[,i] <- .domdist(object[,ln[i]], x[,ln[i]])
+			dom[,i] <- domdist(object, ln[i], x[,ln[i]])
 		}
-		return ( 1 - apply(dom, 1, max) )
+		return ( apply(dom, 1, min ) )
 
 	} else {
 
@@ -109,8 +110,9 @@ function(object, x, ext=NULL, filename='', progress='', ...) {
 		for (r in 1:nrow(out)) {
 			vals <- getValues(x, r)
 			for (i in 1:ncol(dom)) {
-				dom[,i] <- .domdist(object[,ln[i]], vals[,ln[i]])
+				dom[,i] <- .domdist(object, ln[i], vals[,ln[i]])
 			}
+			dom <- apply(dom, 1, min)
 			if (inmem) {
 				v[,r] <- dom
 			} else {

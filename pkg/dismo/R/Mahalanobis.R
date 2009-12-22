@@ -24,13 +24,27 @@ if (!isGeneric("mahal")) {
 setMethod('mahal', signature(x='Raster', p='matrix'), 
 	function(x, p, ...) {
 		m <- xyValues(x, p)
-		new('Mahalanobis', as.matrix(m))
+		new('Mahalanobis', m)
 	}
 )
+
+setMethod('mahal', signature(x='Raster', p='data.frame'), 
+	function(x, p, ...) {
+		m <- xyValues(x, p)
+		new('Mahalanobis', m)
+	}
+)
+
 
 setMethod('mahal', signature(x='matrix', p='missing'), 
 	function(x, p, ...) {
 		new('Mahalanobis', x)
+	}
+)
+
+setMethod('mahal', signature(x='data.frame', p='missing'), 
+	function(x, p, ...) {
+		mahal(as.matrix(x))
 	}
 )
 
