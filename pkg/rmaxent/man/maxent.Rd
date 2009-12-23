@@ -18,20 +18,17 @@ that in the 'java' folder of this package. That is folder \code{system.file("jav
 \item{output}{Character. Ouput folder}
 }
 
-
 \details{
 This function runs the maxent model by Steven Phillips and colleagues (see references below). You can download the model and documentation here: \url{http://www.cs.princeton.edu/~schapire/maxent/}
 
-The samples data.frame must consists of at least 3 columns: species, longitude (x), and latitude (y)
+The samples data.frame must consists of at least 3 columns: species, longitude (x), and latitude (y). Alternatively provide a valid maxent samples file.
 }
 
 \value{
-none. Run for the side effect of files on disk
+None. Run for the side effect of files on disk
 }
 
-
 \author{Steven Phillips and Robert J. Hijmans}
-
 
 \references{
 
@@ -43,15 +40,14 @@ Steven J. Phillips, Robert P. Anderson, Robert E. Schapire, 2006. Maximum entrop
 }
 
 \examples{
-pfile <- paste(system.file(package="rmaxent"), "/samples/bradypus.csv", sep='')
-samp <- read.table(pfile, header=TRUE, sep=',')
-
+pfile <- system.file("/samples/bradypus.csv", package="rmaxent")
 input <- paste(system.file(package="rmaxent"), "/layers", sep='')
-maxent(samp, input)
-# or run:  maxent(pfile, input) 
 
-library(raster)
-r <- raster("bradypus_variegatus.asc")
+samp <- read.table(pfile, header=TRUE, sep=',')
+maxent(samp, input)
+# or:  maxent(pfile, input) 
+
+library(raster)r <- raster("bradypus_variegatus.asc", native=TRUE)
 plot(r)
 points(samp[,2:3])
 }
