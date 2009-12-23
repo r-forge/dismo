@@ -44,7 +44,7 @@ to visually explore the environmental distribution of sets of points in the cont
 
 
 \value{
-A RasterLayer or (if \code{x} is a matrix), a vector.
+An object of class 'Bioclim'
 }
 
 
@@ -59,10 +59,33 @@ Novel methods improve prediction of species' distributions from occurrence data.
 Hijmans R.J., and C.H. Graham, 2006. Testing the ability of climate envelope models to predict the effect of climate change on species distributions. Global change biology 12: 2272-2281. \url{http://dx.doi.org/10.1111/j.1365-2486.2006.01256.x}
 }
 
+
+
 \author{
 Robert J. Hijmans
 }
 
+\seealso{
+\code{\link[dismo]{predict}}, \code{\link[dismo]{domain}}, \code{\link[dismo]{mahal}}
+}
+
+
+\examples{
+logo <- stack(system.file("pictures/Rlogo.jpg", package="rgdal"), bands=-1)
+#presence data
+pts <- matrix(c(48.243420, 48.243420, 47.985820, 52.880230, 49.531423, 46.182616, 54.168232, 69.624263, 83.792291, 85.337894, 74.261072, 83.792291, 95.126713, 84.565092, 66.275456, 41.803408, 25.832176, 3.936132, 18.876962, 17.331359,7.048974, 13.648543, 26.093446, 28.544714, 39.104026, 44.572240, 51.171810, 56.262906, 46.269272, 38.161230, 30.618865, 21.945145, 34.390047, 59.656971, 69.839163, 73.233228, 63.239594, 45.892154, 43.252326, 28.356155), ncol=2)
+bc <- bioclim(logo, pts)
+
+#or
+v <- xyValues(logo, pts)
+bc <- bioclim(v)
+
+#or
+sp <- SpatialPoints(pts)
+bc <- bioclim(logo, pts)
+
+
+}
 
 \keyword{spatial}
 

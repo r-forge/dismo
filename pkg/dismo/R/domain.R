@@ -110,7 +110,7 @@ function(object, x, ext=NULL, filename='', progress='', ...) {
 		for (r in 1:nrow(out)) {
 			vals <- getValues(x, r)
 			for (i in 1:ncol(dom)) {
-				dom[,i] <- .domdist(object, ln[i], vals[,ln[i]])
+				dom[,i] <- domdist(object, ln[i], vals[,ln[i]])
 			}
 			dom <- apply(dom, 1, min)
 			if (inmem) {
