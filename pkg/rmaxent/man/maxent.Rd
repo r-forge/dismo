@@ -53,7 +53,6 @@ library(raster)
 r <- raster("bradypus_variegatus.asc")
 plot(r)
 points(samp[,2:3])
-
 	
 }
 
