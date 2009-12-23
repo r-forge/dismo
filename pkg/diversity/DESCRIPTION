@@ -7,6 +7,6 @@ Depends: methods, raster
 Suggests: RODBC, rgdal
 Author: Robert Hijmans
 Maintainer: <r.hijmans@gmail.com>
-Description: Biodiversity and niche modeling functions
+Description: A few biodiversity functions
 License: GPL (>=3)
 LazyLoad: yes
