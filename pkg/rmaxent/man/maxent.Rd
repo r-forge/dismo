@@ -47,7 +47,8 @@ samp <- read.table(pfile, header=TRUE, sep=',')
 maxent(samp, input)
 # or:  maxent(pfile, input) 
 
-library(raster)r <- raster("bradypus_variegatus.asc", native=TRUE)
+library(raster)
+r <- raster("bradypus_variegatus.asc", native=TRUE)
 plot(r)
 points(samp[,2:3])
 }
