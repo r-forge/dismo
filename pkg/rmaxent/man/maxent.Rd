@@ -4,7 +4,8 @@
 \title{MaxEnt}
 
 \description{
-  R link to MaxEnt species distribution model
+R link to MaxEnt species distribution model. You need to first donwload 'maxent.jar' from http://www.cs.princeton.edu/~schapire/maxent/ and put 
+that in the 'java' folder of this package. That is folder \code{system.file("java", package="rmaxent")}. Note that this program can not be redistributed or use for comercial purposes.
 }
 
 \usage{
@@ -36,14 +37,14 @@ none. Run for the side effect of files on disk
 
 \url{http://www.cs.princeton.edu/~schapire/maxent/}
 
-Steven J. Phillips, Miroslav Dudik, Robert E. Schapire.  A maximum entropy approach to species distribution modeling. In Proceedings of the Twenty-First International Conference on Machine Learning, pages 655-662, 2004.
+Steven J. Phillips, Miroslav Dudik, Robert E. Schapire, 2004.  A maximum entropy approach to species distribution modeling. Proceedings of the Twenty-First International Conference on Machine Learning. p. 655-662.
 
-Steven J. Phillips, Robert P. Anderson, Robert E. Schapire. Maximum entropy modeling of species geographic distributions. Ecological Modelling, 190:231-259, 2006. 
+Steven J. Phillips, Robert P. Anderson, Robert E. Schapire, 2006. Maximum entropy modeling of species geographic distributions. Ecological Modelling 190:231-259. 
 }
 
 \examples{
 pfile <- paste(system.file(package="rmaxent"), "/samples/bradypus.csv", sep='')
-samp <- read.table(samp, header=TRUE, sep=',')
+samp <- read.table(pfile, header=TRUE, sep=',')
 
 input <- paste(system.file(package="rmaxent"), "/layers", sep='')
 maxent(samp, input)
@@ -53,8 +54,6 @@ library(raster)
 r <- raster("bradypus_variegatus.asc")
 plot(r)
 points(samp[,2:3])
-	
 }
-
 
 \keyword{spatial}
