@@ -1,7 +1,7 @@
 \name{bioclim}
 
 \alias{bioclim}
-\alias{bioclim,Raster,Spatial-method}
+\alias{bioclim,Raster,SpatialPoints-method}
 \alias{bioclim,Raster,matrix-method}
 \alias{bioclim,Raster,data.frame-method}
 \alias{bioclim,matrix,missing-method}

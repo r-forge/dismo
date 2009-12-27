@@ -53,7 +53,7 @@ setMethod('domain', signature(x='matrix', p='missing'),
 	}
 )
 
-setMethod('domain', signature(x='Raster', p='Spatial'), 
+setMethod('domain', signature(x='Raster', p='SpatialPoints'), 
 	function(x, p, ...) {
 		m <- xyValues(x, p)
 		domain(m)
