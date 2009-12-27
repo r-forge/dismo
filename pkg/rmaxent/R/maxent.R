@@ -70,18 +70,37 @@ setMethod('maxent', signature(x='Raster', p='matrix'),
 #extract values for points from stack
 		colnames(p) <- c('x', 'y')
 		pv <- data.frame(pa=1, species='species')
-		pv <- cbind(pv, p, xyValues(x, p))
+		pv1 <- cbind(pv, p, xyValues(x, p))
+		
+		pv <- na.omit(pv1)
+		nas <- length(as.vector(attr(pv, "na.action")))
+		if (nas > 0) {
+			if (nas >= 0.5 * nrow(pv1)) {
+				stop('more than half of the presence points have NA predictor values')
+			} else {
+				warning(100*nas/nrow(pv1), '% of the presence points have NA predictor values')
+			}
+		} 
+		
 # random absence
 		if (ncell(x) < 100000) {
 			a <- 1:ncell(x)
 		} else {
-			a <- cbind(runif(100000)*(xmax(x)-xmin(x))+xmin(x), runif(100000)*(ymax(x)-ymin(x))+ymin(x))
-			a <- unique(cellFromXY(x, a))
+			a <- unique(round(runif(100000)*ncell(x)))
+			#a <- cbind(runif(100000)*(xmax(x)-xmin(x))+xmin(x), runif(100000)*(ymax(x)-ymin(x))+ymin(x))
+			#a <- unique(cellFromXY(x, a))
 		}
 		v <- na.omit(cbind(a, cellValues(x, a)))
+		if (nrow(v) < 25) {
+			stop('absence points generation failed (number of points < 25)')
+		}
+		if (nrow(v) < 250) {
+			warning('very low number of valid absence points:', nrow(v))
+		}
 		if (nrow(v) > 10000) {
 			v <- sample(v, 10000)
 		} 
+		
 		xy <- xyFromCell(x, v[,1])
 		av <- data.frame(pa=0, species='background', xy, v[,-1])
 		maxent(rbind(pv, av), ...)
@@ -120,7 +139,9 @@ setMethod('maxent', signature(x='data.frame', p='missing'),
 		me@variables <- colnames(x)[-(1:4)]
 		me@presence <- as.matrix(pv[,-(1:3)])
 		me@absence <- as.matrix(av[,-(1:3)])
-		unlink(dir, recursive = T)
+#		file.remove(list.files(path=dirout, full.names=TRUE))
+#		file.remove(list.files(path=out, full.names=TRUE))
+		unlink(dir, recursive = TRUE)
 		me
 	}
 )
@@ -139,31 +160,46 @@ setMethod('predict', signature(object='MaxEnt'),
 		lambdas <- paste(dir, basename(tempfile()), sep='')
 		write.table(object@lambdas, file=lambdas, row.names=FALSE, col.names=FALSE, quote=FALSE)
 		mxe <- .jnew("rmaxent") 
-
+		filename <- trim(filename)
 		if (inherits(x, "Raster")) {
 			out <- raster(x)
+			filename <- trim(filename)
+			if (!canProcessInMemory(out, 3) & filename == '') {
+				filename <- rasterTmpFile()
+			}
 			vars <- layerNames(x)
-			v <- matrix(ncol=nrow(out), nrow=ncol(out))
+				# check with model object?
+				
+			if (filename == '') {
+				v <- matrix(ncol=nrow(out), nrow=ncol(out))
+			}
 			pb <- pbCreate(nrow(out), type=progress)
+			cv <- rep(NA, times=ncol(out))
 			for (r in 1:nrow(out)) {
 				rowvals <- getValues(x, r) 
 				rowv <- na.omit(rowvals)
+				res <- cv
 				if (length(rowv) > 0) {
 					p <- .jcall(mxe, "[D", "predict", lambdas, vars, .jarray(rowv)) 
 					naind <- as.vector(attr(rowv, "na.action"))
 					if (!is.null(naind)) {
-						v[-naind,r] <- p
+						res[-naind] <- p
 					} else {
-						v[,r] <- p
+						res <- p
 					}
 				}
 				if (filename != '') {
-							
+					out <- setValues(out, res, r)
+					out <- writeRaster(out, filename=filename, ...)
+				} else {
+					v[,r] <- res
 				}
 				pbStep(pb, r) 
 			} 
 			pbClose(pb)
-			out <- setValues(out, as.vector(v))
+			if (filename  == '') {
+				out <- setValues(out, as.vector(v))
+			}
 		} else {
 			if (inherits(x, "Spatial")) {
 				x <- as.data.frame(x)
