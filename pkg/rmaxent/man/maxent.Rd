@@ -21,15 +21,18 @@ maxent(x, p, ...)
 }
 
 \arguments{
-\item{x}{data.frame or Character (file name); see Details}
-\item{p}{Character. Folder with predictors}
+\item{x}{Predictors. Raster* object or SpatialGridDataFrame; Or a data.frame, see Details}
+\item{p}{Occurrence data. missing, data.frame, matrix or SpatialPoints* object. If it is a data.frame or matrix it must have two columns with the first being the x-coordinate (or longitude) and the second the y-coordinate (or latitude).}
 \item{...}{Additional arguments. See Details}
 }
 
 \details{
-This function runs the maxent model by Steven Phillips and colleagues (see references below). You can download the model and documentation here: \url{http://www.cs.princeton.edu/~schapire/maxent/}
-
-The samples data.frame must consists of at least 3 columns: species, longitude (x), and latitude (y). Alternatively provide a valid maxent samples file.
+This function runs the maxent model by Steven Phillips and colleagues (see references below). You can download the model and documentation
+ here: \url{http://www.cs.princeton.edu/~schapire/maxent/}
+ 
+if \code{x} is a \code{data.frame} it must consist of > 3 columns. The first column can only have the values 0 (absence) and 1 (presence). 
+The next two colums have the x and y coordinates for the observations (presence and absence). The following columns should have values for the 
+predictor variables at those locations.
 }
 
 \value{
