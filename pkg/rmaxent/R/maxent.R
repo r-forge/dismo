@@ -7,11 +7,15 @@
 setClass('MaxEnt',
 	representation (
 		variables = 'vector',
-		lambdas  = 'vector'
+		lambdas  = 'vector',
+		presence = 'matrix',
+		absence = 'matrix'
 	),	
 	prototype (	
 		variables = as.vector(NA),
-		lambdas = as.vector(NA)
+		lambdas = as.vector(NA),
+		presence = matrix(NA),
+		absence = matrix(NA)
 	),
 	validity = function(object)	{
 		return(TRUE)
@@ -113,8 +117,9 @@ setMethod('maxent', signature(x='data.frame', p='missing'),
 		lambdas <- readLines(flam)
 		me <- new('MaxEnt')
 		me@lambdas <- unlist(lambdas)
-		me@variables <- colnames(x)
-	
+		me@variables <- colnames(x)[-(1:4)]
+		me@presence <- as.matrix(pv[,-(1:3)])
+		me@absence <- as.matrix(av[,-(1:3)])
 		unlink(dir, recursive = T)
 		me
 	}
