@@ -1,6 +1,6 @@
 \name{mahal}
 \alias{mahal}
-\alias{mahal,Raster,Spatial-method}
+\alias{mahal,Raster,SpatialPoints-method}
 \alias{mahal,Raster,matrix-method}
 \alias{mahal,Raster,data.frame-method}
 \alias{mahal,matrix,missing-method}

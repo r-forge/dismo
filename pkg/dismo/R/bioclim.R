@@ -53,12 +53,28 @@ setMethod('bioclim', signature(x='Raster', p='data.frame'),
 	}
 )
 
-setMethod('bioclim', signature(x='Raster', p='Spatial'), 
+setMethod('bioclim', signature(x='Raster', p='SpatialPoints'), 
 	function(x, p, ...) {
 		m <- xyValues(x, coordinates(p))
 		bioclim(m)
 	}
 )
+
+setMethod('bioclim', signature(x='SpatialGridDataFrame', p='SpatialPoints'), 
+	function(x, p, ...) {
+		x <- brick(x)
+		p <- coordinates(p)
+		bioclim(x, p)
+	}
+)
+
+setMethod('bioclim', signature(x='SpatialGridDataFrame', p='matrix'), 
+	function(x, p, ...) {
+		x <- brick(x)
+		bioclim(x, p)
+	}
+)
+
 
 setMethod('predict', signature(object='Bioclim'), 
 function(object, x, ext=NULL, filename='', progress='', test=TRUE, ...) {

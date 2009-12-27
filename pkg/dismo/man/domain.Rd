@@ -1,6 +1,6 @@
 \name{domain}
 \alias{domain}
-\alias{domain,Raster,Spatial-method}
+\alias{domain,Raster,SpatialPoints-method}
 \alias{domain,Raster,matrix-method}
 \alias{domain,Raster,data.frame-method}
 \alias{domain,matrix,missing-method}

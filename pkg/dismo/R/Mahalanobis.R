@@ -48,7 +48,7 @@ setMethod('mahal', signature(x='data.frame', p='missing'),
 	}
 )
 
-setMethod('mahal', signature(x='Raster', p='Spatial'), 
+setMethod('mahal', signature(x='Raster', p='SpatialPoints'), 
 	function(x, p, ...) {
 		mahal(x, coordinates(p), ...)
 	}
