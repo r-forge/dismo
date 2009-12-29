@@ -5,8 +5,9 @@
 # Licence GPL v3
 
 setClass('Mahalanobis',
-	contains = 'matrix',
+	contains = 'DistModel',
 	representation (
+		cov = 'matrix' 
 	),	
 	prototype (	
 	),
@@ -21,24 +22,12 @@ if (!isGeneric("mahal")) {
 		standardGeneric("mahal"))
 }	
 
-setMethod('mahal', signature(x='Raster', p='matrix'), 
-	function(x, p, ...) {
-		m <- xyValues(x, p)
-		new('Mahalanobis', m)
-	}
-)
-
-setMethod('mahal', signature(x='Raster', p='data.frame'), 
-	function(x, p, ...) {
-		m <- xyValues(x, p)
-		new('Mahalanobis', m)
-	}
-)
-
-
 setMethod('mahal', signature(x='matrix', p='missing'), 
 	function(x, p, ...) {
-		new('Mahalanobis', x)
+		m <- new('Mahalanobis')
+		m@presence <- x
+		m@cov <- var(x)
+		m
 	}
 )
 
@@ -48,26 +37,43 @@ setMethod('mahal', signature(x='data.frame', p='missing'),
 	}
 )
 
+setMethod('mahal', signature(x='Raster', p='matrix'), 
+	function(x, p, ...) {
+		m <- xyValues(x, p)
+		mahal(m)
+	}
+)
+
+setMethod('mahal', signature(x='Raster', p='data.frame'), 
+	function(x, p, ...) {
+		m <- xyValues(x, p)
+		mahal(m)
+	}
+)
+
 setMethod('mahal', signature(x='Raster', p='SpatialPoints'), 
 	function(x, p, ...) {
-		mahal(x, coordinates(p), ...)
+		m <- xyValues(x, p)
+		mahal(m)
 	}
 )
 
 
 setMethod('predict', signature(object='Mahalanobis'), 
-function(object, x, ext=NULL, filename='', progress='', ...) {
+function(object, x, ext=NULL, filename='', progress='text', ...) {
 
 	if (! (extends(class(x), 'Raster')) ) {
-		if (! all(colnames(object) %in% colnames(x)) ) {
-			stop('missing variables in x ')
+		if (! all(colnames(object@presence) %in% colnames(x)) ) {
+			stop('missing variables in matrix ')
 		}
-		x <- x[ , colnames(object),drop=FALSE]
-		S <- var(object)
-		mah <- 1 - apply(data.frame(x), 1, FUN=function(z) min( mahalanobis(object, z, S)))
+		x <- x[ , colnames(object@presence),drop=FALSE]
+		mah <- 1 - apply(data.frame(x), 1, FUN=function(z) min( mahalanobis(object@presence, z, object@cov)))
 		return(mah)
 		
 	} else {
+		if (! all(colnames(object@presence) %in% layerNames(x)) ) {
+			stop('missing variables in Raster object ')
+		}
 	
 		out <- raster(x)
 		if (canProcessInMemory(out, 2)) {
@@ -81,14 +87,12 @@ function(object, x, ext=NULL, filename='', progress='', ...) {
 			}
 		}
 
-		object <- as.matrix(object)
-		S <- var(object)
-		cn <- colnames(object)
+		cn <- colnames(object@presence)
 		pb <- pbCreate(nrow(out), type=progress)
 		for (r in 1:nrow(out)) {
 			vals <- getValues(x, r)
 			vals <- vals[,cn,drop=FALSE]
-			mah <- 1 - apply(data.frame(vals), 1, FUN=function(z) min( mahalanobis(object, z, S)))
+			mah <- 1 - apply(data.frame(vals), 1, FUN=function(z) min( mahalanobis(object@presence, z, object@cov)))
 			if (inmem) {
 				v[,r] <- mah
 			} else {

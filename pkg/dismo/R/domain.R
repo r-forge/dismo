@@ -5,8 +5,9 @@
 # Licence GPL v3
 
 
+
 setClass('Domain',
-	contains = 'matrix',
+	contains = 'DistModel',
 	representation (
 		range='vector'
 	),	
@@ -46,7 +47,8 @@ setMethod('domain', signature(x='data.frame', p='missing'),
 
 setMethod('domain', signature(x='matrix', p='missing'), 
 	function(x, p, ...) {
-		d <- new('Domain', x)
+		d <- new('Domain')
+		d@presence <- x
 		r <- apply(x, 2, FUN=function(x){range(x, na.rm=TRUE)})
 		d@range <-  abs(r[2,] - r[1,])
 		d
@@ -63,11 +65,11 @@ setMethod('domain', signature(x='Raster', p='SpatialPoints'),
 
 
 setMethod('predict', signature(object='Domain'), 
-function(object, x, ext=NULL, filename='', progress='', ...) {
+function(object, x, ext=NULL, filename='', progress='text', ...) {
 
 	domdist <- function(xx, ii, y) {
-		r <- xx@range[i]
-		xx <- xx[,i]
+		r <- xx@range[ii]
+		xx <- xx@presence[,ii]
 		d <- apply(data.frame(y), 1, FUN=function(z)(abs(xx-z)/r))
 		d <- apply(d, 2, mean)
 		d[which(d > 1)] <- 1
@@ -75,20 +77,20 @@ function(object, x, ext=NULL, filename='', progress='', ...) {
 	}
 		
 	if (! (extends(class(x), 'Raster')) ) {
-		if (! all(colnames(object) %in% colnames(x)) ) {
+		if (! all(colnames(object@presence) %in% colnames(x)) ) {
 			stop('missing variables in x ')
 		}
 		
-		dom <- matrix(ncol=length(colnames(object)), nrow=nrow(x))
-		ln <- colnames(object)
+		dom <- matrix(ncol=length(colnames(object@presence)), nrow=nrow(x))
+		ln <- colnames(object@presence)
 		for (i in 1:ncol(dom)) {
-			dom[,i] <- domdist(object, ln[i], x[,ln[i]])
+			dom[,i] <- domdist(object@presence, ln[i], x[,ln[i]])
 		}
 		return ( apply(dom, 1, min ) )
 
 	} else {
 
-		if (! all(colnames(object) %in% layerNames(x)) ) {
+		if (! all(colnames(object@presence) %in% layerNames(x)) ) {
 			stop('missing variables in Raster object')
 		}
 		
@@ -104,7 +106,7 @@ function(object, x, ext=NULL, filename='', progress='', ...) {
 			}
 		}
 
-		ln <- colnames(object)
+		ln <- colnames(object@presence)
 		dom <- matrix(ncol=nlayers(x), nrow=ncol(x))
 		pb <- pbCreate(nrow(out), type=progress)
 		for (r in 1:nrow(out)) {
@@ -112,11 +114,11 @@ function(object, x, ext=NULL, filename='', progress='', ...) {
 			for (i in 1:ncol(dom)) {
 				dom[,i] <- domdist(object, ln[i], vals[,ln[i]])
 			}
-			dom <- apply(dom, 1, min)
+			ddom <- apply(dom, 1, min)
 			if (inmem) {
-				v[,r] <- dom
+				v[,r] <- ddom
 			} else {
-				out <- setValues(out, dom)
+				out <- setValues(out, ddom)
 				out <- writeRaster(out, filename, ...)
 			}
 			pbStep(pb, r) 

@@ -5,7 +5,7 @@
 # Licence GPL v3
 
 setClass('Bioclim',
-	contains = 'matrix',
+	contains = 'DistModel',
 	representation (
 		min='vector',
 		max='vector'
@@ -26,9 +26,10 @@ if (!isGeneric("bioclim")) {
 
 setMethod('bioclim', signature(x='matrix', p='missing'), 
 	function(x, p, ...) {
-		bc <- new('Bioclim', x)
-		bc@min <- apply(bc, 2, min)
-		bc@max <- apply(bc, 2, max)
+		bc <- new('Bioclim')
+		bc@presence <- x
+		bc@min <- apply(x, 2, min)
+		bc@max <- apply(x, 2, max)
 		bc
 	}
 )
@@ -77,7 +78,7 @@ setMethod('bioclim', signature(x='SpatialGridDataFrame', p='matrix'),
 
 
 setMethod('predict', signature(object='Bioclim'), 
-function(object, x, ext=NULL, filename='', progress='', test=TRUE, ...) {
+function(object, x, ext=NULL, filename='', progress='text', test=TRUE, ...) {
 
 	percRank <- function(x, y) {
 		x <- sort(as.vector(na.omit(x)))
@@ -92,18 +93,18 @@ function(object, x, ext=NULL, filename='', progress='', test=TRUE, ...) {
 
 
 	if (! (extends(class(x), 'Raster')) ) {
-		if (! all(colnames(object) %in% colnames(x)) ) {
+		if (! all(colnames(object@presence) %in% colnames(x)) ) {
 			stop('missing variables in x ')
 		}
-		ln <- colnames(object)
+		ln <- colnames(object@presence)
 		bc <- matrix(ncol=length(ln), nrow=nrow(x))
 		for (i in 1:ncol(bc)) {
-			bc[,i] <- percRank(object[,ln[i]], x[,ln[i]])
+			bc[,i] <- percRank(object@presence[,ln[i]], x[,ln[i]])
 		}
 		return( apply(bc, 1, min) )
 
 	} else {
-		if (! all(colnames(object) %in% layerNames(x)) ) {
+		if (! all(colnames(object@presence) %in% layerNames(x)) ) {
 			stop('missing variables in Raster object')
 		}
 		
@@ -119,7 +120,7 @@ function(object, x, ext=NULL, filename='', progress='', test=TRUE, ...) {
 			}
 		}
 
-		ln <- colnames(object)
+		ln <- colnames(object@presence)
 		pb <- pbCreate(nrow(out), type=progress)
 		
 	if (test) {
@@ -133,7 +134,7 @@ function(object, x, ext=NULL, filename='', progress='', test=TRUE, ...) {
 			i <- (apply(t(vals) >= object@min, 2, all) & apply(t(vals) <= object@max, 2, all))
 			i[is.na(i)] <- FALSE
 			for (j in 1:length(ln)) {
-				bc[i,j] <- percRank( object[ ,ln[j]], vals[i, ln[j]] )
+				bc[i,j] <- percRank( object@presence[ ,ln[j]], vals[i, ln[j]] )
 			}
 			if (inmem) {
 				v[,r] <- apply(bc, 1, min)
@@ -149,7 +150,7 @@ function(object, x, ext=NULL, filename='', progress='', test=TRUE, ...) {
 			bc <- matrix(ncol=nlayers(x), nrow=ncol(x))
 			vals <- getValues(x, r, names=TRUE)
 			for (i in 1:length(ln)) {
-				bc[,i] <- percRank(object[,ln[i]], vals[,ln[i]])
+				bc[,i] <- percRank(object@presence[,ln[i]], vals[,ln[i]])
 			}
 			if (inmem) {
 				v[,r] <- apply(bc, 1, min)
@@ -178,6 +179,8 @@ function(object, x, ext=NULL, filename='', progress='', test=TRUE, ...) {
 
 setMethod("plot", signature(x='Bioclim', y='missing'), 
 	function(x, a=1, b=2, p=0.9, ...) {
+		
+		x <- x@presence
 	
 		myquantile <- function(x, p) {
 			p <- min(1, max(0, p))
@@ -214,6 +217,7 @@ setMethod("plot", signature(x='Bioclim', y='missing'),
 
 setMethod("plot", signature(x='Bioclim', y='numeric'), 
 	function(x, y=1, ...) {
+		x <- x@presence
 		plot(sort(x[,y]), ...)
 	}
 )
@@ -225,6 +229,7 @@ if (!isGeneric("points")) {
 
 setMethod("points", signature(x='Bioclim'), 
 	function(x, y=2, ...) {
+		x <- x@presence
 		points(sort(x[,y]), ...)
 	}
 )

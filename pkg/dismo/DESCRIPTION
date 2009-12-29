@@ -1,8 +1,8 @@
 Package: dismo
 Type: Package
 Title: Spatial prediction
-Version: 0.0.1
-Date: 14-December-2009
+Version: 0.0.2
+Date: 29-December-2009
 Depends: methods, raster
 Suggests: ROCR, rgdal
 Author: Robert Hijmans

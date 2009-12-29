@@ -26,6 +26,7 @@ pointValues(stack, p, a, uniquecells = TRUE, na.rm = TRUE)
 
 
 \value{
+matrix
 }
 
 

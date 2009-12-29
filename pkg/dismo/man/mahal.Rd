@@ -22,10 +22,7 @@ mahal(x, p, ...)
 \arguments{
   \item{x}{ Raster* object or matrix}
   \item{p}{ two column matrix or SpatialPoints* object}
-  \item{...}{ Additional arguments }
-}
-
-\details{
+  \item{...}{ Additional arguments. Currently not used }
 }
 
 
