@@ -68,6 +68,8 @@ setMethod('maxent', signature(x='SpatialGridDataFrame', p='data.frame'),
 setMethod('maxent', signature(x='Raster', p='matrix'), 
 	function(x, p, ...) {
 #extract values for points from stack
+		if (dim(p)[2] != 2) { stop('p should have 2 columns' ) 	}
+		
 		colnames(p) <- c('x', 'y')
 		pv <- data.frame(pa=1, species='species')
 		pv1 <- cbind(pv, p, xyValues(x, p))

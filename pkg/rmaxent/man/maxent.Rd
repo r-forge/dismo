@@ -11,7 +11,8 @@
 \title{MaxEnt}
 
 \description{
-R link to MaxEnt species distribution model. You need to first donwload 'maxent.jar' from http://www.cs.princeton.edu/~schapire/maxent/ and put 
+R link to the Maximum Entropy (maxent) species distribution model by Steven Phillips and colleagues (see references below). 
+You need to first donwload 'maxent.jar' from http://www.cs.princeton.edu/~schapire/maxent/ and put 
 that in the 'java' folder of this package. That is folder returned by \code{system.file("java", package="rmaxent")}. 
 Please note that this program can not be redistributed or used for comercial purposes.
 }
@@ -27,16 +28,13 @@ maxent(x, p, ...)
 }
 
 \details{
-This function runs the maxent model by Steven Phillips and colleagues (see references below). You can download the model and documentation
- here: \url{http://www.cs.princeton.edu/~schapire/maxent/}
- 
 if \code{x} is a \code{data.frame} it must consist of > 3 columns. The first column can only have the values 0 (absence) and 1 (presence). 
 The next two colums have the x and y coordinates for the observations (presence and absence). The following columns should have values for the 
 predictor variables at those locations.
 }
 
 \value{
-None. Run for the side effect of files on disk
+A RasterLayer object. Sometimes with the side effect of a file on disk.
 }
 
 \author{Steven Phillips and Robert J. Hijmans}
