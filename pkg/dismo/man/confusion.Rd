@@ -6,7 +6,7 @@ Model testing
 }
 
 \description{
-.. description ...
+Compute AUC and other statistics.
 }
 
 \usage{

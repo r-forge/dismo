@@ -2,7 +2,11 @@
 
 \docType{methods}
 
-\alias{plot,ConfusionMatrix','ANY'-method}
+\alias{plot,ConfusionMatrix,ANY-method}
+\alias{plot,Bioclim,missing-method}
+\alias{plot,Bioclim,numeric-method}
+\alias{points,Bioclim-method}
+
 
 \title{
 plot
@@ -21,9 +25,6 @@ plot
 }
 }
 
-
-\value{
-}
 
 \author{
 Robert J. Hijmans

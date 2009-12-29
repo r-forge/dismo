@@ -4,24 +4,6 @@
 # Licence GPL v3
 
 
-setClass('MaxEnt',
-	representation (
-		variables = 'vector',
-		lambdas  = 'vector',
-		presence = 'matrix',
-		absence = 'matrix'
-	),	
-	prototype (	
-		variables = as.vector(NA),
-		lambdas = as.vector(NA),
-		presence = matrix(NA),
-		absence = matrix(NA)
-	),
-	validity = function(object)	{
-		return(TRUE)
-	}
-)
-
 if (!isGeneric("maxent")) {
 	setGeneric("maxent", function(x, p, ...)
 		standardGeneric("maxent"))
@@ -138,88 +120,12 @@ setMethod('maxent', signature(x='data.frame', p='missing'),
 		lambdas <- readLines(flam)
 		me <- new('MaxEnt')
 		me@lambdas <- unlist(lambdas)
-		me@variables <- colnames(x)[-(1:4)]
 		me@presence <- as.matrix(pv[,-(1:3)])
 		me@absence <- as.matrix(av[,-(1:3)])
+		me@hasabsence <- TRUE
 #		file.remove(list.files(path=dirout, full.names=TRUE))
 #		file.remove(list.files(path=out, full.names=TRUE))
 		unlink(dir, recursive = TRUE)
 		me
 	}
 )
-
-
-if (!isGeneric("predict")) {
-	setGeneric("predict", function(object, ...)
-		standardGeneric("predict"))
-}	
-
-
-setMethod('predict', signature(object='MaxEnt'), 
-	function(object, x, ext=NULL, filename='', progress='', ...) {
-		dir <- paste(tempfile(), '/', sep='')
-		dir.create(dir, showWarnings=FALSE, recursive=TRUE)
-		lambdas <- paste(dir, basename(tempfile()), sep='')
-		write.table(object@lambdas, file=lambdas, row.names=FALSE, col.names=FALSE, quote=FALSE)
-		mxe <- .jnew("rmaxent") 
-		filename <- trim(filename)
-		if (inherits(x, "Raster")) {
-			out <- raster(x)
-			filename <- trim(filename)
-			if (!canProcessInMemory(out, 3) & filename == '') {
-				filename <- rasterTmpFile()
-			}
-			vars <- layerNames(x)
-				# check with model object?
-				
-			if (filename == '') {
-				v <- matrix(ncol=nrow(out), nrow=ncol(out))
-			}
-			pb <- pbCreate(nrow(out), type=progress)
-			cv <- rep(NA, times=ncol(out))
-			for (r in 1:nrow(out)) {
-				rowvals <- getValues(x, r) 
-				rowv <- na.omit(rowvals)
-				res <- cv
-				if (length(rowv) > 0) {
-					p <- .jcall(mxe, "[D", "predict", lambdas, vars, .jarray(rowv)) 
-					naind <- as.vector(attr(rowv, "na.action"))
-					if (!is.null(naind)) {
-						res[-naind] <- p
-					} else {
-						res <- p
-					}
-				}
-				if (filename != '') {
-					out <- setValues(out, res, r)
-					out <- writeRaster(out, filename=filename, ...)
-				} else {
-					v[,r] <- res
-				}
-				pbStep(pb, r) 
-			} 
-			pbClose(pb)
-			if (filename  == '') {
-				out <- setValues(out, as.vector(v))
-			}
-		} else {
-			if (inherits(x, "Spatial")) {
-				x <- as.data.frame(x)
-			}
-			rowv <- na.omit(rowvals)
-			out <- rep(NA, times=nrow(rowvals))
-			if (length(rowv) > 0) {
-				p <- .jcall(mxe, "[D", "predict", lambdas, vars, .jarray(rowv)) 
-				naind <- as.vector(attr(rowv, "na.action"))
-				if (!is.null(naind)) {
-					out[-naind] <- p
-				} else {
-					out <- p
-				}
-			} 
-		}
-		unlink(dir, recursive = T)
-		out
-	}
-)
-

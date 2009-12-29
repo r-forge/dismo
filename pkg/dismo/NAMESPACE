@@ -1,3 +1,4 @@
-importFrom("graphics", "plot", "points")
-importFrom("stats", "predict")
+importFrom("graphics", plot, points, pairs)
+importFrom("stats", predict, density)
 exportPattern("^[^\\.]")
+

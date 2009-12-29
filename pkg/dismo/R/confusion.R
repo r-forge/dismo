@@ -92,17 +92,6 @@ setMethod("plot", signature(x='ConfusionMatrix', y='ANY'),
 )
 
 
-.badauc <- function(x) {
-	y <- rev(x[,2])
-	x <- rev(x[,3])
-	y1 <- y[-length(y)]
-	y2 <- y[-1]
-	dy <- y2 - y1
-	dx <- x[-1] - x[-length(x)]
-	dxy <- dx * (y1 + 0.5 * dy)
-	sum(dxy)
-}
-
 .kappa <- function(x) {
 	PrA <- x[,2] + x[,5]
 	a <- sum(x[,2:3])/sum(x[,2:5])
