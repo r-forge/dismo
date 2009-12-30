@@ -5,7 +5,7 @@ Version: 0.0.2
 Date: 29-December-2009
 Depends: R (>= 2.7.0), rJava (>= 0.5-0), methods, raster, sp
 Suggests: ROCR, rgdal
-Author: Robert Hijmans
+Author: Robert Hijmans and Steven Phillips
 Maintainer: <r.hijmans@gmail.com>
 Description: Spatial modeling functions
 License: GPL (>=3)
