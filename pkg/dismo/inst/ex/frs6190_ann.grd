@@ -1,0 +1,28 @@
+[general] 
+creator=R package 'raster' 
+created= 2009-12-26 23:30:14 
+[georeference] 
+nrows= 160 
+ncols= 122 
+xmin= -94.8 
+ymin= -56.45 
+xmax= -33.8 
+ymax= 23.55 
+xres= 0.5 
+yres= 0.5 
+projection= NA 
+[data] 
+datatype= INT2S 
+byteorder= little 
+nbands= 1 
+bandorder= BIL 
+minvalue= 0 
+maxvalue= 219 
+nodatavalue= -32768 
+[legend] 
+legendtype=  
+values=  
+color=  
+[description] 
+layername= frs6190_ann 
+history=  
