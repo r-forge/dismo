@@ -68,8 +68,8 @@ plot(r)
 points(presence)
 
 # a real species:
-predictors <- stack(list.files(path=paste(system.file(package="rmaxent"), '/layers', sep=''), pattern='grd', full.names=TRUE ))
-occurence <- paste(system.file(package="rmaxent"), '/samples/bradypus.csv', sep='')
+predictors <- stack(list.files(path=paste(system.file(package="rmaxent"), '/ex', sep=''), pattern='grd', full.names=TRUE ))
+occurence <- paste(system.file(package="rmaxent"), '/ex/bradypus.csv', sep='')
 occ <- read.table(occurence, header=TRUE, sep=',')[,-1]
 me2 <- maxent(predictors, occ)
 # predict to entire dataset
