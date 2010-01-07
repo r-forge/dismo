@@ -140,7 +140,7 @@ setMethod('maxent', signature(x='Raster', p='matrix'),
 setMethod('maxent', signature(x='data.frame', p='missing'), 
 	function(x, ...) {
 
-		jar <- paste(system.file(package="rmaxent"), "/java/maxent.jar", sep='')
+		jar <- paste(system.file(package="dismo"), "/java/maxent.jar", sep='')
 		if (!file.exists(jar)) {
 			stop('file missing:', jar, '.\nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
 		}
