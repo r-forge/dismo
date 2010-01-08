@@ -146,7 +146,7 @@ setMethod('maxent', signature(x='data.frame', p='missing'),
 		}
 		
 		d <- .meTmpDir()
-		dirout <- paste(d, 'out/', sep='')
+		dirout <- paste(d, '/out', sep='')
 		if (! file.exists(dirout)) {
 			dir.create(dirout, showWarnings=TRUE )
 		}
@@ -163,7 +163,8 @@ setMethod('maxent', signature(x='data.frame', p='missing'),
 	
 		add <- NULL  # to replace with additional arguments supplied with ...
 		.jcall(mxe, "V", "fit", c("autorun", "-e", afn, "-o", dirout, "-s", pfn, add)) 
-		flam <- paste(dirout, 'species.lambdas', sep='')
+		
+		flam <- paste(dirout, '/species.lambdas', sep='')
 		lambdas <- readLines(flam)
 		me <- new('MaxEnt')
 		me@lambdas <- unlist(lambdas)
@@ -176,13 +177,6 @@ setMethod('maxent', signature(x='data.frame', p='missing'),
 		me
 	}
 )
-
-
-
-# Author: Robert J. Hijmans, r.hijmans@gmail.com
-# Date: December 2009
-# Version 0.1
-# Licence GPL v3
 
 
 if (!isGeneric("predict")) {
@@ -255,15 +249,16 @@ setMethod('predict', signature(object='MaxEnt'),
 				}
 			} 
 		}
-		file.remove(lambdas)
+#		try( file.remove(lambdas), silent=TRUE )
 		out
 	}
 )
 
 
 .meTmpDir <- function() {
-	return( paste(dirname(tempdir()), '/R_maxent_tmp/', sep="") )
+	return( paste(dirname(tempdir()), '/R_maxent_tmp', sep="") )
 }
+
 
 .maxentTmpFile <- function()  {
 	d <- .meTmpDir()
@@ -271,9 +266,10 @@ setMethod('predict', signature(object='MaxEnt'),
 		dir.create(d, showWarnings=TRUE )
 	}
 	f <- paste(round(runif(10)*10), collapse="")
-	d <- paste(d, 'maxent_', f, '.csv', sep="")
+	d <- paste(d, '/maxent_', f, '.csv', sep="")
 	return(d)
 }
+
 
 .maxentRemoveTmpFiles <- function() {
 	d <- .meTmpDir()
