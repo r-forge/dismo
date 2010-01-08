@@ -144,12 +144,14 @@ setMethod('maxent', signature(x='data.frame', p='missing'),
 		if (!file.exists(jar)) {
 			stop('file missing:', jar, '.\nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
 		}
-		dir <- paste(tempfile(), '/', sep='')
-		dirout <- paste(dir, 'out/', sep='')
-		dir.create(dir, showWarnings=FALSE, recursive=TRUE)
-		dir.create(dirout, showWarnings=FALSE, recursive=TRUE)
-		pfn <- paste(dir, basename(tempfile()), '.csv', sep='')
-		afn <- paste(dir, basename(tempfile()), '.csv', sep='')
+		
+		d <- .meTmpDir()
+		dirout <- paste(d, 'out/', sep='')
+		if (! file.exists(dirout)) {
+			dir.create(dirout, showWarnings=TRUE )
+		}
+		pfn <- .maxentTmpFile()
+		afn <- .maxentTmpFile()
 
 		pv <- x[x$pa == 1, ][,-1]
 		av <- x[x$pa == 0, ][,-1]
@@ -170,7 +172,7 @@ setMethod('maxent', signature(x='data.frame', p='missing'),
 		me@hasabsence <- TRUE
 #		file.remove(list.files(path=dirout, full.names=TRUE))
 #		file.remove(list.files(path=out, full.names=TRUE))
-		unlink(dir, recursive = TRUE)
+		unlink(paste(d, "/*", sep=""), recursive = TRUE)
 		me
 	}
 )
@@ -191,10 +193,11 @@ if (!isGeneric("predict")) {
 
 setMethod('predict', signature(object='MaxEnt'), 
 	function(object, x, ext=NULL, filename='', progress='text', ...) {
-		dir <- paste(tempfile(), '/', sep='')
-		dir.create(dir, showWarnings=FALSE, recursive=TRUE)
-		lambdas <- paste(dir, basename(tempfile()), sep='')
+
+		lambdas <- .maxentTmpFile()
+		
 		write.table(object@lambdas, file=lambdas, row.names=FALSE, col.names=FALSE, quote=FALSE)
+		
 		mxe <- .jnew("rmaxent") 
 		filename <- trim(filename)
 		if (inherits(x, "Raster")) {
@@ -252,9 +255,29 @@ setMethod('predict', signature(object='MaxEnt'),
 				}
 			} 
 		}
-		unlink(dir, recursive = T)
+		file.remove(lambdas)
 		out
 	}
 )
 
 
+.meTmpDir <- function() {
+	return( paste(dirname(tempdir()), '/R_maxent_tmp/', sep="") )
+}
+
+.maxentTmpFile <- function()  {
+	d <- .meTmpDir()
+	if (!file.exists(d)) {
+		dir.create(d, showWarnings=TRUE )
+	}
+	f <- paste(round(runif(10)*10), collapse="")
+	d <- paste(d, 'maxent_', f, '.csv', sep="")
+	return(d)
+}
+
+.maxentRemoveTmpFiles <- function() {
+	d <- .meTmpDir()
+	if (file.exists(d)) {
+		unlink(paste(d, "/*", sep=""), recursive = TRUE)
+	}
+}
