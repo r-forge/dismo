@@ -1,6 +1,0 @@
-import("rJava")
-importFrom("stats", predict)
-importFrom("sp", SpatialPoints, SpatialGridDataFrame)
-importClasses("raster", Raster)
-exportPattern("^[^\\.]")
-
