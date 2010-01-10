@@ -44,7 +44,7 @@ d <- domain(logo, pts)
 }
 
 \seealso{
-\code{\link[dismo]{predict}}, \code{\link[dismo]{bioclim}}, \code{\link[dismo]{mahal}}
+\code{\link[dismo]{predict}, \link[dismo]{maxent}, \link[dismo]{bioclim}, \link[dismo]{mahal}}
 }
 
 \references{

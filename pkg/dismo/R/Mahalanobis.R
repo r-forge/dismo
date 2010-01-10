@@ -76,6 +76,19 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 		}
 	
 		out <- raster(x)
+
+		if (!is.null(ext)) {
+			ext <- intersectExtent(extent(ext), extent(x))
+			out <- crop(out, ext)
+			firstrow <- rowFromY(x, yFromRow(out, 1))
+			firstcol <- colFromX(x, xFromCol(out, 1))
+			ncols <- colFromX(x, xFromCol(out, ncol(out))) - firstcol + 1
+		} else {
+			firstrow <- 1
+			firstcol <- 1
+			ncols <- ncol(x)
+		}
+
 		if (canProcessInMemory(out, 2)) {
 			inmem <- TRUE
 			v <- matrix(NA, ncol=nrow(out), nrow=ncol(out))
@@ -90,7 +103,10 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 		cn <- colnames(object@presence)
 		pb <- pbCreate(nrow(out), type=progress)
 		for (r in 1:nrow(out)) {
-			vals <- getValues(x, r)
+
+			rr <- firstrow + r - 1
+			vals <- getValuesBlock(x, rr, 1, firstcol, ncols)
+
 			vals <- vals[,cn,drop=FALSE]
 			mah <- 1 - apply(data.frame(vals), 1, FUN=function(z) min( mahalanobis(object@presence, z, object@cov)))
 			if (inmem) {

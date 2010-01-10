@@ -68,7 +68,7 @@ Robert J. Hijmans
 }
 
 \seealso{
-\code{\link[dismo]{predict}}, \code{\link[dismo]{domain}}, \code{\link[dismo]{mahal}}
+\code{\link[dismo]{predict}, \link[dismo]{maxent}, \link[dismo]{domain}, \link[dismo]{mahal}}
 }
 
 

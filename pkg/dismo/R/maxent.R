@@ -25,10 +25,10 @@ setMethod ('show' , 'MaxEnt',
 		cat('\n')
 		pp <- nrow(object@presence)
 		cat('\npresence points:', pp, '\n')
-		if (pp < 25) {
+		if (pp < 10) {
 			print(object@presence)
 		} else {
-			print(object@presence[1:25,])
+			print(object@presence[1:10,])
 			cat('\n')
 			cat('  (... ...  ...)\n')
 			cat('\n')
@@ -196,6 +196,18 @@ setMethod('predict', signature(object='MaxEnt'),
 		filename <- trim(filename)
 		if (inherits(x, "Raster")) {
 			out <- raster(x)
+			if (!is.null(ext)) {
+				ext <- intersectExtent(extent(ext), extent(x))
+				out <- crop(out, ext)
+				firstrow <- rowFromY(x, yFromRow(out, 1))
+				firstcol <- colFromX(x, xFromCol(out, 1))
+				ncols <- colFromX(x, xFromCol(out, ncol(out))) - firstcol + 1
+			} else {
+				firstrow <- 1
+				firstcol <- 1
+				ncols <- ncol(x)
+			}
+			
 			filename <- trim(filename)
 			if (!canProcessInMemory(out, 3) & filename == '') {
 				filename <- rasterTmpFile()
@@ -209,7 +221,8 @@ setMethod('predict', signature(object='MaxEnt'),
 			pb <- pbCreate(nrow(out), type=progress)
 			cv <- rep(NA, times=ncol(out))
 			for (r in 1:nrow(out)) {
-				rowvals <- getValues(x, r) 
+				rr <- firstrow + r - 1
+				rowvals <- getValuesBlock(x, rr, 1, firstcol, ncols)
 				rowv <- na.omit(rowvals)
 				res <- cv
 				if (length(rowv) > 0) {
