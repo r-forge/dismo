@@ -1,5 +1,7 @@
 \name{maxent}
+
 \alias{maxent}
+
 \alias{maxent,data.frame,missing-method}
 \alias{maxent,Raster,matrix-method}
 \alias{maxent,Raster,data.frame-method}
@@ -11,8 +13,10 @@
 \title{MaxEnt}
 
 \description{
-R link to the Maximum Entropy (maxent) species distribution model by Steven Phillips and colleagues (see references below). 
-You need to first donwload 'maxent.jar' from http://www.cs.princeton.edu/~schapire/maxent/ and put 
+NOTE: This function will work after the next release of maxent. This currently does not work!
+
+R link to the Maximum Entropy (maxent) species distribution model (see references below). 
+First download 'maxent.jar' from \url{http://www.cs.princeton.edu/~schapire/maxent/} and put 
 that in the 'java' folder of this package. That is folder returned by \code{system.file("java", package="rmaxent")}. 
 Please note that this program can not be redistributed or used for comercial purposes.
 }
@@ -36,6 +40,11 @@ predictor variables at those locations.
 \value{
 A RasterLayer object. Sometimes with the side effect of a file on disk.
 }
+
+\seealso{
+\code{\link[dismo]{predict}}
+}
+
 
 \author{Steven Phillips and Robert J. Hijmans}
 

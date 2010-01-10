@@ -31,6 +31,25 @@ setClass('ConfusionMatrix',
 )
 
 
+testModel <- function(model, p, a, x=NULL) {
+	if (!is.null(x)) {
+		p <- predict(model, xyValues(x, p))
+		a <- predict(model, xyValues(x, a))
+	} else if (is.matrix(p) & is.matrix(a)) {
+			if (ncol(p) >= ncol(model@presence) & nrow(p) >= nrow(model@presence) ) {
+			p <- predict(model, p)
+			a <- predict(model, a)
+		} else if (is.vector(p) & is.vector(a)) {
+			# do nothing
+		} else {
+			stop('I do not undertand these data')
+		}
+	}
+	pa <- rbind(cbind(0,a), cbind(1,p))
+	return(confusion(pa, t=1))	
+}
+
+
 confusion <- function(x, t) {
 	x <- na.omit(x)
 	if (length(x[,1]) == 0) {

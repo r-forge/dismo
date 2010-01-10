@@ -77,8 +77,13 @@ setMethod('bioclim', signature(x='SpatialGridDataFrame', p='matrix'),
 )
 
 
+if (!isGeneric("predict")) {
+	setGeneric("predict", function(object, ...)
+		standardGeneric("predict"))
+}	
+
 setMethod('predict', signature(object='Bioclim'), 
-function(object, x, ext=NULL, filename='', progress='text', test=TRUE, ...) {
+function(object, x, ext=NULL, filename='', progress='text', ...) {
 
 	percRank <- function(x, y) {
 		x <- sort(as.vector(na.omit(x)))
@@ -104,11 +109,23 @@ function(object, x, ext=NULL, filename='', progress='text', test=TRUE, ...) {
 		return( apply(bc, 1, min) )
 
 	} else {
+		out <- raster(x)
+		if (!is.null(ext)) {
+			ext <- intersectExtent(extent(ext), extent(x))
+			out <- crop(out, ext)
+			firstrow <- rowFromY(x, yFromRow(out, 1))
+			firstcol <- colFromX(x, xFromCol(out, 1))
+			ncols <- colFromX(x, xFromCol(out, ncol(out))) - firstcol + 1
+		} else {
+			firstrow <- 1
+			firstcol <- 1
+			ncols <- ncol(x)
+		}
+		
 		if (! all(colnames(object@presence) %in% layerNames(x)) ) {
 			stop('missing variables in Raster object')
 		}
 		
-		out <- raster(x)
 		if (canProcessInMemory(out, 2)) {
 			inmem=TRUE
 			v <- matrix(NA, ncol=nrow(out), nrow=ncol(out))
@@ -123,12 +140,12 @@ function(object, x, ext=NULL, filename='', progress='text', test=TRUE, ...) {
 		ln <- colnames(object@presence)
 		pb <- pbCreate(nrow(out), type=progress)
 		
-	if (test) {
-		nc <- ncol(out)
-		bbc <- matrix(0, ncol=nlayers(x), nrow=ncol(x))
+		bbc <- matrix(0, ncol=nlayers(x), nrow=ncols)
+	#	for (r in 1:nrow(out)) {
 		for (r in 1:nrow(out)) {
+			rr <- firstrow + r - 1
 			bc <- bbc
-			vals <- getValues(x, r, names=TRUE)
+			vals <- getValuesBlock(x, rr, 1, firstcol, ncols)
 			na <- as.vector(attr(na.omit(vals), 'na.action'))
 			bc[na] <- NA
 			i <- (apply(t(vals) >= object@min, 2, all) & apply(t(vals) <= object@max, 2, all))
@@ -145,23 +162,19 @@ function(object, x, ext=NULL, filename='', progress='text', test=TRUE, ...) {
 			pbStep(pb, r) 
 		} 
 
-	} else {
-		for (r in 1:nrow(out)) {
-			bc <- matrix(ncol=nlayers(x), nrow=ncol(x))
-			vals <- getValues(x, r, names=TRUE)
-			for (i in 1:length(ln)) {
-				bc[,i] <- percRank(object@presence[,ln[i]], vals[,ln[i]])
-			}
-			if (inmem) {
-				v[,r] <- apply(bc, 1, min)
-			} else {
-				out <- setValues(out, apply(bc, 1, min))
-				out <- writeRaster(out, filename, ...)
-			}
-			pbStep(pb, r) 
-		} 
-		
-	}
+#		for (r in 1:nrow(out)) {
+#			bc <- matrix(ncol=nlayers(x), nrow=ncol(x))
+#			vals <- getValues(x, r)
+#			for (i in 1:length(ln)) {
+#				bc[,i] <- percRank(object@presence[,ln[i]], vals[,ln[i]])
+#			}
+###			} else {
+#				out <- setValues(out, apply(bc, 1, min))
+#				out <- writeRaster(out, filename, ...)
+#			}
+#			pbStep(pb, r) 
+#		} 
+#	}
 	
 		if (inmem) {
 			out <- setValues(out, as.vector(v))
@@ -180,7 +193,7 @@ function(object, x, ext=NULL, filename='', progress='text', test=TRUE, ...) {
 setMethod("plot", signature(x='Bioclim', y='missing'), 
 	function(x, a=1, b=2, p=0.9, ...) {
 		
-		x <- x@presence
+		d <- x@presence
 	
 		myquantile <- function(x, p) {
 			p <- min(1, max(0, p))
@@ -197,39 +210,20 @@ setMethod("plot", signature(x='Bioclim', y='missing'),
 		p <- min(1,  max(0, p))
 		if (p > 0.5) p <- 1 - p
 		p <- p / 2
-		prd <- predict(x, x)
+		prd <- predict(x, d)
 		i <- prd > p & prd < (1-p)
-		plot(x[,a], x[,b], xlab=colnames(x)[a], ylab=colnames(x)[b], cex=0)
+		plot(d[,a], d[,b], xlab=colnames(d)[a], ylab=colnames(d)[b], cex=0)
 		type=6
-		x1 <- quantile(x[,a], probs=p, type=type)	
-		x2 <- quantile(x[,a], probs=1-p, type=type)	
-		y1 <- quantile(x[,b], probs=p, type=type)	
-		y2 <- quantile(x[,b], probs=1-p, type=type)	
+		x1 <- quantile(d[,a], probs=p, type=type)	
+		x2 <- quantile(d[,a], probs=1-p, type=type)	
+		y1 <- quantile(d[,b], probs=p, type=type)	
+		y2 <- quantile(d[,b], probs=1-p, type=type)	
 #		x1 <- myquantile(x[,a], p)	
 #		x2 <- myquantile(x[,a], 1-p)	
 #		y1 <- myquantile(x[,b], p)	
 #		y2 <- myquantile(x[,b], 1-p)	
 		polygon(rbind(c(x1,y1), c(x1,y2), c(x2,y2), c(x2,y1), c(x1,y1)), border='blue', lwd=2)
-		points(x[i,a], x[i,b], xlab=colnames(r)[a], ylab=colnames(r)[b], col='green' )
-		points(x[!i,a], x[!i,b], col='red', pch=3)
-	}
-)
-
-setMethod("plot", signature(x='Bioclim', y='numeric'), 
-	function(x, y=1, ...) {
-		x <- x@presence
-		plot(sort(x[,y]), ...)
-	}
-)
-
-if (!isGeneric("points")) {
-	setGeneric("points", function(x, ...)
-		standardGeneric("points"))
-}	
-
-setMethod("points", signature(x='Bioclim'), 
-	function(x, y=2, ...) {
-		x <- x@presence
-		points(sort(x[,y]), ...)
+		points(d[i,a], d[i,b], xlab=colnames(x)[a], ylab=colnames(x)[b], col='green' )
+		points(d[!i,a], d[!i,b], col='red', pch=3)
 	}
 )

@@ -95,6 +95,19 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 		}
 		
 		out <- raster(x)
+		
+		if (!is.null(ext)) {
+			ext <- intersectExtent(exent(ext), extent(x))
+			out <- crop(out, ext)
+			firstrow <- rowFromY(x, yFromRow(out, 1))
+			firstcol <- colFromX(x, xFromCol(out, 1))
+			ncols <- colFromX(x, xFromCol(out, ncol(out))) - firstcol + 1
+		} else {
+			firstrow <- 1
+			firstcol <- 1
+			ncols <- ncol(x)
+		}
+		
 		if (canProcessInMemory(out, 2)) {
 			inmem=TRUE
 			v <- matrix(NA, ncol=nrow(out), nrow=ncol(out))
@@ -107,10 +120,13 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 		}
 
 		ln <- colnames(object@presence)
-		dom <- matrix(ncol=nlayers(x), nrow=ncol(x))
+		dom <- matrix(ncol=nlayers(x), nrow=ncols)
 		pb <- pbCreate(nrow(out), type=progress)
 		for (r in 1:nrow(out)) {
-			vals <- getValues(x, r)
+
+			rr <- firstrow + r - 1
+			vals <- getValuesBlock(x, rr, 1, firstcol, ncols)
+
 			for (i in 1:ncol(dom)) {
 				dom[,i] <- domdist(object, ln[i], vals[,ln[i]])
 			}
