@@ -262,7 +262,7 @@ setMethod('predict', signature(object='MaxEnt'),
 				}
 			} 
 		}
-#		try( file.remove(lambdas), silent=TRUE )
+		try( file.remove(lambdas), silent=TRUE )
 		out
 	}
 )
