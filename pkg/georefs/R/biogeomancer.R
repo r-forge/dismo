@@ -5,27 +5,53 @@
 # October 2008
 
 
+biogeomancer <- function(country='', adm1='', adm2='', locality='', singleRecord=TRUE, progress='text') {
 
-biogeomancer <- function(country='', adm1='', adm2='', locality='', singleRecord=TRUE) {
-	theurl <- paste("http://bg.berkeley.edu:8080/ws/single?cy=", country, "&sp=", adm1, "&co=", adm2, "&locality=", locality, sep='')
-	doc <- xmlInternalTreeParse(theurl)
+	d <- data.frame(country, adm1, adm2, locality)
+	d[is.na(d)] <- ''
+	pb <- pbCreate(dim(d)[1], type=progress)
+
+	for (r in 1:dim(d)[1]) {
+		theurl <- paste("http://bg.berkeley.edu:8080/ws/single?cy=", d$country[r], "&sp=", d$adm1[r], "&co=", d$adm2[r], "&locality=", d$locality[r], sep='')
+		
+		try( doc <- xmlInternalTreeParse(theurl) )
+		if (class(doc)[1] == 'try-error') {
+			ans <- data.frame(lon=NA, lat=NA, coordUncertaintyM=NA)
+		} else {
 # to do: improved parsing:	
-	nodes <- getNodeSet(doc, "//georeference")
-	if(length(nodes) == 0)   return(data.frame())
-
-	varNames <- c("DecimalLongitude", "DecimalLatitude", "GeodeticDatum", "CoordinateUncertaintyInMeters")
-	dims <- c(length(nodes), length(varNames)) 
+			nodes <- getNodeSet(doc, "//georeference")
+			if(length(nodes) == 0) {
+				ans <- data.frame(lon=NA, lat=NA, coordUncertaintyM=NA)
+			} else {
+				varNames <- c("DecimalLongitude", "DecimalLatitude", "GeodeticDatum", "CoordinateUncertaintyInMeters")
+				dims <- c(length(nodes), length(varNames)) 
    # create an empty data frame with as many rows and columns as needed.
-	ans <- as.data.frame(replicate(dims[2], rep(as.character(NA), dims[1]), simplify = FALSE), stringsAsFactors = FALSE)
-	names(ans) <- varNames
+				ans <- as.data.frame(replicate(dims[2], rep(as.character(NA), dims[1]), simplify = FALSE), stringsAsFactors = FALSE)
+				names(ans) <- varNames
     # Fill in the rows based on the names.
-	for(i in seq(length = dims[1])) 
-			ans[i, varNames] = xmlSApply(nodes[[i]], xmlValue)[varNames]
-	
-	ans <- ans[,-3]
-	names(ans) <- c("lon", "lat", "coordUncertaintyM")
-	if (singleRecord) {
-		ans <- ans[which.min(ans[,"coordUncertaintyM"]),][1,]
-	}
-	ans
+				for(i in seq(length = dims[1])) { 
+					ans[i, varNames] = xmlSApply(nodes[[i]], xmlValue)[varNames]
+				}
+				ans <- ans[,-3]
+				names(ans) <- c("lon", "lat", "coordUncertaintyM")
+				if (singleRecord) {
+					ans <- ans[which.min(ans[,"coordUncertaintyM"]),][1,]
+				}
+			}
+		}
+		if (r == 1) {
+			res <- cbind(id=r, ans)
+		} else {
+			res <- rbind(res, cbind(id=r, ans))
+		}
+		pbStep(pb, r) 
+	} 
+	pbClose(pb)
+	res$lon = as.numeric(res$lon)
+	res$lat = as.numeric(res$lat)
+	res$coordUncertaintyM = as.numeric(res$coordUncertaintyM)
+	res
 }
+
+# biogeomancer(country='United States', adm1='California', adm2='Yolo', locality=c('Davis', 'Woodland'))
+
