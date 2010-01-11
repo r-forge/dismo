@@ -75,8 +75,8 @@ gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE, downlo
 		zz <- gbifxmlToDataFrame(aurl)
 
 		#s <- readLines(aurl, warn=FALSE)
-        #test <- try(zz <- gbifxmlToDataFrame(s), silent=TRUE)
-		#if (class(test) == 'try-error') {
+        #try(zz <- gbifxmlToDataFrame(s), silent=TRUE)
+		#if (class(zz) == 'try-error') {
 		#	s <- sub("\002", "", s)
 		#	zz <- gbifxmlToDataFrame(s)
 		#}
@@ -98,18 +98,10 @@ gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE, downlo
 	z[,'lat'] <- as.numeric(z[,'lat'])
 	
 	if (removeZeros) {
+		i <- isTRUE(z[,'lon']== 0 & z[,'lat']==0)
 		if (geo) {
-			z <- subset(z, z[,'lon'] != 0 & z[,'lat'] !=0 )
+			z <- z[!i,]
 		} else {
-			i <- z[,'lon']== 0 | z[,'lat']==0
-			z[i,'lat'] <- NA 
-			z[i,'lon'] <- NA 
-		}
-	} else {
-		if (geo) {
-			z <- subset(z, !(z[,'lon'] == 0 & z[,'lat'] == 0) )
-		} else {
-			i <- z[,'lon']== 0 & z[,'lat']==0
 			z[i,'lat'] <- NA 
 			z[i,'lon'] <- NA 
 		}
@@ -151,5 +143,6 @@ gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE, downlo
 }
 
 #sa <- gbif('solanum')
+#sa <- gbif('solanum', '*')
 #sa <- gbif('solanum', 'tuberosum')
 
