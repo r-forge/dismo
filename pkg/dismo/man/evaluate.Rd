@@ -1,5 +1,5 @@
-\name{confusion}
-\alias{confusion}
+\name{evaluate}
+\alias{evaluate}
 
 \title{
 Model testing
@@ -10,12 +10,15 @@ Compute AUC and other statistics.
 }
 
 \usage{
-confusion(x, t)
+evaluate(model, p, a, x, tr)
 }
  
 \arguments{
+  \item{model}{}
+  \item{p}{}
+  \item{a}{}
   \item{x}{}
-  \item{t}{}
+  \item{tr}{}
 }
 
 
