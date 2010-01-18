@@ -13,18 +13,19 @@ setClass('ModelEvaluation',
 		pauc = 'numeric',
 		cor = 'numeric',
 		pcor = 'numeric',
+		t = 'vector',
 		confusion = 'matrix',
 		prevalence = 'vector',
-		overallDiagnosticPower = 'vector',
-		correctClassificationRate = 'vector',
-		sensitivity = 'vector',
-		specificity = 'vector',
-		falsePositiveRate ='vector',
-		falseNegativeRate ='vector',
+		ODP = 'vector', # overall diagnostic power
+		CCR = 'vector', # correct classification rate
+		TPR = 'vector', # sensitivity, or true poistive rate
+		TNR = 'vector', # specificity, or true negative rate
+		FPR ='vector', # False positive rate
+		FNR ='vector', # False negative rate
 		PPP = 'vector',
 		NPP = 'vector',
-		misclassificationRate = 'vector',
-		oddsRatio = 'vector',
+		MCR = 'vector', # misclassification rate
+		OR = 'vector', # odds ratio
 		kappa = 'vector'
 	),	
 	prototype (	
@@ -35,6 +36,32 @@ setClass('ModelEvaluation',
 		return(TRUE)
 	}
 )
+
+
+evaluateROCR <- function(model, p, a, x) {
+	require(ROCR)
+	if (!missing(x)) {
+		p <- predict(model, xyValues(x, p))
+		a <- predict(model, xyValues(x, a))
+	} else if (is.matrix(p) & is.matrix(a)) {
+			if (ncol(p) >= ncol(model@presence) & nrow(p) >= nrow(model@presence) ) {
+			p <- predict(model, p)
+			a <- predict(model, a)
+		} else if (is.vector(p) & is.vector(a)) {
+			# do nothing
+		} else {
+			stop('I do not undertand these data')
+		}
+	}
+	p <- na.omit(p)
+	a <- na.omit(a)
+	if (length(p) < 1) { stop('no valid presence (p) values') }
+	if (length(a) < 1) { stop('no valid absence (a) values') }
+	predictions = c(p, a)
+	labels = c( rep(1, length(p)), rep(0, length(a)) )
+	pred <- prediction( predictions, labels)
+	return(pred)
+}
 
 
 evaluate <- function(model, p, a, x=NULL, tr) {
@@ -71,43 +98,43 @@ evaluate <- function(model, p, a, x=NULL, tr) {
 	mv <- wilcox.test(p, a)
 	xc@pauc <- mv$p.value
 	xc@auc <- as.vector(mv$statistic) / (na * np)
-	cr <- cor.test(a, p)
+	cr <- cor.test(c(p,a), 	c(rep(1, length(p)), rep(0, length(a))) )
 	xc@cor <- cr$estimate
 	xc@pcor <- cr$p.value
 	
-	res <- matrix(ncol=5, nrow=length(tr))
-	colnames(res) <- c('x', 'tp', 'fp', 'fn', 'tn')
-	res[,1] <- tr
+	res <- matrix(ncol=4, nrow=length(tr))
+	colnames(res) <- c('tp', 'fp', 'fn', 'tn')
+	xc@t <- tr
 	for (i in 1:length(tr)) {
-		res[i,2] <- length(p[p>=tr[i]]) / np  # a
-		res[i,3] <- length(p[p<tr[i]]) / np   # b
-		res[i,4] <- length(a[a>=tr[i]]) / na  # c
-		res[i,5] <- length(a[a<tr[i]]) / na   # d
+		res[i,1] <- length(p[p>=tr[i]])  # a  true positives
+		res[i,2] <- length(a[a>=tr[i]])  # b  false positives
+		res[i,3] <- length(p[p<tr[i]])    # c  false negatives
+		res[i,4] <- length(a[a<tr[i]])    # d  true negatives
 	}
 	xc@confusion = res
-	a = res[,2]
-	b = res[,3]
-	c = res[,4]
-	d = res[,5]
+	a = res[,1]
+	b = res[,2]
+	c = res[,3]
+	d = res[,4]
 # after Fielding and Bell	
 	xc@np <- as.integer(np)
 	xc@na <- as.integer(na)
 	xc@prevalence = a + c / N
-	xc@overallDiagnosticPower = b + d / N
-	xc@correctClassificationRate = a + d / N
-	xc@sensitivity = a / (a + c)
-	xc@specificity = d / (b + d)
-	xc@falsePositiveRate = b / (b + d)
-	xc@falseNegativeRate = c/(a + c)
+	xc@ODP = b + d / N
+	xc@CCR = a + d / N
+	xc@TPR = a / (a + c)
+	xc@TNR = d / (b + d)
+	xc@FPR = b / (b + d)
+	xc@FNR = c/(a + c)
 	xc@PPP = a/(a + b)
 	xc@NPP = d/(c + d)
-	xc@misclassificationRate = (b + c)/N
-	xc@oddsRatio = (a*d)/(c*b)
+	xc@MCR = (b + c)/N
+	xc@OR = (a*d)/(c*b)
 
 	kappa <- function(x) {
-		PrA <- x[,2] + x[,5]
-		a <- sum(x[,2:3])/sum(x[,2:5])
-		b <- (x[,2] + x[,4])/sum(x[,2:5])
+		PrA <- x[,1] + x[,4]
+		a <- sum(x[,1:2])/sum(x[,1:4])
+		b <- (x[,1] + x[,3])/sum(x[,1:4])
 		ra <- a * b
 		rd <- (1-a) * (1-b)
 		PrE <- ra + rd
@@ -152,23 +179,37 @@ if (!isGeneric("plot")) {
 }	
 
 
-setMethod("plot", signature(x='ModelEvaluation', y='ANY'), 
-	function(x, y, xlab='1-specificity',ylab='sensitivty', col='red', ...) {
-		plot(1-e@specificity, e@sensitivity, xlim=c(0,1), ylim=c(0,1), xlab=xlab, ylab=ylab, col=col, ...)
-		lines(1-e@specificity, e@sensitivity, , col=col)
+setMethod("plot", signature(x='ModelEvaluation', y='character'), 
+	function(x, y='ROC', col='red', ...) {
+		if (y == 'ROC') {
+			txt = paste('AUC=', round(e@auc,3))
+			plot(x@FPR, x@TPR, xlim=c(0,1), ylim=c(0,1), xlab='False postive rate', ylab='True positive rate', col=col, main=txt, ...)
+			lines(x@FPR, x@TPR, col=col)
+			lines(rbind(c(0,0), c(1,1)), lwd=2, col='grey')
+		} else if (y == 'kappa') {
+			txt = paste('max kappa at:', round(x@t[which.max(e@kappa)], 2))
+			plot(x@t, x@kappa, xlab='threshold', ylab='kappa', col=col, main=txt, ...)
+			lines(x@t, x@kappa, col=col)
+		} else {
+			stop('unknown value for "y"')
+		}
 	}
 )
 
 
-
 setMethod('density', signature(x='ModelEvaluation'), 
 	function(x, ...) {
-		ab <- density(x@absence)
 		pr <- density(x@presence)
+		ab <- density(x@absence, bw=pr$bw )
 		yl = c(min(ab$y, pr$y), max(ab$y, pr$y))
-		xl = c(min(ab$x, pr$x), max(ab$x, pr$x))
-		plot(ab, main='', ylab='', xlab='', xlim=xl, ylim=yl, lwd=2, lty=2, col='blue', ...)
+		xl = c(min(x@t), max(x@t))
+		plot(ab, main='', ylab=paste('density. Bandwidth=',round(pr$bw,5),paste=''), xlab='predicted value', xlim=xl, ylim=yl, lwd=2, lty=2, col='blue', ...)
 		lines(pr, col='red', lwd=2)
+#		x1 <- xl[1]+(xl[2]-xl[1]) / 3
+#		x2 <- xl[1]+ 2 * (xl[2]-xl[1]) / 3
+#		y = yl[1] + 0.5 * (yl[2] - yl[1])
+#		text(x1,y,'absence',col='blue')
+#		text(x2,y,'presence',col='red')
 	} 
 )
 
