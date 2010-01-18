@@ -8,7 +8,7 @@
 \title{density}
 
 \description{
-density plots
+Create a density plots of presence and absence data
 }
 
 \usage{
@@ -16,12 +16,8 @@ density(x, ...)
 }
 
 \arguments{
-\item{x}{Object of class DistModel or derived from that class (such as 'MaxEnt', 'Bioclim')}
-\item{...}{Additional arguments. See Details}
-}
-
-\details{
-An additional argument \code{v} can be supplied to select a subset of variables. Either by number, e.g. \code{v=1:4}, or by the names of the variables.
+\item{x}{Object of class 'ModelEvaluation' or of a class that inherits from 'DistModel, (such as 'MaxEnt', 'Bioclim')}
+\item{...}{Additional arguments passed to plot}
 }
 
 \value{

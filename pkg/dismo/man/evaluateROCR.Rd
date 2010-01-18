@@ -1,17 +1,17 @@
-\name{evaluate}
+\name{evaluateROCR}
 
-\alias{evaluate}
+\alias{evaluateROCR}
 
 \title{
-Model testing
+Model testing, using the ROCR package
 }
 
 \description{
-Model testing using AUC and other statistics.
+Preparing data for model testing with the ROCR package.
 }
 
 \usage{
-evaluate(model, p, a, x, tr)
+evaluate(model, p, a, x)
 }
  
 \arguments{
@@ -28,13 +28,11 @@ evaluate(model, p, a, x, tr)
 
 			Or, a matrix with values to compute predictions for}
 			
-  \item{x}{optional. predictor variables, if present, \code{p} and \code{a} are interpreted as (spatial) points }
-  
-  \item{tr}{optional. a vector of threshold values to use for computing the confusion matrices}
+  \item{x}{optional. predictor variables, if present, \code{p} and \code{a} are considered }
 }
 
 \value{
-An object of class ModelEvaluation
+An object of class "prediction" (define in the ROCR package)
 }
 
 \author{
