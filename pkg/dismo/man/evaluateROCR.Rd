@@ -3,7 +3,7 @@
 \alias{evaluateROCR}
 
 \title{
-Model testing, using the ROCR package
+Model testing with the ROCR package
 }
 
 \description{
@@ -11,7 +11,7 @@ Preparing data for model testing with the ROCR package.
 }
 
 \usage{
-evaluate(model, p, a, x)
+evaluateROCR(model, p, a, x)
 }
  
 \arguments{
