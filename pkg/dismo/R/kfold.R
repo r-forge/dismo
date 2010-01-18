@@ -45,7 +45,7 @@ kfold <- function(x, k=5, by=NULL) {
 		stop('by should be a vector with the same number of records as x')
 	}
 	un <- unique(by)
-	group <- vector(length=length(by))
+	group <- vector(length=obs)
 	for ( u in un ) {
 		i = which(by==u)
 		kk = min(length(i), k)
