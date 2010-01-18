@@ -2,6 +2,7 @@
 
 \alias{density}
 \alias{density,DistModel-method}
+\alias{density,ModelEvaluation-method}
 
 \docType{methods}
 
