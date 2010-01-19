@@ -2,7 +2,6 @@
 
 \docType{methods}
 
-\alias{predict}
 \alias{predict,Bioclim-method}
 \alias{predict,Domain-method}
 \alias{predict,Mahalanobis-method}
@@ -10,32 +9,22 @@
 
 \title{Model predictions}
 
-\usage{
-predict(object, ...) 
-}
-
-\arguments{
-  \item{object}{a RasterStack, RasterBrick or RasterLayer object}
-  \item{...}{Additional arguments. See under Methods}  
-}
-
 \description{
 Make a RasterLayer with a prediction based on a model object. Provide a Raster* object with the independent variables. The layerNames in the Raster* object should include those expected by the model. 
 }
 
 \section{Methods}{
 \describe{
- 
 \code{predict(object, x, ext=NULL, filename='', progress='text', ...)}
   
 \tabular{rll}{  
-  \tab  \code{object}  \tab A fitted model of class Bioclim, Domain, or Mahalanobis\cr
+  \tab  \code{object}  \tab A fitted model of class Bioclim, Domain, MaxEnt, or Mahalanobis (classes that inherit from DistModel)\cr
   \tab  \code{x} \tab A Raster* object \cr
   \tab  \code{ext} \tab An Extent object that can be used to make a prediction for a sub-region of \code{x}. You can also supply an 
   object that can be coerced to an Extent object by \code{\link[raster]{extent}}; such as a Raster* or Spatial* object \cr
   \tab  \code{filename}  \tab Output filename for a new raster; if NA the result is not written to a file but returned with the RasterLayer object, in the data slot \cr
   \tab \code{progress} \tab Character. Valid values are "" (no progress bar), "text", "tcltk", and "windows" (on that platform only) \cr
-  \tab  \code{...}  \tab Additional arguments (see below)\cr
+  \tab  \code{...}  \tab Additional arguments for file writing (see below)\cr
 }
 
 The following additional arguments can be passed, to replace default values, when writing the results to a file

@@ -5,7 +5,7 @@
 # Licence GPL v3
 
 
-randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=3) {
+randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=5) {
 # stub function
 	if (class(mask) != 'RasterLayer') { 
 		mask <- raster(mask, 1)
@@ -14,15 +14,20 @@ randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=3) 
 	if (n > ncell(mask)) {
 		stop('n > ncell(mask)')
 	}
-
+	tryf <- max(tryf, 1)
+	
 	if (class(ext)=='character') {
-		if (! ext%in%c('points', 'raster')) { 
+		if (! ext%in% c('points', 'raster')) { 
 			stop("if ext is a character variable it should be either 'points' or 'raster'") 
 		}
-		if (ext == 'raster') { ext <- extent(mask) 
-		} else if (missing(p)) {  ext <- extent(mask)  }
+		if (ext == 'raster') { 
+			ext <- extent(mask) 
+		} else if (missing(p)) { 
+			ext <- extent(mask)  
+		}
 	} 
-	if (missing(p)) { excludep <- FALSE
+	if (missing(p)) { 
+		excludep <- FALSE
 	} else {
 		if (class(p) == 'SpatialPoints' | class(p) == 'SpatialPointsDataFrame') {
 			p <- coordinates(p)
@@ -38,15 +43,21 @@ randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=3) 
 		ext <- extent(ext)
 		ext <- ext * extf
 		ext <- intersectExtent(ext, extent(mask))
-		mask <- crop(raster(mask), ext)
-	} 
-	cells <- unique(round(runif(n*tryf) * ncell(mask)))
-	xy <- xyFromCell(mask, cells)
-	cells <- cellFromXY(mask, xy)
+		mask2 <- crop(raster(mask), ext)
+	}  else {
+		mask2 <- raster(mask)
+	}
+	
+	
+	nn = n * tryf
+	nn = max(nn, 250)
+	cells <- unique(round(runif(nn) * ncell(mask2)))
 	if (excludep) {	
-		pcells <- cellFromXY(mask, p)
+		pcells <- cellFromXY(mask2, p)
 		cells <- cells[!(cells%in%pcells)] 	
 	}
+	xy <- xyFromCell(mask2, cells)
+	cells <- cellFromXY(mask, xy)
 	vals <- cbind(cells, cellValues(mask, cells))
 	cells <- na.omit(vals)[,1]
 	if (length(cells) >= n) { 

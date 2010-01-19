@@ -80,7 +80,10 @@ evaluate <- function(model, p, a, x=NULL, tr) {
 	}
 
 	if (missing(tr)) {
-		tr = as.vector(quantile(c(p, a), 0:100/100))
+		pr = range(c(0,p,1))
+		pr <- 1:50 * (pr[2]-pr[1])/50
+		ar <- as.vector(quantile(c(p, a), 0:50/50))
+		tr = sort(unique(round(c(pr,ar), 3)))
 	}
 	
 	np <- length(p)
@@ -145,6 +148,7 @@ evaluate <- function(model, p, a, x=NULL, tr) {
 	
 	return(xc)
 }
+
 
 
 
