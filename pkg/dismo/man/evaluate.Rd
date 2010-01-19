@@ -37,5 +37,20 @@ An object of class ModelEvaluation
 Robert J. Hijmans
 }
 
+\examples{
+# p = the predicted value for 50 known cases (locations) with presence of the phenomenon (species)
+p = rnorm(50, mean=0.7, sd=0.3)
+# b = the predicted value for 50 known cases (locations) with absence of the phenomenon (species)
+a = rnorm(50, mean=0.4, sd=0.4)
+e = evaluate(p=p, a=a)
+
+# threshold at maximum kappa
+e@t[which.max(e@kappa)]
+
+# threshold at maximum of the sum of the sensitivity (true positive rate) and specificity (true negative rate)
+e@t[which.max(e@TPR + e@TNR)]
+
+}
+
 \keyword{spatial}
 
