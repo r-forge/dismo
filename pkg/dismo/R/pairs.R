@@ -6,7 +6,7 @@
  
 
 setMethod('pairs', signature(x='DistModel'), 
-	function(x, v=NULL, pa='pa', hist=TRUE, cor=TRUE, ...) {
+	function(x, v=NULL, pa='pa', hist=TRUE, cor=TRUE) {
 	
 		panelhist <- function(x,...)	{
 			usr <- par("usr"); on.exit(par(usr))

@@ -250,8 +250,9 @@ setMethod('predict', signature(object='MaxEnt'),
 			if (inherits(x, "Spatial")) {
 				x <- as.data.frame(x)
 			}
-			rowv <- na.omit(rowvals)
-			out <- rep(NA, times=nrow(rowvals))
+			vars <- colnames(x)
+			rowv <- na.omit(x)
+			out <- rep(NA, times=nrow(x))
 			if (length(rowv) > 0) {
 				p <- .jcall(mxe, "[D", "predict", lambdas, vars, .jarray(rowv)) 
 				naind <- as.vector(attr(rowv, "na.action"))
@@ -262,7 +263,7 @@ setMethod('predict', signature(object='MaxEnt'),
 				}
 			} 
 		}
-		try( file.remove(lambdas), silent=TRUE )
+		#try( file.remove(lambdas), silent=TRUE )
 		out
 	}
 )
