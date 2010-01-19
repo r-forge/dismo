@@ -91,7 +91,6 @@ evaluate <- function(model, p, a, x=NULL, tr) {
 	if (na == 0 | np == 0) {
 		stop('cannot evaluate a model without absence and presence data that are not NA')
 	}
-
 	N <- na + np
 
 	xc <- new('ModelEvaluation')
@@ -134,18 +133,11 @@ evaluate <- function(model, p, a, x=NULL, tr) {
 	xc@MCR = (b + c)/N
 	xc@OR = (a*d)/(c*b)
 
-	kappa <- function(x) {
-		PrA <- x[,1] + x[,4]
-		a <- sum(x[,1:2])/sum(x[,1:4])
-		b <- (x[,1] + x[,3])/sum(x[,1:4])
-		ra <- a * b
-		rd <- (1-a) * (1-b)
-		PrE <- ra + rd
-		k <- (PrA-PrE)/(1-PrE)
-		return(k)
-	}
-	xc@kappa = kappa(res)
-	
+	prA = (a+d)/N
+	prY = (a+b)/N * (a+c)/N
+	prN = (c+d)/N * (b+d)/N
+	prE = prY + prN
+	xc@kappa = (prA - prE) / (1-prE)
 	return(xc)
 }
 
