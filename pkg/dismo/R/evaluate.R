@@ -18,7 +18,7 @@ setClass('ModelEvaluation',
 		prevalence = 'vector',
 		ODP = 'vector', # overall diagnostic power
 		CCR = 'vector', # correct classification rate
-		TPR = 'vector', # sensitivity, or true poistive rate
+		TPR = 'vector', # sensitivity, or true positive rate
 		TNR = 'vector', # specificity, or true negative rate
 		FPR ='vector', # False positive rate
 		FNR ='vector', # False negative rate
