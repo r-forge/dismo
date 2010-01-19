@@ -17,20 +17,16 @@ evaluate(model, p, a, x, tr)
 \arguments{
   \item{model}{any fitted model, including objects inherting from 'DistModel'}
   \item{p}{presence points (x and y coordinates or SpatialPoints* object). 
-  
-           Or, if \code{x} is missing, values at presence points
-		   
-		   Or, a matrix with values to compute predictions for}
+             Or, if \code{x} is missing, values at presence points
+			   Or, a matrix with values to compute predictions for}
 		   
   \item{a}{absence points (x and y coordinates or SpatialPoints* object). 
-			
 			Or, if \code{x} is missing, values at presence points.
-
 			Or, a matrix with values to compute predictions for}
 			
-  \item{x}{optional. predictor variables, if present, \code{p} and \code{a} are interpreted as (spatial) points }
+  \item{x}{Optional. Predictor variables (object of class Raster*). If present, \code{p} and \code{a} are interpreted as (spatial) points }
   
-  \item{tr}{optional. a vector of threshold values to use for computing the confusion matrices}
+  \item{tr}{Optional. a vector of threshold values to use for computing the confusion matrices}
 }
 
 \value{
