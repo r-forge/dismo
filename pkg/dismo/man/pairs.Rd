@@ -5,10 +5,14 @@
 \alias{pairs}
 \alias{pairs,DistModel-method}
 
-
 \title{
-plot pairs of occurence data
+plot pairs
 }
+
+\description{
+Pair plots of presence and absence (background) data.
+}
+
 
 \usage{
 pairs(x, ...)
@@ -16,18 +20,21 @@ pairs(x, ...)
 
 \arguments{
 \item{x}{Object of class DistModel or derived from that class (such as 'MaxEnt', 'Bioclim')}
-\item{...}{Additional arguments. See Details}
+\item{...}{Additional arguments. See Methods}
 }
 
-
-\description{
-.. description ...
-}
 
 
 \section{Methods}{
 \describe{
-	\code{pairs(x, ...)}
+	\code{pairs(x, v=NULL, pa='pa', hist=TRUE, cor=TRUE)}
+
+\tabular{rll}{
+\tab \code{v} \tab a RasterLayer object \cr
+\tab \code{pa} \tab Character. Either 'pa', 'p', or 'a' to show presence and absence, presence, or absence data respectively\cr
+\tab \code{hist} \tab logical. If \code{TRUE} a histogram of the values is shown on the diagonal\cr
+\tab \code{cor} \tab logical. If \code{TRUE} the correlation coefficient is shown in the upper panels \cr
+}		
 }
 }
 
@@ -39,7 +46,6 @@ pairs(x, ...)
 \author{
 Robert J. Hijmans
 }
-
 
 \keyword{spatial}
 
