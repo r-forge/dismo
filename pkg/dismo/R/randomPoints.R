@@ -5,39 +5,35 @@
 # Licence GPL v3
 
 
-randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=5) {
-# stub function
+randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=5, warn=2) {
 	if (class(mask) != 'RasterLayer') { 
 		mask <- raster(mask, 1)
 	}
 	
 	if (n > ncell(mask)) {
-		stop('n > ncell(mask)')
+		n <- ncell(mask)
+		if (warn>0) { warning('changed n to ncell(mask)') }
 	}
 	tryf <- max(tryf, 1)
 	
-	if (class(ext)=='character') {
-		if (! ext%in% c('points', 'raster')) { 
-			stop("if ext is a character variable it should be either 'points' or 'raster'") 
-		}
-		if (ext == 'raster') { 
-			ext <- extent(mask) 
-		} else if (missing(p)) { 
-			ext <- extent(mask)  
-		}
-	} 
 	if (missing(p)) { 
 		excludep <- FALSE
 	} else {
 		if (class(p) == 'SpatialPoints' | class(p) == 'SpatialPointsDataFrame') {
 			p <- coordinates(p)
 		}
-		if ( class(ext)=='character') {
-			if (ext == 'points' ) {
-				ext <- extent(min(p[,1]), max(p[,1]), min(p[,2]), max(p[,2]))
-			}
-		}
 	}
+	
+	if (class(ext)=='character') {
+		if (! ext%in% c('points')) { 
+			stop("if ext is a character variable it should be 'points'") 
+		} else if (missing(p)) { 
+			warning("if p is missing, 'ext=points' is meaningless") 
+			ext <- extent(mask)  
+		} else {
+			ext <- extent(min(p[,1]), max(p[,1]), min(p[,2]), max(p[,2]))
+		}
+	} 
 
 	if (! is.null(ext)) {
 		ext <- extent(ext)
@@ -48,25 +44,37 @@ randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=5) 
 		mask2 <- raster(mask)
 	}
 	
-	
+	if (excludep) {
+		pcells <- cellFromXY(mask2, p)
+	}
+
 	nn = n * tryf
 	nn = max(nn, 250)
-	cells <- unique(round(runif(nn) * ncell(mask2)))
-	if (excludep) {	
-		pcells <- cellFromXY(mask2, p)
-		cells <- cells[!(cells%in%pcells)] 	
+	nn = min(ncell(mask2), nn)
+	
+	if (nn == ncell(mask2)) {
+		cells <- 1:ncell(mask2)
+	} else {
+		cells <- unique(round(runif(nn) * ncell(mask2)))
 	}
 	xy <- xyFromCell(mask2, cells)
 	cells <- cellFromXY(mask, xy)
+	if (excludep) {	
+		cells <- cells[!(cells%in%pcells)] 	
+	}
 	vals <- cbind(cells, cellValues(mask, cells))
 	cells <- na.omit(vals)[,1]
+
 	if (length(cells) >= n) { 
-		cells <- cells[1:n]
+			cells <- cells[1:n]
 	} else {
 		frac <- length(cells) / n
-		if (frac < 0.5) {
+		if (frac < 0.1) {
 			stop("generated absence points = ", frac," times requested number; Use a higher value for tryf" )
-		} else {
+		}
+		if (frac < 0.5  & warn==1) {
+			warning("generated absence points = ", frac," times requested number; Use a higher value for tryf" )
+		} else if (warn > 1) {
 			warning("generated absence points = ", frac," times requested number")
 		}
 	}

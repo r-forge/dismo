@@ -3,7 +3,6 @@
 # Version 0.1
 # Licence GPL v3
 
-
 setClass('MaxEnt',
 	contains = 'DistModel',
 	representation (
@@ -13,7 +12,6 @@ setClass('MaxEnt',
 		lambdas = as.vector(NA)
 	),
 )
-
 
 
 setMethod ('show' , 'MaxEnt', 
@@ -47,6 +45,21 @@ setMethod ('show' , 'MaxEnt',
 )	
 
 
+.getMatrix <- function(x) {
+	if (inherits(x, 'SpatialPoints')) {
+		x <- coordinates(x)
+	} else if (inherits(x, 'matrix')) {
+		x <- data.frame(x)
+	}
+	if (! class(x) == 'data.frame' ) {
+		stop('data should be  a matrix, data.frame, or SpatialPoints* object')
+	}
+	if (dim(x)[2] != 2) {
+		stop('presence or absence coordiantes data should be a matrix or data.frame with 2 columns' ) 	
+	}
+	colnames(x) <- c('x', 'y')
+	return(x)
+} 
 
 
 if (!isGeneric("maxent")) {
@@ -55,52 +68,25 @@ if (!isGeneric("maxent")) {
 }	
 
 
-setMethod('maxent', signature(x='Raster', p='SpatialPoints'), 
-	function(x, p, ...) {
-		p <- coordinates(p)
-		maxent(x, p)
-	}
-)
 
-setMethod('maxent', signature(x='Raster', p='data.frame'), 
-	function(x, p, ...) {
-		p <- as.matrix(p)
-		maxent(x, p)
-	}
-)
-
-setMethod('maxent', signature(x='SpatialGridDataFrame', p='SpatialPoints'), 
-	function(x, p, ...) {
+setMethod('maxent', signature(x='SpatialGridDataFrame', p='ANY'), 
+	function(x, p, a=NULL,...) {
 		x <- brick(x)
-		p <- coordinates(p)
-		maxent(x, p)
+		p <- .getMatrix(p)
+		if (! is.null(a) ) { a <- .getMatrix(a) }
+
+		# Signature = raster, ANY
+		maxent(x, p, a, ...)
 	}
 )
 
-setMethod('maxent', signature(x='SpatialGridDataFrame', p='matrix'), 
-	function(x, p, ...) {
-		x <- brick(x)
-		maxent(x, p)
-	}
-)
-
-setMethod('maxent', signature(x='SpatialGridDataFrame', p='data.frame'), 
-	function(x, p, ...) {
-		x <- brick(x)
-		p <- as.matrix(p)
-		maxent(x, p)
-	}
-)
-
-setMethod('maxent', signature(x='Raster', p='matrix'), 
-	function(x, p, ...) {
+setMethod('maxent', signature(x='Raster', p='ANY'), 
+	function(x, p, a=NULL, ...) {
 #extract values for points from stack
-		if (dim(p)[2] != 2) { stop('p should have 2 columns' ) 	}
-		
-		colnames(p) <- c('x', 'y')
+		p = .getMatrix(p)
 		pv <- data.frame(pa=1, species='species')
 		pv1 <- cbind(pv, p, xyValues(x, p))
-		
+
 		pv <- na.omit(pv1)
 		nas <- length(as.vector(attr(pv, "na.action")))
 		if (nas > 0) {
@@ -111,30 +97,42 @@ setMethod('maxent', signature(x='Raster', p='matrix'),
 			}
 		} 
 		
-# random absence
-		if (ncell(x) < 100000) {
-			a <- 1:ncell(x)
-		} else {
-			a <- unique(round(runif(100000)*ncell(x)))
-			#a <- cbind(runif(100000)*(xmax(x)-xmin(x))+xmin(x), runif(100000)*(ymax(x)-ymin(x))+ymin(x))
-			#a <- unique(cellFromXY(x, a))
+		if (! is.null(a) ) {
+			a = .getMatrix(a)
+			av <- data.frame(pa=0, species='species')
+			av <- cbind(av, a, xyValues(x, a))
+			avr = nrow(av)
+			av <- na.omit(av)
+			nas <- length(as.vector(attr(av, "na.action")))
+			if (nas > 0) {
+				if (nas >= 0.5 * avr) {
+					stop('more than half of the abpresence points have NA predictor values')
+				} else {
+					warning(100*nas/nrow(avr), '% of the presence points have NA predictor values')
+				}
+			}
+		} else { 
+		# random absence
+			xy <- randomPoints( raster(x,1), 10000, p, warn=0 )
+			av <- data.frame(pa=0, species='background', xy, xyValues(x, xy))
+			av <- na.omit(av)
+			if (nrow(av) == 0) {
+				stop('could not get valid background point values; is there a layer with only NA values?')
+			}
+			if (nrow(av) < 100) {
+				stop('only got:', nrow(av), 'random background point values; is there a layer with many NA values?')
+			}
+			if (nrow(av) < 1000) {
+				warning('only got:', nrow(av), 'random background point values; Small exent? Or is there a layer with many NA values?')
+			}
 		}
-		v <- na.omit(cbind(a, cellValues(x, a)))
-		if (nrow(v) < 25) {
-			stop('absence points generation failed (number of points < 25)')
-		}
-		if (nrow(v) < 250) {
-			warning('very low number of valid absence points:', nrow(v))
-		}
-		if (nrow(v) > 10000) {
-			v <- sample(v, 10000)
-		} 
 		
-		xy <- xyFromCell(x, v[,1])
-		av <- data.frame(pa=0, species='background', xy, v[,-1])
-		maxent(rbind(pv, av), ...)
+		# Signature = data.frame, missing
+		maxent(rbind(pv, av), ...)	
 	}
 )
+
+
 
 
 setMethod('maxent', signature(x='data.frame', p='missing'), 

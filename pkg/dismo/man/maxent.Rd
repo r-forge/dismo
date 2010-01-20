@@ -3,12 +3,8 @@
 \alias{maxent}
 
 \alias{maxent,data.frame,missing-method}
-\alias{maxent,Raster,matrix-method}
-\alias{maxent,Raster,data.frame-method}
-\alias{maxent,Raster,SpatialPoints-method}
-\alias{maxent,SpatialGridDataFrame,matrix-method}
-\alias{maxent,SpatialGridDataFrame,data.frame-method}
-\alias{maxent,SpatialGridDataFrame,SpatialPoints-method}
+\alias{maxent,Raster,ANY-method}
+\alias{maxent,SpatialGridDataFrame,ANY-method}
 
 \title{MaxEnt}
 
@@ -27,14 +23,21 @@ maxent(x, p, ...)
 
 \arguments{
 \item{x}{Predictors. Raster* object or SpatialGridDataFrame; Or a data.frame, see Details}
-\item{p}{Occurrence data. missing, data.frame, matrix or SpatialPoints* object. If it is a data.frame or matrix it must have two columns with the first being the x-coordinate (or longitude) and the second the y-coordinate (or latitude).}
+\item{p}{Occurrence data. data.frame, matrix, SpatialPoints* object, or missing. 
+If it is a data.frame or matrix it must have two columns with the first being the x-coordinate (or longitude) and 
+the second the y-coordinate (or latitude).  If missing, it is assumed that x is a data.frame with all the values to fit the model with} 
 \item{...}{Additional arguments. See Details}
 }
 
 \details{
-if \code{x} is a \code{data.frame} it must consist of > 3 columns. The first column can only have the values 0 (absence) and 1 (presence). 
-The next two colums have the x and y coordinates for the observations (presence and absence). The following columns should have values for the 
-predictor variables at those locations.
+if \code{x} is a \code{data.frame} it must consist of > 4 columns. The first column can only have the values 0 (absence) and 1 (presence); the second column a species identifier (name). Columns 3 and 4 are reserved for the x and y coordinates for the observations (presence and absence); but these are ignored. The following columns should have values for the predictor variables at those locations.
+
+Additional arguments:
+\tabular{rll}{
+\tab \code{a} \tab Absence points. Should be of the same class as \code{p} \cr
+}
+
+
 }
 
 \value{
