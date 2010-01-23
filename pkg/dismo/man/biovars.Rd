@@ -20,9 +20,9 @@ biovars(prec, tmin, tmax, ...)
  
 
 \arguments{
-  \item{prec}{ }
-  \item{tmin}{ }
-  \item{tmax}{ }
+  \item{prec}{monthly precipitation data}
+  \item{tmin}{monthly minimum temperature data}
+  \item{tmax}{monthly maximum temperature data}
   \item{...}{ Additional arguments }
 }
 
