@@ -84,9 +84,8 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 	function(x, p, a=NULL, ...) {
 #extract values for points from stack
 		p = .getMatrix(p)
-		pv <- data.frame(pa=1, species='species')
-		pv1 <- cbind(pv, p, xyValues(x, p))
-
+		p = unique(cellFromXY(x, p))
+		pv1 <- data.frame(cellValues(x, p))
 		pv <- na.omit(pv1)
 		nas <- length(as.vector(attr(pv, "na.action")))
 		if (nas > 0) {
@@ -96,11 +95,12 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 				warning(100*nas/nrow(pv1), '% of the presence points have NA predictor values')
 			}
 		} 
+		if (nrow(pv) < 10) {
+			warning('only ', nrow(pv), ' presence points!') 
+		}
 		
 		if (! is.null(a) ) {
-			a = .getMatrix(a)
-			av <- data.frame(pa=0, species='species')
-			av <- cbind(av, a, xyValues(x, a))
+			av <- data.frame(xyValues(x, a))
 			avr = nrow(av)
 			av <- na.omit(av)
 			nas <- length(as.vector(attr(av, "na.action")))
@@ -114,7 +114,7 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 		} else { 
 		# random absence
 			xy <- randomPoints( raster(x,1), 10000, p, warn=0 )
-			av <- data.frame(pa=0, species='background', xy, xyValues(x, xy))
+			av <- data.frame(xyValues(x, xy))
 			av <- na.omit(av)
 			if (nrow(av) == 0) {
 				stop('could not get valid background point values; is there a layer with only NA values?')
@@ -126,21 +126,31 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 				warning('only got:', nrow(av), 'random background point values; Small exent? Or is there a layer with many NA values?')
 			}
 		}
-		
+				
+		y <- c(rep(1, nrow(pv)), rep(0, nrow(av)))
 		# Signature = data.frame, missing
-		maxent(rbind(pv, av), ...)	
+		maxent(x=rbind(pv, av), p=y, ...)	
 	}
 )
 
 
 
 
-setMethod('maxent', signature(x='data.frame', p='missing'), 
-	function(x, ...) {
-
+setMethod('maxent', signature(x='data.frame', p='vector'), 
+	function(x, p, ...) {
+		p = as.logical(as.vector(p))
+		if (length(p) != nrow(x)) {
+			stop('p should be of lenght nrow(x)')
+		}
+		
+		x = cbind(p, x)
+		x = na.omit(x)
+		p = x[,1]
+		x = x[,-1]
+		
 		jar <- paste(system.file(package="dismo"), "/java/maxent.jar", sep='')
 		if (!file.exists(jar)) {
-			stop('file missing:', jar, '.\nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
+			stop('file missing:', jar, '\nPlease download it here:\nhttp://www.cs.princeton.edu/~schapire/maxent/')
 		}
 		
 		d <- .meTmpDir()
@@ -148,26 +158,22 @@ setMethod('maxent', signature(x='data.frame', p='missing'),
 		if (! file.exists(dirout)) {
 			dir.create(dirout, showWarnings=TRUE )
 		}
-		pfn <- .maxentTmpFile()
-		afn <- .maxentTmpFile()
 
-		pv <- x[x$pa == 1, ][,-1]
-		av <- x[x$pa == 0, ][,-1]
-		
-		write.table(pv, file=pfn, sep=',', row.names=FALSE)
-		write.table(av, file=afn, sep=',', row.names=FALSE)
+		x = cbind(data.frame(species='species'), x=1:nrow(x), y=1:nrow(x), x)
+		afn = .maxentTmpFile()
+		pfn = .maxentTmpFile()
+		write.table(x[p, ], file=afn, sep=',', row.names=FALSE)
+		write.table(x[!p, ], file=pfn, sep=',', row.names=FALSE)
 
 		mxe <- .jnew("mebridge") 
 	
-		add <- NULL  # to replace with additional arguments supplied with ...
+		add <- NULL  # placeholder. To be replaced with additional arguments supplied with ...
 		.jcall(mxe, "V", "fit", c("autorun", "-e", afn, "-o", dirout, "-s", pfn, add)) 
 		
-		flam <- paste(dirout, '/species.lambdas', sep='')
-		lambdas <- readLines(flam)
 		me <- new('MaxEnt')
-		me@lambdas <- unlist(lambdas)
-		me@presence <- as.matrix(pv[,-(1:3)])
-		me@absence <- as.matrix(av[,-(1:3)])
+		me@lambdas <- unlist( readLines( paste(dirout, '/species.lambdas', sep='') ) )
+		me@presence <- as.matrix(x[p, -(1:3)])
+		me@absence <- as.matrix(x[!p, -(1:3)])
 		me@hasabsence <- TRUE
 #		file.remove(list.files(path=dirout, full.names=TRUE))
 #		file.remove(list.files(path=out, full.names=TRUE))
@@ -200,3 +206,4 @@ setMethod('maxent', signature(x='data.frame', p='missing'),
 		unlink(paste(d, "/*", sep=""), recursive = TRUE)
 	}
 }
+

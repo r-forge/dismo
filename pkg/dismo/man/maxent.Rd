@@ -2,9 +2,9 @@
 
 \alias{maxent}
 
-\alias{maxent,data.frame,missing-method}
 \alias{maxent,Raster,ANY-method}
 \alias{maxent,SpatialGridDataFrame,ANY-method}
+\alias{maxent,data.frame,vector-method}
 
 \title{MaxEnt}
 
@@ -13,8 +13,8 @@ NOTE: This function will work after the next release of maxent. This currently d
 
 R link to the Maximum Entropy (maxent) species distribution model (see references below). 
 First download 'maxent.jar' from \url{http://www.cs.princeton.edu/~schapire/maxent/} and put 
-that in the 'java' folder of this package. That is folder returned by \code{system.file("java", package="rmaxent")}. 
-Please note that this program can not be redistributed or used for comercial purposes.
+that in the 'java' folder of this package. That is the folder returned by \code{system.file("java", package="dismo")}. 
+Please note that this program can not be redistributed or used for commercial purposes.
 }
 
 \usage{
@@ -23,20 +23,20 @@ maxent(x, p, ...)
 
 \arguments{
 \item{x}{Predictors. Raster* object or SpatialGridDataFrame; Or a data.frame, see Details}
-\item{p}{Occurrence data. data.frame, matrix, SpatialPoints* object, or missing. 
+\item{p}{Occurrence data. data.frame, matrix, SpatialPoints* object, vector, or missing. 
 If it is a data.frame or matrix it must have two columns with the first being the x-coordinate (or longitude) and 
-the second the y-coordinate (or latitude).  If missing, it is assumed that x is a data.frame with all the values to fit the model with} 
+the second the y-coordinate (or latitude).  If missing, it is assumed that x is a data.frame with all the values to fit the model with}. 
+If p is a vector, it should have a length equal to nrow(x) and contain values 0 (absence) and 1 (presence). 
 \item{...}{Additional arguments. See Details}
 }
 
 \details{
-if \code{x} is a \code{data.frame} it must consist of > 4 columns. The first column can only have the values 0 (absence) and 1 (presence); the second column a species identifier (name). Columns 3 and 4 are reserved for the x and y coordinates for the observations (presence and absence); but these are ignored. The following columns should have values for the predictor variables at those locations.
+if \code{x} is a \code{data.frame}, each column should be a predictor variable; and you also need to sup=ply an additional argument y (see below). 
 
 Additional arguments:
 \tabular{rll}{
-\tab \code{a} \tab Absence points. Should be of the same class as \code{p} \cr
+\tab \code{a} \tab Absence points. Only if p is not NULL and not a vector. Should be of the same class as \code{p} \cr
 }
-
 
 }
 
