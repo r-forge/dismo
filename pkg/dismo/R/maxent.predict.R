@@ -16,7 +16,7 @@ setMethod('predict', signature(object='MaxEnt'),
 
 	
 		lambdas <- .maxentTmpFile()
-		variables = colnames(me@presence)
+		variables = colnames(object@presence)
 
 		write.table(object@lambdas, file=lambdas, row.names=FALSE, col.names=FALSE, quote=FALSE)
 		
