@@ -71,16 +71,20 @@ if (!isGeneric("maxent")) {
 
 setMethod('maxent', signature(x='SpatialGridDataFrame', p='ANY'), 
 	function(x, p, a=NULL,...) {
+		factors = NULL
+		for (i in 1:colnames(x@data)) {
+			if (is.factor(x[,i])) { factors = c(factors, colnames(x@data)[i]) }
+		}
 		x <- brick(x)
 		p <- .getMatrix(p)
 		if (! is.null(a) ) { a <- .getMatrix(a) }
 		# Signature = raster, ANY
-		maxent(x, p, a, ...)
+		maxent(x, p, a, factors=factors, ...)
 	}
 )
 
 setMethod('maxent', signature(x='Raster', p='ANY'), 
-	function(x, p, a=NULL, ...) {
+	function(x, p, a=NULL, factors=NULL, ...) {
 #extract values for points from stack
 		p = .getMatrix(p)
 		pv1 <- data.frame(xyValues(x, p))
@@ -125,7 +129,15 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 		}
 		
 		# Signature = data.frame, missing
+
 		x = rbind(pv, av)
+		
+		if (!is.null(factors)) {
+			for (f in factors) {
+				x[,f] <- factor(x[,f])
+			}
+		}
+		
 		p = c(rep(1, nrow(pv)), rep(0, nrow(av)))
 		maxent(x, p, ...)	
 	}

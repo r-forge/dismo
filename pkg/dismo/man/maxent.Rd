@@ -9,6 +9,7 @@
 \title{MaxEnt}
 
 \description{
+
 NOTE: This function will work after the next release of maxent. This currently does not work!
 
 R link to the Maximum Entropy (maxent) species distribution model (see references below). 
@@ -36,6 +37,8 @@ if \code{x} is a \code{data.frame}, each column should be a predictor variable; 
 Additional arguments:
 \tabular{rll}{
 \tab \code{a} \tab Absence points. Only if p is not NULL and not a vector. Should be of the same class as \code{p} \cr
+\tab \code{factors} \tab Which (if any) variables should be considered as categorical? Either by (layer)name or by index. Only available when argument 
+   \code{x} is a Raster* object because it is not needed in other cases as you can set the appropriate class to the variables in the data.frame \cr 
 }
 
 }
