@@ -14,14 +14,21 @@ if (!isGeneric("predict")) {
 setMethod('predict', signature(object='MaxEnt'), 
 	function(object, x, ext=NULL, filename='', progress='text', ...) {
 
+	
 		lambdas <- .maxentTmpFile()
-		
+		variables = colnames(me@presence)
+
 		write.table(object@lambdas, file=lambdas, row.names=FALSE, col.names=FALSE, quote=FALSE)
 		
 		mxe <- .jnew("mebridge") 
 		filename <- trim(filename)
 		if (inherits(x, "Raster")) {
 			out <- raster(x)
+			
+			if (! all(colnames(object@presence)  %in%  layerNames(x) )) {
+				stop('missing layers (or wrong names)')
+			}
+			
 			if (!is.null(ext)) {
 				ext <- intersectExtent(extent(ext), extent(x))
 				out <- crop(out, ext)
@@ -38,7 +45,6 @@ setMethod('predict', signature(object='MaxEnt'),
 			if (!canProcessInMemory(out, 3) & filename == '') {
 				filename <- rasterTmpFile()
 			}
-			vars <- layerNames(x)
 				# check with model object?
 				
 			if (filename == '') {
@@ -49,10 +55,11 @@ setMethod('predict', signature(object='MaxEnt'),
 			for (r in 1:nrow(out)) {
 				rr <- firstrow + r - 1
 				rowvals <- getValuesBlock(x, rr, 1, firstcol, ncols)
+				rowvals <- rowvals[,variables,drop=FALSE]
 				rowv <- na.omit(rowvals)
 				res <- cv
 				if (length(rowv) > 0) {
-					p <- .jcall(mxe, "[D", "predict", lambdas, vars, .jarray(rowv)) 
+					p <- .jcall(mxe, "[D", "predict", lambdas, .jarray(colnames(rowv)), .jarray(rowv)) 
 					naind <- as.vector(attr(rowv, "na.action"))
 					if (!is.null(naind)) {
 						res[-naind] <- p
@@ -60,6 +67,7 @@ setMethod('predict', signature(object='MaxEnt'),
 						res <- p
 					}
 				}
+				res[res == -9999] <- NA
 				if (filename != '') {
 					out <- setValues(out, res, r)
 					out <- writeRaster(out, filename=filename, ...)
@@ -76,12 +84,20 @@ setMethod('predict', signature(object='MaxEnt'),
 			if (inherits(x, "Spatial")) {
 				x <- as.data.frame(x)
 			}
-			vars <- colnames(x)
-			rowv <- na.omit(x)
+			
+			if (! all(colnames(object@presence) %in% colnames(x))) {
+				stop('missing layers (or wrong names)')
+			}
+			
+			
+			x <- x[,variables,drop=FALSE]
+			x <- na.omit(x)
 			out <- rep(NA, times=nrow(x))
-			if (length(rowv) > 0) {
-				p <- .jcall(mxe, "[D", "predict", lambdas, vars, .jarray(rowv)) 
-				naind <- as.vector(attr(rowv, "na.action"))
+			x = as.matrix(x)
+			if (nrow(x) > 0) {
+				p <- .jcall(mxe, "[D", "predict", lambdas, .jarray(colnames(x)), .jarray(x)) 
+				p[p == -9999] <- NA
+				naind <- as.vector(attr(x, "na.action"))
 				if (!is.null(naind)) {
 					out[-naind] <- p
 				} else {
