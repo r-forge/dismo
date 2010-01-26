@@ -1,6 +1,6 @@
 [general] 
 creator=R package 'raster' 
-created= 2009-12-26 23:30:14 
+created= 2010-01-25 23:23:30 
 [georeference] 
 nrows= 160 
 ncols= 122 
@@ -24,5 +24,5 @@ legendtype=
 values=  
 color=  
 [description] 
-layername= ecoreg 
+layername=  
 history=  
