@@ -4,7 +4,7 @@ Title: Spatial prediction
 Version: 0.1.2
 Date: 18-January-2010
 Depends: R (>= 2.7.0), rJava (>= 0.5-0), methods, raster, sp
-Suggests: ROCR, rgdal
+Suggests: ROCR, rgdal, gbm, splines
 Author: Robert Hijmans and Steven Phillips
 Maintainer: <r.hijmans@gmail.com>
 Description: Spatial modeling functions

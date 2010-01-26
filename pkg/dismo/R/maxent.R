@@ -70,18 +70,27 @@ if (!isGeneric("maxent")) {
 
 
 setMethod('maxent', signature(x='SpatialGridDataFrame', p='ANY'), 
-	function(x, p, a=NULL,...) {
+	function(x, p, a=NULL, ...) {
 		x <- brick(x)
+		
+		factors = c("", "")
+		for (i in 1:ncol(x)) {
+			if (class(x[,i]) == 'factor') {
+				factors = c(factors, colnames(x)[i])
+			}
+		}
+		
+		
 		p <- .getMatrix(p)
 		if (! is.null(a) ) { a <- .getMatrix(a) }
-
+		
 		# Signature = raster, ANY
-		maxent(x, p, a, ...)
+		maxent(x, p, a, factors=factors, ...)
 	}
 )
 
 setMethod('maxent', signature(x='Raster', p='ANY'), 
-	function(x, p, a=NULL, ...) {
+	function(x, p, a=NULL, factors=NULL, ...) {
 #extract values for points from stack
 		p = .getMatrix(p)
 		p = unique(cellFromXY(x, p))
@@ -129,7 +138,7 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 				
 		y <- c(rep(1, nrow(pv)), rep(0, nrow(av)))
 		# Signature = data.frame, missing
-		maxent(x=rbind(pv, av), p=y, ...)	
+		maxent(x=rbind(pv, av), p=y, factors=factors, ...)	
 	}
 )
 
@@ -137,7 +146,17 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 
 
 setMethod('maxent', signature(x='data.frame', p='vector'), 
-	function(x, p, ...) {
+	function(x, p, factors=NULL, ...) {
+	
+		if (is.null(factors)) {
+			factors = c("", "")
+			for (i in 1:ncol(x)) {
+				if (class(x[,i]) == 'factor') {
+					factors = c(factors, colnames(x)[i])
+				}
+			}
+		}
+			
 		p = as.logical(as.vector(p))
 		if (length(p) != nrow(x)) {
 			stop('p should be of lenght nrow(x)')
@@ -146,7 +165,7 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 		x = cbind(p, x)
 		x = na.omit(x)
 		p = x[,1]
-		x = x[,-1]
+		x = x[,-1, drop=FALSE]
 		
 		jar <- paste(system.file(package="dismo"), "/java/maxent.jar", sep='')
 		if (!file.exists(jar)) {
@@ -168,7 +187,7 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 		mxe <- .jnew("mebridge") 
 	
 		add <- NULL  # placeholder. To be replaced with additional arguments supplied with ...
-		.jcall(mxe, "V", "fit", c("autorun", "-e", afn, "-o", dirout, "-s", pfn, add)) 
+		.jcall(mxe, "V", "fit", c("autorun", "-e", afn, "-o", dirout, "-s", pfn, add), factors) 
 		
 		me <- new('MaxEnt')
 		me@lambdas <- unlist( readLines( paste(dirout, '/species.lambdas', sep='') ) )
