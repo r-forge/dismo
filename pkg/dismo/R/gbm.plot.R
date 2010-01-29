@@ -56,7 +56,7 @@ gbm.plot.fits <- function(gbm.object,
      }
 
      if (plot.count == 0) {
-       windows(width = 11, height = 8)
+       x11(width = 11, height = 8)
        par(mfrow = plot.layout)
      }
 
@@ -186,7 +186,7 @@ for (j in c(1:n.plots)) {  #cycle through the first time and get the range of th
    }
 
    if (plot.count == 0) {
-     windows(width = 11, height = 8)
+     x11(width = 11, height = 8)
      par(mfrow = plot.layout)
    }
 
