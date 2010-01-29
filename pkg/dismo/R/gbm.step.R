@@ -182,7 +182,7 @@ function (data,                             # the input dataframe
   u_i <- sum(y.data * site.weights) / sum(site.weights)
   u_i <- rep(u_i,length(y_i))
 
-  total.deviance <- .calc.deviance(y_i, u_i, weights = site.weights, family = family, calc.mean = FALSE)
+  total.deviance <- calc.deviance(y_i, u_i, weights = site.weights, family = family, calc.mean = FALSE)
 
   mean.total.deviance <- total.deviance/n.cases
 
@@ -245,14 +245,14 @@ function (data,                             # the input dataframe
     y_i <- y.subset
     u_i <- fitted.values
     weight.fitted <- site.weights[model.mask]
-    training.loss.matrix[i,1] <- .calc.deviance(y_i, u_i, weight.fitted, family = family)
+    training.loss.matrix[i,1] <- calc.deviance(y_i, u_i, weight.fitted, family = family)
 
 # calc holdout deviance
 
     y_i <- y.data[pred.mask]
     u_i <- pred.values[pred.mask]
     weight.preds <- site.weights[pred.mask]
-    cv.loss.matrix[i,1] <- .calc.deviance(y_i, u_i, weight.preds, family = family)
+    cv.loss.matrix[i,1] <- calc.deviance(y_i, u_i, weight.preds, family = family)
 
   } # end of first loop
 
@@ -309,14 +309,14 @@ function (data,                             # the input dataframe
       y_i <- y.subset
       u_i <- fitted.values
       weight.fitted <- site.weights[model.mask]
-      training.loss.matrix[i,j] <- .calc.deviance(y_i, u_i, weight.fitted, family = family)
+      training.loss.matrix[i,j] <- calc.deviance(y_i, u_i, weight.fitted, family = family)
 
 # calc holdout deviance
 
       u_i <- pred.values[pred.mask]
       y_i <- y.data[pred.mask]
       weight.preds <- site.weights[pred.mask]
-      cv.loss.matrix[i,j] <- .calc.deviance(y_i, u_i, weight.preds, family = family)
+      cv.loss.matrix[i,j] <- calc.deviance(y_i, u_i, weight.preds, family = family)
 
     }  # end of inner loop
 
@@ -418,7 +418,7 @@ function (data,                             # the input dataframe
     u_i <- fitted.matrix[pred.mask,i]  #pred.values[pred.mask]
     weight.preds <- site.weights[pred.mask]
 
-    cv.deviance.stats[i] <- .calc.deviance(y_i, u_i, weight.preds, family = family)
+    cv.deviance.stats[i] <- calc.deviance(y_i, u_i, weight.preds, family = family)
 
     cv.cor.stats[i] <- cor(y_i,u_i)
 
@@ -496,7 +496,7 @@ function (data,                             # the input dataframe
 
   y_i <- y.data
   u_i <- fitted.values
-  resid.deviance <- .calc.deviance(y_i, u_i, weights = site.weights, family = family, calc.mean = FALSE)
+  resid.deviance <- calc.deviance(y_i, u_i, weights = site.weights, family = family, calc.mean = FALSE)
 
   self.cor <- cor(y_i,u_i)
   self.calibration <- 0.0

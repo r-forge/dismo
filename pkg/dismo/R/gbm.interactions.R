@@ -51,7 +51,7 @@ gbm.interactions <- function(gbm.object,
        }
     x.length <- length(x.var)
 
-    cat(i,"\n")
+    cat(i," ")
 
     for (j in (i+1):n.preds) { #create vector or factor data for second variable
       
@@ -138,6 +138,7 @@ gbm.interactions <- function(gbm.object,
 
   rank.list <- data.frame(var1.index,var1.names,var2.index,var2.names,int.size)
 
+  cat("\n")
   return(list(rank.list = rank.list, interactions = cross.tab, gbm.call = gbm.object$gbm.call))
 }
 
