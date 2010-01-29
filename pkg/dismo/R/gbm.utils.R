@@ -1,7 +1,6 @@
 
 
-.roc <-function (obsdat, preddat) 
-{
+.roc <-function (obsdat, preddat) {
 # code adapted from Ferrier, Pearce and Watson's code, by J.Elith
 #
 # see:
@@ -16,66 +15,19 @@
 # using the fact that a MannWhitney U statistic is closely related to
 # the area
 #
+
+# in dismo, this is used in the gbm routines, but not elsewhere (see evaluate).
+
     if (length(obsdat) != length(preddat)) 
         stop("obs and preds must be equal lengths")
     n.x <- length(obsdat[obsdat == 0])
     n.y <- length(obsdat[obsdat == 1])
     xy <- c(preddat[obsdat == 0], preddat[obsdat == 1])
     rnk <- rank(xy)
-    wilc <- ((n.x * n.y) + ((n.x * (n.x + 1))/2) - sum(rnk[1:n.x]))/(n.x * 
-        n.y)
+    wilc <- ((n.x * n.y) + ((n.x * (n.x + 1))/2) - sum(rnk[1:n.x]))/(n.x * n.y)
     return(round(wilc, 4))
 }
 
-
-
-.calc.deviance <-  function(obs.values, fitted.values, weights = rep(1,length(obs.values)), family="binomial", calc.mean = TRUE)
-{
-# j. leathwick/j. elith
-#
-# version 2.1 - 5th Sept 2005
-#
-# function to calculate deviance given two vectors of raw and fitted values
-# requires a family argument which is set to binomial by default
-#
-#
-
-if (length(obs.values) != length(fitted.values)) 
-   stop("observations and predictions must be of equal length")
-
-y_i <- obs.values
-
-u_i <- fitted.values
- 
-if (family == "binomial" | family == "bernoulli") {
- 
-   deviance.contribs <- (y_i * log(u_i)) + ((1-y_i) * log(1 - u_i))
-   deviance <- -2 * sum(deviance.contribs * weights)
-
-}
-
-if (family == "poisson" | family == "Poisson") {
-
-    deviance.contribs <- ifelse(y_i == 0, 0, (y_i * log(y_i/u_i))) - (y_i - u_i)
-    deviance <- 2 * sum(deviance.contribs * weights)
-
-}
-
-if (family == "laplace") {
-    deviance <- sum(abs(y_i - u_i))
-    }
-
-if (family == "gaussian") {
-    deviance <- sum((y_i - u_i) * (y_i - u_i))
-    }
-    
-
-
-if (calc.mean) deviance <- deviance/length(obs.values)
-
-return(deviance)
-
-}
 
 
 

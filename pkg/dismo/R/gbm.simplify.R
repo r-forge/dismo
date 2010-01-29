@@ -155,15 +155,16 @@ function(gbm.object,          # a gbm object describing sample intensity
     u_i <- eval.data[,gbm.y]
     y_i <- predict.gbm(model.list[[i]], eval.data, n.trees, "response")
 
-    original.deviances[i] <- round(.calc.deviance(u_i,y_i, family = family, calc.mean = TRUE),4)
+    original.deviances[i] <- round(calc.deviance(u_i,y_i, family = family, calc.mean = TRUE),4)
  
   } # end of creating initial models
 
   n.steps <- 1
  
+ cat("dropping predictor:")
   while (n.steps <= n.drops & n.steps <= max.drops) {
-
-    cat("dropping predictor",n.steps,"\n")
+	
+    cat(" ",n.steps)
 
     for (i in 1:n.folds) {
 
@@ -195,7 +196,7 @@ function(gbm.object,          # a gbm object describing sample intensity
     u_i <- eval.data[,gbm.y]
     y_i <- predict.gbm(model.list[[i]],eval.data,n.trees,"response")
 
-    deviance <- round(.calc.deviance(u_i,y_i, family = family, calc.mean = TRUE),4)
+    deviance <- round(calc.deviance(u_i,y_i, family = family, calc.mean = TRUE),4)
     
 # calculate difference between intial and new model by subtracting new from old because we want to minimise deviance
 
@@ -214,6 +215,7 @@ function(gbm.object,          # a gbm object describing sample intensity
     }   
   n.steps <- n.steps + 1
   }
+   cat("\n")
 
 # now label the deviance matrix
 
