@@ -83,7 +83,7 @@ public class mebridge {
 	public void fit(String cmd[], String[] categorical) {
 		Params params = new Params();
 		params.readFromArgs(cmd);
-		
+		params.setPrefixes(false);
 		for (int i=0; i<categorical.length; i++) {
 			if (categorical[i] != "") {
 				params.parseParam("togglelayertype="+categorical[i]);
