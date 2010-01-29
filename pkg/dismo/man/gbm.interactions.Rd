@@ -8,7 +8,7 @@
 
 \description{
 Tests whether interactions have been detected and modelled, and reports the relative strength of these. 
-Results can be visualised with gbm.perspec. 
+Results can be visualised with gbm.perspec
 
 The function assesses the magnitude of 2nd order interaction effects in gbm models fitted with interaction depths greater than 1. This is achieved by:
 
@@ -24,7 +24,7 @@ The function assesses the magnitude of 2nd order interaction effects in gbm mode
 }
 
 \usage{
-gbm.interactions(gbm.object, use.weights = FALSE, mask.object)
+gbm.interactions(gbm.object, use.weights=FALSE, mask.object)
 }
 
 \arguments{
@@ -35,6 +35,7 @@ gbm.interactions(gbm.object, use.weights = FALSE, mask.object)
 
 
 \value{
+object of class gbm
 }
 
 \keyword{ spatial }

@@ -5,10 +5,8 @@
 \title{gbm fixed }
 
 \description{
-Calculates a gradient boosting (gbm)object with a fixed number of trees
-with the number of trees identified using gbm.step or some other procedure.
-Mostly used as a utility function, e.g., when being called by gbm.simplify
-takes as input a dataset and args selecting x and y variables, learning rate and tree complexity
+Calculates a gradient boosting (gbm) object with a fixed number of trees.  The optimal number of trees can be identified using gbm.step or some other procedure.
+Mostly used as a utility function, e.g., when being called by gbm.simplify. It takes as input a dataset and arguments selecting x and y variables, learning rate and tree complexity.
 }
 
 \usage{
@@ -32,6 +30,7 @@ gbm.fixed(data, gbm.x, gbm.y, tree.complexity = 1, site.weights = rep(1, nrow(da
 }
 
 \value{
+object of class gbm
 }
 
 \references{

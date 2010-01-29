@@ -1,15 +1,15 @@
-\name{gbm data}
+\name{Anguilla data}
 
-\alias{brt_train}
-\alias{brt_eval}
-\alias{brt_grids}
+\alias{Anguilla_train}
+\alias{Anguilla_test}
+\alias{Anguilla_grids}
 
 \docType{data}
 
-\title{Boosted regression trees example data}
+\title{Anguilla australis distribution data}
 
 \description{
-presence and absence data of the short-finned eel (Anguilla australis) in New Zealand and environmental data at these sites; and gridded data for the whole study area.
+A number of sites with presence or absence of the short-finned eel (Anguilla australis) in New Zealand, and environmental data at these sites; and gridded data of the environmental variables for the study area. 
 
 \tabular{llll}{  
 type  \tab variable name \tab values \tab mean and range \cr
@@ -30,9 +30,9 @@ Upstream / catchment scale \tab USAvgT \tab  average temperature in catchment (d
 }
 
 \usage{
-data(brt_train)
-data(brt_eval)
-data(brt_grids)
+data(Anguilla_train)
+data(Anguilla_test)
+data(Anguilla_grids)
 }
 
 \references{
