@@ -2,7 +2,7 @@
 # gbm.perspec version 2.9 April 2007
 # J Leathwick/J Elith
 #
-# takes a gbm boosted regression tree object produced by gbm.step and
+# takes a model object and
 # plots a perspective plot showing predicted values for two predictors
 # as specified by number using x and y
 # values for all other variables are set at their mean by default
@@ -10,7 +10,7 @@
 # and its desired value, e.g., c(name1 = 12.2, name2 = 57.6)
 
 
-gbm.perspec <- function(gbm.object, 
+model.persp <- function(object, 
     x = 1,                # the first variable to be plotted
     y = 2,                # the second variable to be plotted
     pred.means = NULL,    # allows specification of values for other variables
@@ -25,7 +25,6 @@ gbm.perspec <- function(gbm.object,
     theta = 55,           # rotation 
     phi=40,               # and elevation 
     smooth = "none",      # controls smoothing of the predicted surface
-    mask = FALSE,         # controls masking using a sample intensity model
     perspective = TRUE,   # controls whether a contour or perspective plot is drawn
     ...)                  # allows the passing of additional arguments to plotting routine
                            # useful options include shade, ltheta, lphi for controlling illumination
@@ -37,12 +36,11 @@ gbm.perspec <- function(gbm.object,
 
 #get the boosting model details
 
-	gbm.call <- gbm.object$gbm.call
+	gbm.call <- object$gbm.call
 	gbm.x <- gbm.call$gbm.x
 	n.preds <- length(gbm.x)
 	gbm.y <- gbm.call$gbm.y
 	pred.names <- gbm.call$predictor.names
-	family = gbm.call$family
 
 # and now set up range variables for the x and y preds
 
@@ -124,7 +122,7 @@ gbm.perspec <- function(gbm.object,
 # form the prediction
 #
 #assign("pred.frame", pred.frame, pos=1)
-	prediction <- predict.gbm(gbm.object,pred.frame,n.trees = n.trees, type="response")
+	prediction <- predict(object,pred.frame,n.trees = n.trees, type="response")
 #assign("prediction", prediction, pos=1, immediate =T)
 
 # model smooth if required
@@ -139,27 +137,17 @@ gbm.perspec <- function(gbm.object,
 	max.pred <- max(prediction)
 	cat("maximum value = ",round(max.pred,2),"\n")
 
-	if (is.null(z.range)) {
-		if (family == "bernoulli") {
-			z.range <- c(0,1)
-		} else if (family == "poisson") {
-			z.range <- c(0,max.pred * 1.1)
-		} else {
-			z.min <- min(data[,y],na.rm=T)
-			z.max <- max(data[,y],na.rm=T)
-			z.delta <- z.max - z.min
-			z.range <- c(z.min - (1.1 * z.delta), z.max + (1.1 * z.delta))
-		}
-	}
+	z.min <- min(data[,y],na.rm=T)
+	if (z.min > 0 & z.min < 1) z.min = 0
+	z.max <- max(data[,y],na.rm=T)
+	if (z.max < 1 & z.max > 0) z.max = 1
+	z.delta <- z.max - z.min
+	z.range <- c(z.min - (1.1 * z.delta), z.max + (1.1 * z.delta))
 
 # now process assuming both x and y are vectors
-
-	if (have.factor == FALSE) {
-
+	if (! have.factor) {
 # form the matrix
-
 		pred.matrix <- matrix(prediction,ncol=50,nrow=50)
-
 # kernel smooth if required
 
 		if (smooth == "average") {  #apply a 3 x 3 smoothing average
@@ -175,8 +163,8 @@ gbm.perspec <- function(gbm.object,
 # mask out values inside hyper-rectangle but outside of sample space
 
 		if (mask) {
-			mask.trees <- gbm.object$gbm.call$best.trees
-			point.prob <- predict.gbm(gbm.object[[1]],pred.frame, n.trees = mask.trees, type="response")
+			mask.trees <- object$gbm.call$best.trees
+			point.prob <- predict.gbm(object[[1]],pred.frame, n.trees = mask.trees, type="response")
 			point.prob <- matrix(point.prob,ncol=50,nrow=50)
 			pred.matrix[point.prob < 0.5] <- 0.0
 		}
