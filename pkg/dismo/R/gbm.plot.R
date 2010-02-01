@@ -19,7 +19,7 @@ gbm.plot.fits <- function(gbm.object,
 # file.name routes to a pdf file of this name
 #
 
-    max.plots <- plot.layout[1] * plot.layout[2]
+	max.plots <- plot.layout[1] * plot.layout[2]
     plot.count <- 0
 
     dat <- gbm.object$gbm.call$dataframe    #get the dataframe name
@@ -43,49 +43,50 @@ gbm.plot.fits <- function(gbm.object,
     sp.name <- names(dat)[gbm.y]
 
     if (mask.presence) {
-	  mask <- ydat == 1 }
-    else {
-	  mask <- rep(TRUE, length = n.cases) }
+		mask <- ydat == 1 
+	} else {
+	  mask <- rep(TRUE, length = n.cases) 
+	}
 
     robust.max.fit <- approx(ppoints(fitted.values[mask]), sort(fitted.values[mask]), 0.99) #find 99%ile value
 
     for (j in 1:n.preds) {
 
-     if (plot.count == max.plots) {
-       plot.count = 0
-     }
-
-     if (plot.count == 0) {
-       x11(width = 11, height = 8)
-       par(mfrow = plot.layout)
-     }
-
-     plot.count <- plot.count + 1
-
-	  if (is.numeric(xdat[mask,j])) {
-            wt.mean <- zapsmall(mean((xdat[mask, j] * fitted.values[mask]^5)/mean(fitted.values[mask]^5),na.rm=TRUE),2)
-            }
-        else {wt.mean <- "na"}
- 	  if (use.factor) {
-	      temp <- factor(cut(xdat[mask, j], breaks = 12))
-		if (family == "binomial") {
-		    plot(temp, fitted.values[mask], xlab = pred.names[j], ylab = "fitted values", ylim = c(0, 1))}
-		else {
-		    plot(temp, fitted.values[mask], xlab = pred.names[j], ylab = "fitted values")}
+		if (plot.count == max.plots) {
+			plot.count = 0
 		}
- 	  else {
-		if (family == "binomial") {
-		    plot(xdat[mask, j], fitted.values[mask], xlab = pred.names[j], ylab = "fitted values", 
-					ylim = c(0, 1))}
-		    else {
-			plot(xdat[mask, j], fitted.values[mask], xlab = pred.names[j], ylab = "fitted values")}
+
+		if (plot.count == 0) {
+			par(mfrow = plot.layout)
+		}
+
+		plot.count <- plot.count + 1
+	
+		if (is.numeric(xdat[mask,j])) {
+			wt.mean <- zapsmall(mean((xdat[mask, j] * fitted.values[mask]^5)/mean(fitted.values[mask]^5),na.rm=TRUE),2)
+		} else {
+			wt.mean <- "na"
+		}
+		
+		if (use.factor) {
+			temp <- factor(cut(xdat[mask, j], breaks = 12))
+			if (family == "binomial") {
+				plot(temp, fitted.values[mask], xlab = pred.names[j], ylab = "fitted values", ylim = c(0, 1))
+			} else {
+				plot(temp, fitted.values[mask], xlab = pred.names[j], ylab = "fitted values")
+			}
+		} else {
+			if (family == "binomial") {
+				plot(xdat[mask, j], fitted.values[mask], xlab = pred.names[j], ylab = "fitted values", ylim = c(0, 1))
+			} else {
+				plot(xdat[mask, j], fitted.values[mask], xlab = pred.names[j], ylab = "fitted values")}
 		    }
-		abline(h = (0.333 * robust.max.fit$y), lty = 2.)
-		if (j == 1) { 
-			title(paste(sp.name, ", wtm = ", wt.mean))}
-		else {
-			title(paste("wtm = ", wt.mean))}
-    }
+			abline(h = (0.333 * robust.max.fit$y), lty = 2.)
+			if (j == 1) { 
+				title(paste(sp.name, ", wtm = ", wt.mean))
+			} else {
+				title(paste("wtm = ", wt.mean))}
+		}
 }
 
 
@@ -121,120 +122,114 @@ function(gbm.object,                # a gbm object - could be one from gbm.step
   if (! require(gbm) ) { stop ('you need to install the gbm package to run this function') }
   if (! require(splines) ) { stop ('you need to install the gbm package to run this function') }
 
-gbm.call <- gbm.object$gbm.call
-gbm.x <- gbm.call$gbm.x
-pred.names <- gbm.call$predictor.names
-response.name <- gbm.call$response.name
-dataframe.name <- gbm.call$dataframe
-data <- eval(parse(text = dataframe.name))
+	gbm.call <- gbm.object$gbm.call
+	gbm.x <- gbm.call$gbm.x
+	pred.names <- gbm.call$predictor.names
+	response.name <- gbm.call$response.name
+	dataframe.name <- gbm.call$dataframe
+	data <- eval(parse(text = dataframe.name))
 
-max.plots <- plot.layout[1] * plot.layout[2]
-plot.count <- 0
-n.pages <- 1
+	max.plots <- plot.layout[1] * plot.layout[2]
+	plot.count <- 0
+	n.pages <- 1
 
-if (length(variable.no) > 1) {stop("only one response variable can be plotted at a time")}
+	if (length(variable.no) > 1) { stop("only one response variable can be plotted at a time") }
 
-if (variable.no > 0) {   #we are plotting all vars in rank order of contribution
-  n.plots <- 1
-  }
+	if (variable.no > 0) {   #we are plotting all vars in rank order of contribution
+		n.plots <- 1
+	}
 
-max.vars <- length(gbm.object$contributions$var)
-if (n.plots > max.vars) {
-  n.plots <- max.vars
-  cat("warning - reducing no of plotted predictors to maximum available (",max.vars,")\n",sep="")
-  }
+	max.vars <- length(gbm.object$contributions$var)
+	if (n.plots > max.vars) {
+		n.plots <- max.vars
+		warning("reducing no of plotted predictors to maximum available (",max.vars,")")
+	}
 
-predictors <- list(rep(NA,n.plots)) # matrix(0,ncol=n.plots,nrow=100)
-responses <- list(rep(NA,n.plots)) # matrix(0,ncol=n.plots,nrow=100)
+	predictors <- list(rep(NA,n.plots)) # matrix(0,ncol=n.plots,nrow=100)
+	responses <- list(rep(NA,n.plots)) # matrix(0,ncol=n.plots,nrow=100)
 
-for (j in c(1:n.plots)) {  #cycle through the first time and get the range of the functions
-  if (n.plots == 1) {
-    k <- variable.no
-  }
-  else k <- match(gbm.object$contributions$var[j],pred.names)
+	for (j in c(1:n.plots)) {  #cycle through the first time and get the range of the functions
+		if (n.plots == 1) {
+			k <- variable.no
+		} else k <- match(gbm.object$contributions$var[j],pred.names)
 
-  if (is.null(x.label)) var.name <- gbm.call$predictor.names[k]
-    else var.name <- x.label
+		if (is.null(x.label)) var.name <- gbm.call$predictor.names[k]
+		else var.name <- x.label
 
-  pred.data <- data[,gbm.call$gbm.x[k]]
+		pred.data <- data[,gbm.call$gbm.x[k]]
 
-  response.matrix <- plot.gbm(gbm.object, k, return.grid = TRUE)
+		response.matrix <- plot.gbm(gbm.object, k, return.grid = TRUE)
 
-  predictors[[j]] <- response.matrix[,1]
-  if (is.factor(data[,gbm.call$gbm.x[k]])) {
-    predictors[[j]] <- factor(predictors[[j]],levels = levels(data[,gbm.call$gbm.x[k]]))
-    }
-  responses[[j]] <- response.matrix[,2] - mean(response.matrix[,2])
+		predictors[[j]] <- response.matrix[,1]
+		if (is.factor(data[,gbm.call$gbm.x[k]])) {
+			predictors[[j]] <- factor(predictors[[j]],levels = levels(data[,gbm.call$gbm.x[k]]))
+		}
+		responses[[j]] <- response.matrix[,2] - mean(response.matrix[,2])
 
-  if(j == 1) {
-    ymin = min(responses[[j]])
-    ymax = max(responses[[j]])
-    }
-  else {
-    ymin = min(ymin,min(responses[[j]]))
-    ymax = max(ymax,max(responses[[j]]))
-    }
-  }
+		if(j == 1) {
+			ymin = min(responses[[j]])
+			ymax = max(responses[[j]])
+		} else {
+			ymin = min(ymin,min(responses[[j]]))
+			ymax = max(ymax,max(responses[[j]]))
+		}
+	}
 
 # now do the actual plots
 
-  for (j in c(1:n.plots)) {
+	for (j in c(1:n.plots)) {
 
-   if (plot.count == max.plots) {
-     plot.count = 0
-     n.pages <- n.pages + 1
-   }
+		if (plot.count == max.plots) {
+			plot.count = 0
+			n.pages <- n.pages + 1
+		}
 
-   if (plot.count == 0) {
-     x11(width = 11, height = 8)
-     par(mfrow = plot.layout)
-   }
+		if (plot.count == 0) {
+			x11(width = 11, height = 8)
+			par(mfrow = plot.layout)
+		}
 
-    plot.count <- plot.count + 1
+		plot.count <- plot.count + 1
 
-    if (n.plots == 1) {
-      k <- match(pred.names[variable.no],gbm.object$contributions$var)
-      if (show.contrib) {
-         x.label <- paste(var.name,"  (",round(gbm.object$contributions[k,2],1),"%)",sep="")
-      }
-    }
-    else {
-      k <- match(gbm.object$contributions$var[j],pred.names)
-      var.name <- gbm.call$predictor.names[k]
-      if (show.contrib) {
-         x.label <- paste(var.name,"  (",round(gbm.object$contributions[j,2],1),"%)",sep="")
-      }
-      else x.label <- var.name
-    }
+		if (n.plots == 1) {
+			k <- match(pred.names[variable.no],gbm.object$contributions$var)
+			if (show.contrib) {
+				x.label <- paste(var.name,"  (",round(gbm.object$contributions[k,2],1),"%)",sep="")
+			}
+		} else {
+			k <- match(gbm.object$contributions$var[j],pred.names)
+			var.name <- gbm.call$predictor.names[k]
+			if (show.contrib) {
+				x.label <- paste(var.name,"  (",round(gbm.object$contributions[j,2],1),"%)",sep="")
+			} else x.label <- var.name
+		}
 
-    if (common.scale) {
-      plot(predictors[[j]],responses[[j]],ylim=c(ymin,ymax), type='l',
-        xlab = x.label, ylab = y.label, ...)
-    }
-    else {
-      plot(predictors[[j]],responses[[j]], type='l', 
-        xlab = x.label, ylab = y.label, ...)
-    }
-    if (smooth & is.vector(predictors[[j]])) {
-      temp.lo <- loess(responses[[j]] ~ predictors[[j]], span = 0.3)
-      lines(predictors[[j]],fitted(temp.lo), lty = 2, col = 2)
-    }
-    if (plot.count == 1) {
-      if (write.title) {
-        title(paste(response.name," - page ",n.pages,sep=""))
-      }
-      if (rug & is.vector(data[,gbm.call$gbm.x[variable.no]])) {
-        rug(quantile(data[,gbm.call$gbm.x[variable.no]], probs = seq(0, 1, 0.1), na.rm = TRUE))
-      }
-    }
-    else {
-      if (write.title & j == 1) {
-        title(response.name)
-      }
-      if (rug & is.vector(data[,gbm.call$gbm.x[k]])) {
-        rug(quantile(data[,gbm.call$gbm.x[k]], probs = seq(0, 1, 0.1), na.rm = TRUE))
-      }
-    }
-  }
+		if (common.scale) {
+			plot(predictors[[j]],responses[[j]],ylim=c(ymin,ymax), type='l',
+			xlab = x.label, ylab = y.label, ...)
+		} else {
+			plot(predictors[[j]],responses[[j]], type='l', 
+			xlab = x.label, ylab = y.label, ...)
+		}
+		if (smooth & is.vector(predictors[[j]])) {
+			temp.lo <- loess(responses[[j]] ~ predictors[[j]], span = 0.3)
+			lines(predictors[[j]],fitted(temp.lo), lty = 2, col = 2)
+		}
+		if (plot.count == 1) {
+			if (write.title) {
+				title(paste(response.name," - page ",n.pages,sep=""))
+			}
+			if (rug & is.vector(data[,gbm.call$gbm.x[variable.no]])) {
+				rug(quantile(data[,gbm.call$gbm.x[variable.no]], probs = seq(0, 1, 0.1), na.rm = TRUE))
+			}
+		} else {
+			if (write.title & j == 1) {
+				title(response.name)
+			}
+			if (rug & is.vector(data[,gbm.call$gbm.x[k]])) {
+				rug(quantile(data[,gbm.call$gbm.x[k]], probs = seq(0, 1, 0.1), na.rm = TRUE))
+			}
+		}
+	}
 }
 
