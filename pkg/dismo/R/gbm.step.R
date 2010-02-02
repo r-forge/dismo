@@ -96,8 +96,8 @@ function (data,                             # the input dataframe
   sp.name <- names(data)[gbm.y]
   if (family == "bernoulli") prevalence <- mean(y.data)
 
-  assign("x.data", x.data, env = globalenv())               #and assign them for later use
-  assign("y.data", y.data, env = globalenv())
+#  assign("x.data", x.data, env = globalenv())               #and assign them for later use
+#  assign("y.data", y.data, env = globalenv())
 
   offset.name <- deparse(substitute(offset))   # get the dataframe name
   offset = eval(offset)
@@ -571,7 +571,7 @@ function (data,                             # the input dataframe
     cv.stats$cv.threshold.se <- cv.threshold.se
   }
 
-  rm(x.data,y.data, envir = globalenv())           #finally, clean up the temporary dataframes
+#  rm(x.data,y.data, envir = globalenv())           #finally, clean up the temporary dataframes
 
 # and assemble results for return
 
