@@ -2,28 +2,31 @@
 
 \alias{evaluate}
 
-\title{
-Model testing
-}
+\title{ Model testing }
 
-\description{
-Model testing using AUC and other statistics.
+\description{ 
+Model testing for models predicting presence/absence. Given a vector of presence and a vector of absence values (or a model and presence and absence points and predictors), a number of confusion matrices is computed (for varying thresholds), and model evaluation statistics are computed for each confusion matrix / threshold. 
 }
 
 \usage{
-evaluate(model, p, a, x, tr)
+evaluate(p, a, model, x, tr)
 }
  
 \arguments{
-  \item{model}{any fitted model, including objects inherting from 'DistModel'}
   \item{p}{presence points (x and y coordinates or SpatialPoints* object). 
-             Or, if \code{x} is missing, values at presence points
-			   Or, a matrix with values to compute predictions for}
+  
+          Or, if \code{x} is missing, values at presence points
+		  
+		  Or, a matrix with values to compute predictions for}
 		   
   \item{a}{absence points (x and y coordinates or SpatialPoints* object). 
+  
 			Or, if \code{x} is missing, values at presence points.
+			
 			Or, a matrix with values to compute predictions for}
 			
+  \item{model}{any fitted model, including objects inherting from 'DistModel'; not used when \code{x} is missing}
+
   \item{x}{Optional. Predictor variables (object of class Raster*). If present, \code{p} and \code{a} are interpreted as (spatial) points }
   
   \item{tr}{Optional. a vector of threshold values to use for computing the confusion matrices}
@@ -50,6 +53,8 @@ e@t[which.max(e@kappa)]
 # threshold at maximum of the sum of the sensitivity (true positive rate) and specificity (true negative rate)
 e@t[which.max(e@TPR + e@TNR)]
 
+plot(e, 'ROC')
+plot(e, 'TPR')
 }
 
 \keyword{spatial}

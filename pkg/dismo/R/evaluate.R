@@ -64,7 +64,7 @@ evaluateROCR <- function(model, p, a, x) {
 }
 
 
-evaluate <- function(model, p, a, x=NULL, tr) {
+evaluate <- function(p, a, model, x=NULL, tr) {
 	if (!missing(x)) {
 		p <- predict(model, xyValues(x, p))
 		a <- predict(model, xyValues(x, a))

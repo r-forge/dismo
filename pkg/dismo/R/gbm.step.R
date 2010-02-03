@@ -108,8 +108,8 @@ function (data,                             # the input dataframe
   if (!silent) {
     cat("\n","\n","GBM STEP - version 2.9","\n","\n")
     cat("Performing cross-validation optimisation of a boosted regression tree model \n")
-    cat("for",sp.name,"with dataframe",dataframe.name,"and using a family of",family,"\n\n")
-    cat("Using",n.cases,"observations and",n.preds,"predictors \n\n")
+    cat("for",sp.name,"with dataframe",dataframe.name,"and using a family of",family,"\n")
+    cat("Using",n.cases,"observations and",n.preds,"predictors \n")
   }
 
 # set up the selector variable either with or without prevalence stratification
@@ -141,7 +141,7 @@ function (data,                             # the input dataframe
     }
   else {
     if (length(fold.vector) != n.cases) stop("supplied fold vector is of wrong length")
-    cat("loading user-supplied fold vector \n\n")
+    cat("loading user-supplied fold vector \n")
     selector <- eval(fold.vector)
     }
 
@@ -194,115 +194,108 @@ function (data,                             # the input dataframe
 
 # now step through the folds setting up the initial call
 
-  if (!silent){ 
+	if (!silent){ 
+		cat("creating",n.folds,"initial models of",n.trees,"trees","\n")
+		if (prev.stratify & family == "bernoulli") cat("\n","folds are stratified by prevalence","\n")
+		else cat("\n","folds are unstratified","\n")
+		cat ("total mean deviance = ",round(mean.total.deviance,4),"\n")
+		cat("tolerance is fixed at ",round(tolerance.test,4),"\n")
+		if (tolerance.method != "fixed" & tolerance.method != "auto") {
+			cat("invalid argument for tolerance method - should be auto or fixed","\n")
+			return()
+		}
+	}
 
-    cat("creating",n.folds,"initial models of",n.trees,"trees","\n")
-  
-    if (prev.stratify & family == "bernoulli") cat("\n","folds are stratified by prevalence","\n","\n")
-      else cat("\n","folds are unstratified","\n","\n")
-  
-    cat ("total mean deviance = ",round(mean.total.deviance,4),"\n","\n")
+	if (verbose) cat("ntrees resid. dev.","\n")
 
-    cat("tolerance is fixed at ",round(tolerance.test,4),"\n","\n")
+	for (i in 1:n.folds) {
 
-    if (tolerance.method != "fixed" & tolerance.method != "auto") {
-      cat("invalid argument for tolerance method - should be auto or fixed","\n")
-      return()}
-  }
+		model.mask <- selector != i  #used to fit model on majority of data
+		pred.mask <- selector == i   #used to identify the with-held subset
 
-  if (verbose) cat("ntrees resid. dev.","\n")
+		y.subset <- y.data[model.mask]
+		x.subset <- x.data[model.mask,]
+		weight.subset <- site.weights[model.mask]
 
-  for (i in 1:n.folds) {
+		if (!is.null(offset)) {
+			offset.subset <- offset[model.mask] 
+		} else {
+			offset.subset <- NULL
+		}
 
-    model.mask <- selector != i  #used to fit model on majority of data
-    pred.mask <- selector == i   #used to identify the with-held subset
+		model.list[[i]] <- eval(parse(text = gbm.call))
 
-    y.subset <- y.data[model.mask]
-    x.subset <- x.data[model.mask,]
-    weight.subset <- site.weights[model.mask]
+		fitted.values <- model.list[[i]]$fit  #predict.gbm(model.list[[i]], x.subset, type = "response", n.trees = n.trees)
+		if (!is.null(offset)) fitted.values <- fitted.values + offset[model.mask]
+		if (family == "bernoulli") fitted.values <- exp(fitted.values)/(1 + exp(fitted.values))
+		if (family == "poisson") fitted.values <- exp(fitted.values)
 
-    if (!is.null(offset)) {
-      offset.subset <- offset[model.mask] 
-    }
-    else {
-      offset.subset <- NULL
-    }
-
-    model.list[[i]] <- eval(parse(text = gbm.call))
-
-    fitted.values <- model.list[[i]]$fit  #predict.gbm(model.list[[i]], x.subset, type = "response", n.trees = n.trees)
-    if (!is.null(offset)) fitted.values <- fitted.values + offset[model.mask]
-    if (family == "bernoulli") fitted.values <- exp(fitted.values)/(1 + exp(fitted.values))
-    if (family == "poisson") fitted.values <- exp(fitted.values)
-
-    pred.values[pred.mask] <- predict.gbm(model.list[[i]], x.data[pred.mask, ], n.trees = n.trees)
-    if (!is.null(offset)) pred.values[pred.mask] <- pred.values[pred.mask] + offset[pred.mask]
-    if (family == "bernoulli") pred.values[pred.mask] <- exp(pred.values[pred.mask])/(1 + exp(pred.values[pred.mask]))
-    if (family == "poisson") pred.values[pred.mask] <- exp(pred.values[pred.mask])
+		pred.values[pred.mask] <- predict.gbm(model.list[[i]], x.data[pred.mask, ], n.trees = n.trees)
+		if (!is.null(offset)) pred.values[pred.mask] <- pred.values[pred.mask] + offset[pred.mask]
+		if (family == "bernoulli") pred.values[pred.mask] <- exp(pred.values[pred.mask])/(1 + exp(pred.values[pred.mask]))
+		if (family == "poisson") pred.values[pred.mask] <- exp(pred.values[pred.mask])
 
 # calc training deviance
 
-    y_i <- y.subset
-    u_i <- fitted.values
-    weight.fitted <- site.weights[model.mask]
-    training.loss.matrix[i,1] <- calc.deviance(y_i, u_i, weight.fitted, family = family)
+		y_i <- y.subset
+		u_i <- fitted.values
+		weight.fitted <- site.weights[model.mask]
+		training.loss.matrix[i,1] <- calc.deviance(y_i, u_i, weight.fitted, family = family)
 
 # calc holdout deviance
 
-    y_i <- y.data[pred.mask]
-    u_i <- pred.values[pred.mask]
-    weight.preds <- site.weights[pred.mask]
-    cv.loss.matrix[i,1] <- calc.deviance(y_i, u_i, weight.preds, family = family)
+		y_i <- y.data[pred.mask]
+		u_i <- pred.values[pred.mask]
+		weight.preds <- site.weights[pred.mask]
+		cv.loss.matrix[i,1] <- calc.deviance(y_i, u_i, weight.preds, family = family)
 
-  } # end of first loop
+	} # end of first loop
 
 # now process until the change in mean deviance is =< tolerance or max.trees is exceeded
 
-  delta.deviance <- 1
+	delta.deviance <- 1
 
-  cv.loss.values <- apply(cv.loss.matrix,2,mean)
-  if (verbose) cat(n.fitted,"  ",round(cv.loss.values,4),"\n","\n")
+	cv.loss.values <- apply(cv.loss.matrix,2,mean)
+	if (verbose) cat(n.fitted,"  ",round(cv.loss.values,4),"\n")
 
-  if (!silent) cat("")
-  if (!silent) cat("now adding trees...","\n")
+	if (!silent) cat("now adding trees...","\n")
 
-  j <- 1
+	j <- 1
 
-  while (delta.deviance > tolerance.test & n.fitted < max.trees) {  # beginning of inner loop
+	while (delta.deviance > tolerance.test & n.fitted < max.trees) {  # beginning of inner loop
 
 # add a new column to the results matrice..
 
-    training.loss.matrix <- cbind(training.loss.matrix,rep(0,n.folds))
-    cv.loss.matrix <- cbind(cv.loss.matrix,rep(0,n.folds))
+		training.loss.matrix <- cbind(training.loss.matrix,rep(0,n.folds))
+		cv.loss.matrix <- cbind(cv.loss.matrix,rep(0,n.folds))
 
-    n.fitted <- n.fitted + step.size
-    trees.fitted <- c(trees.fitted,n.fitted)
+		n.fitted <- n.fitted + step.size
+		trees.fitted <- c(trees.fitted,n.fitted)
   
-    j <- j + 1
+		j <- j + 1
  
-    for (i in 1:n.folds) {
+		for (i in 1:n.folds) {
 
-      model.mask <- selector != i  #used to fit model on majority of data
-      pred.mask <- selector == i   #used to identify the with-held subset
+			model.mask <- selector != i  #used to fit model on majority of data
+			pred.mask <- selector == i   #used to identify the with-held subset
 
-      y.subset <- y.data[model.mask]
-      x.subset <- x.data[model.mask,]
-      weight.subset <- site.weights[model.mask]
-      if (!is.null(offset)) {
-        offset.subset <- offset[model.mask] 
-      }
+			y.subset <- y.data[model.mask]
+			x.subset <- x.data[model.mask,]
+			weight.subset <- site.weights[model.mask]
+			if (!is.null(offset)) {
+				offset.subset <- offset[model.mask] 
+			}
+			model.list[[i]] <- gbm.more(model.list[[i]], weights = weight.subset, step.size)
 
-      model.list[[i]] <- gbm.more(model.list[[i]], weights = weight.subset, step.size)
+			fitted.values <- model.list[[i]]$fit # predict.gbm(model.list[[i]],x.subset, type = "response", n.trees = n.fitted) 
+			if (!is.null(offset)) fitted.values <- fitted.values + offset[model.mask]
+			if (family == "bernoulli") fitted.values <- exp(fitted.values)/(1 + exp(fitted.values))
+			if (family == "poisson") fitted.values <- exp(fitted.values)
 
-      fitted.values <- model.list[[i]]$fit # predict.gbm(model.list[[i]],x.subset, type = "response", n.trees = n.fitted) 
-      if (!is.null(offset)) fitted.values <- fitted.values + offset[model.mask]
-      if (family == "bernoulli") fitted.values <- exp(fitted.values)/(1 + exp(fitted.values))
-      if (family == "poisson") fitted.values <- exp(fitted.values)
-
-      pred.values[pred.mask] <- predict.gbm(model.list[[i]], x.data[pred.mask, ], n.trees = n.fitted)
-      if (!is.null(offset)) pred.values[pred.mask] <- pred.values[pred.mask] + offset[pred.mask]
-      if (family == "bernoulli") pred.values[pred.mask] <- exp(pred.values[pred.mask])/(1 + exp(pred.values[pred.mask]))
-      if (family == "poisson") pred.values[pred.mask] <- exp(pred.values[pred.mask])
+			pred.values[pred.mask] <- predict.gbm(model.list[[i]], x.data[pred.mask, ], n.trees = n.fitted)
+			if (!is.null(offset)) pred.values[pred.mask] <- pred.values[pred.mask] + offset[pred.mask]
+			if (family == "bernoulli") pred.values[pred.mask] <- exp(pred.values[pred.mask])/(1 + exp(pred.values[pred.mask]))
+			if (family == "poisson") pred.values[pred.mask] <- exp(pred.values[pred.mask])
    
 # calculate training deviance
 
@@ -361,8 +354,7 @@ function (data,                             # the input dataframe
       y.min <- min(cv.loss.matrix)
       y.max <- max(cv.loss.matrix) }
 
-      plot(trees.fitted, cv.loss.values, type = 'l', ylab = "holdout deviance",
-          xlab = "no. of trees", ylim = c(y.min,y.max), ...)
+      plot(trees.fitted, cv.loss.values, type = 'l', ylab = "holdout deviance", xlab = "no. of trees", ylim = c(y.min,y.max), ...)
       abline(h = y.bar, col = 2)
 
       lines(trees.fitted, cv.loss.values + cv.loss.ses, lty=2)  
@@ -463,19 +455,14 @@ function (data,                             # the input dataframe
 
 # fit the final model
 
-  if (is.null(offset)) {
-    gbm.call <- paste("gbm(y.data ~ .,data=x.data, n.trees = target.trees,
-    interaction.depth = tree.complexity, shrinkage = learning.rate, 
-    bag.fraction = bag.fraction, weights = site.weights, 
-    distribution = as.character(family), var.monotone = var.monotone, 
-    verbose = FALSE)", sep="")
-    }
-  else {
-    gbm.call <- paste("gbm(y.data ~ . + offset(offset),data=x.data, n.trees = target.trees,
-    interaction.depth = tree.complexity, shrinkage = learning.rate, 
-    bag.fraction = bag.fraction, weights = site.weights, 
-    distribution = as.character(family), var.monotone = var.monotone, 
-    verbose = FALSE)", sep="")
+	if (is.null(offset)) {
+		gbm.call <- paste("gbm(y.data ~ .,data=x.data, n.trees = target.trees,
+		interaction.depth = tree.complexity, shrinkage = learning.rate, bag.fraction = bag.fraction, weights = site.weights, 
+		distribution = as.character(family), var.monotone = var.monotone, verbose = FALSE)", sep="")
+	} else {
+		gbm.call <- paste("gbm(y.data ~ . + offset(offset),data=x.data, n.trees = target.trees,
+			interaction.depth = tree.complexity, shrinkage = learning.rate, bag.fraction = bag.fraction, weights = site.weights, 
+			distribution = as.character(family), var.monotone = var.monotone,  verbose = FALSE)", sep="")
     } 
 
   if (!silent) cat("fitting final gbm model with a fixed number of ",target.trees," trees for ",sp.name,"\n") 

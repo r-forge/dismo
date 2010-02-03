@@ -33,7 +33,7 @@ if \code{x} is a data.frame, \code{p} should be a vector with a length equal to 
 
 \details{
 Additional arguments:
-\tabular{rll}{
+\tabular{lll}{
 \tab \code{a} \tab Absence points. Only used if \code{p} is not missing, and not a vector.  \cr
 \tab \code{factors} \tab Which (if any) variables should be considered as categorical? Either by (layer)name or by index. Only used when argument \code{x} is a Raster* object because it is not needed in other cases as you can set the appropriate class to the variables in the data.frame \cr 
 \tab \code{args} \tab Additional argument that can be passed to maxent   \cr
@@ -62,14 +62,15 @@ Steven J. Phillips, Robert P. Anderson, Robert E. Schapire, 2006. Maximum entrop
 \examples{
 # get predictor variables
 predictors <- stack(list.files(path=paste(system.file(package="dismo"), '/ex', sep=''), pattern='grd', full.names=TRUE ))
+plot(predictors)
 # file with presence points
 occurence <- paste(system.file(package="dismo"), '/ex/bradypus.csv', sep='')
 occ <- read.table(occurence, header=TRUE, sep=',')[,-1]
 # witholding a 20% sample for testing 
 fold <- kfold(occ, k=5)
 occtrain <- occ[fold != 1, ]
-# fit model
-me <- maxent(predictors, occ)
+# fit model, ecoreg is a categorical variable
+me <- maxent(predictors, occ, factors='ecoreg')
 # plot showing importance of each variable
 plot(me)
 # predict to entire dataset
@@ -77,7 +78,8 @@ r <- predict(me, predictors, progress='text')
 plot(r)
 points(occ)
 
-# equivalent to:
+# The below is equivalent (except that we use 
+# k-fold partitioning of the data for testing purposes
 # extract values
 pv <- data.frame(xyValues(predictors, occ))
 fold <- kfold(pv, k=5)
@@ -95,19 +97,13 @@ train <- rbind(pvtrain, avtrain)
 p <- c(rep(1, nrow(pvtrain)), rep(0, nrow(avtrain)))
 # fit maxent model
 me2 <- maxent(x=train, p=p)
-# predict to training points
-trainp <- predict(me, pvtrain) 
-traina <- predict(me, avtrain) 
-evaluate(p=trainp, a=traina)
 
 # predict to testing points 
 testp <- predict(me, pvtest) 
 testa <- predict(me, avtest) 
-evaluate(p=testp, a=testa)
-
-# predict to entire dataset
-# r <- predict(me, predictors, progress='text') 
-# plot(r)
+e = evaluate(p=testp, a=testa)
+e
+plot(e, 'ROC')
 }
 
 \keyword{spatial}

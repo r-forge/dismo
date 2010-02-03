@@ -241,13 +241,13 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 
 
 setMethod("plot", signature(x='MaxEnt', y='missing'), 
-	function(x, sort=TRUE, main='Variable contribution', ...) {
+	function(x, sort=TRUE, main='Variable contribution', xlab='Percentage', ...) {
 		r <- x@results
 		rnames = rownames(r)
 		i <- grep('.contribution', rnames)
 		r <- r[i, ]
 		names(r) <- gsub('.contribution', '', names(r))
 		if (sort) r = sort(r)
-		dotchart(r, main=main, ...)
+		dotchart(r, main=main, xlab=xlab, ...)
 	}
 )
