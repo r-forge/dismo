@@ -190,8 +190,8 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 
 		mxe <- .jnew("mebridge") 
 	
-		add <- NULL  # to replace with additional arguments supplied with ...
-
+		add <- unlist(list(...))
+		
 		if (is.null(factors)) {
 			.jcall(mxe, "V", "fit", c("autorun", "-e", afn, "-o", dirout, "-s", pfn, add)) 
 		} else {
