@@ -6,10 +6,12 @@
 setClass('MaxEnt',
 	contains = 'DistModel',
 	representation (
-		lambdas  = 'vector'
+		lambdas  = 'vector',
+		results = 'matrix'
 	),	
 	prototype (	
-		lambdas = as.vector(NA)
+		lambdas = as.vector(NA),
+		results = as.matrix(NA)
 	),
 )
 
@@ -23,24 +25,28 @@ setMethod ('show' , 'MaxEnt',
 		cat('\n')
 		pp <- nrow(object@presence)
 		cat('\npresence points:', pp, '\n')
-		if (pp < 10) {
+		if (pp < 5) {
 			print(object@presence)
 		} else {
-			print(object@presence[1:10,])
+			print(object@presence[1:5,])
 			cat('\n')
 			cat('  (... ...  ...)\n')
 			cat('\n')
 		}
 		pp <- nrow(object@absence)
 		cat('\nabsence points:', pp, '\n')
-		if (pp < 25) {
+		if (pp < 5) {
 			print(object@absence)
 		} else {
-			print(object@absence[1:25,])
+			print(object@absence[1:5,])
 			cat('\n')
 			cat('  (... ...  ...)\n')
 			cat('\n')
 		}
+		cat('\nmodel fit\n')
+		cat('\n')
+		print(object@results)
+		cat('\n')
 	}
 )	
 
@@ -147,7 +153,7 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 
 
 setMethod('maxent', signature(x='data.frame', p='vector'), 
-	function(x, p, ...) {
+	function(x, p, args=NULL, ...) {
 
 		x <- cbind(p, x)
 		x <- na.omit(x)
@@ -160,7 +166,6 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 				factors = c(factors, colnames(x)[i])
 			}
 		}
-	
 		
 		jar <- paste(system.file(package="dismo"), "/java/maxent.jar", sep='')
 		if (!file.exists(jar)) {
@@ -190,16 +195,19 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 
 		mxe <- .jnew("mebridge") 
 	
-		add <- unlist(list(...))
-		
 		if (is.null(factors)) {
-			.jcall(mxe, "V", "fit", c("autorun", "-e", afn, "-o", dirout, "-s", pfn, add)) 
+			.jcall(mxe, "V", "fit", c("autorun", "-e", afn, "-o", dirout, "-s", pfn, args)) 
 		} else {
-			.jcall(mxe, "V", "fit", c("autorun", "-e", afn, "-o", dirout, "-s", pfn, add), .jarray(factors))
+			.jcall(mxe, "V", "fit", c("autorun", "-e", afn, "-o", dirout, "-s", pfn, args), .jarray(factors))
 		}
 		
 		me@lambdas <- unlist( readLines( paste(dirout, '/species.lambdas', sep='') ) )
-
+		d = t(read.csv(paste(dirout, '/maxentResults.csv', sep='') ))
+		d = d[-1, ,drop=FALSE]
+		dd = matrix(as.numeric(d))
+		rownames(dd) = rownames(d)
+		me@results <- dd
+		
 		unlink(paste(d, "/*", sep=""), recursive = TRUE)
 		me
 	}
@@ -230,3 +238,16 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 	}
 }
 
+
+
+setMethod("plot", signature(x='MaxEnt', y='missing'), 
+	function(x, sort=TRUE, main='Variable contribution', ...) {
+		r <- x@results
+		rnames = rownames(r)
+		i <- grep('.contribution', rnames)
+		r <- r[i, ]
+		names(r) <- gsub('.contribution', '', names(r))
+		if (sort) r = sort(r)
+		dotchart(r, main=main, ...)
+	}
+)
