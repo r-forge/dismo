@@ -9,7 +9,7 @@
 \title{MaxEnt}
 
 \description{
-This function calls the Maximum Entropy (maxent) species distribution model (see references below). Maximum Entropy is a generic machine learning method, but in the context of this function it is treated as a species distribution model. The function uses presence and absence (or random 'background') data for a number of locations, and the values of a number of predictors (independent variables) for those locations. The result is a predictive model that can be used to predict the suitability of other locations, for example to predict the entire range of a species, or its potential range in another region, or under changed conditions. 
+This function calls the Maximum Entropy (maxent) species distribution model (see references below). Maximum Entropy is a generic machine learning method, but in the context of this function it is treated as a species distribution model. The function uses presence and 'background' (random absence) data for a number of locations, and the values of a number of predictors (independent variables) for those locations. The result is a predictive model that can be used to predict the suitability of other locations, for example to predict the entire range of a species, or its potential range in another region, or under changed conditions. 
 
 For this function to work, you must first download the maxent software from \url{http://www.cs.princeton.edu/~schapire/maxent/} and put 
 the file 'maxent.jar' in the 'java' folder of this package. That is the folder returned by \code{system.file("java", package="dismo")}. 
@@ -21,12 +21,12 @@ maxent(x, p, ...)
 }
 
 \arguments{
-\item{x}{Predictors. Raster* object or SpatialGridDataFrame, containing grids with predictor variables. These will be used to extract values from for the point locations. \code{x} can also be a data.frame, in which case each column should be a predictor variable and each row a presence or absence record. }
+\item{x}{Predictors. Raster* object or SpatialGridDataFrame, containing grids with predictor variables. These will be used to extract values from for the point locations. \code{x} can also be a data.frame, in which case each column should be a predictor variable and each row a presence or background record. }
 
 \item{p}{Occurrence data. This can be a data.frame, matrix, SpatialPoints* object, or a vector 
-If \code{p} is a data.frame or matrix it represents a set of point locations; and the object must have two columns with the first being the x-coordinate (longitude) and the second the y-coordinate (latitude). Coordinates can also be specified with a SpatialPoints* object (defined in the sp package). Background (absence) points are sampled randomly from the cells that are not NA in the first predictor variable, unless absence points are specified with an additional argument \code{a} (see Details).}
+If \code{p} is a data.frame or matrix it represents a set of point locations; and the object must have two columns with the first being the x-coordinate (longitude) and the second the y-coordinate (latitude). Coordinates can also be specified with a SpatialPoints* object (defined in the sp package). Background points are sampled randomly from the cells that are not NA in the first predictor variable, unless background points are specified with an additional argument \code{a} (see Details).}
 
-if \code{x} is a data.frame, \code{p} should be a vector with a length equal to \code{nrow(x)} and contain 0 (absence) and 1 (presence) values, to indicate which records (rows) in data.frame \code{x} are presence records, and which are absence records. 
+if \code{x} is a data.frame, \code{p} should be a vector with a length equal to \code{nrow(x)} and contain 0 (background) and 1 (presence) values, to indicate which records (rows) in data.frame \code{x} are presence records, and which are background records. 
 
 \item{...}{Additional arguments. See Details}
 }
@@ -34,7 +34,7 @@ if \code{x} is a data.frame, \code{p} should be a vector with a length equal to 
 \details{
 Additional arguments:
 \tabular{lll}{
-\tab \code{a} \tab Absence points. Only used if \code{p} is not missing, and not a vector.  \cr
+\tab \code{a} \tab Background points. Only used if \code{p} is not missing, and not a vector.  \cr
 \tab \code{factors} \tab Which (if any) variables should be considered as categorical? Either by (layer)name or by index. Only used when argument \code{x} is a Raster* object because it is not needed in other cases as you can set the appropriate class to the variables in the data.frame \cr 
 \tab \code{args} \tab Additional argument that can be passed to maxent   \cr
 }
@@ -86,12 +86,12 @@ fold <- kfold(pv, k=5)
 pvtrain <- pv[fold != 1, ]
 pvtest <- pv[fold == 1, ]
 # background data
-abs <- randomPoints(predictors, 5000)
-av <- data.frame(xyValues(predictors, abs))
+bg <- randomPoints(predictors, 5000)
+av <- data.frame(xyValues(predictors, bg))
 fold <- kfold(av, k=5)
 avtrain <- av[fold != 1, ]
 avtest <- av[fold == 1, ]
-# combine train presence and absence data
+# combine train presence and background data
 train <- rbind(pvtrain, avtrain)
 # vector indicating presence or absence
 p <- c(rep(1, nrow(pvtrain)), rep(0, nrow(avtrain)))
