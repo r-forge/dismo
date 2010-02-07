@@ -55,7 +55,7 @@ randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=5, 
 	if (nn == ncell(mask2)) {
 		cells <- 1:ncell(mask2)
 	} else {
-		cells <- unique(round(runif(nn) * ncell(mask2)))
+		cells <- sample.int(ncell(mask2), nn)
 	}
 	xy <- xyFromCell(mask2, cells)
 	cells <- cellFromXY(mask, xy)
