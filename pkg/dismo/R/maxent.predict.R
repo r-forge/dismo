@@ -92,9 +92,12 @@ setMethod('predict', signature(object='MaxEnt'),
 			
 			x <- x[,variables,drop=FALSE]
 			x <- na.omit(x)
-			out <- rep(NA, times=nrow(x))
-			x = as.matrix(x)
 			if (nrow(x) > 0) {
+				out <- rep(NA, times=nrow(x))
+				xx = as.numeric(as.matrix(x))
+				dim(xx) = dim(x)
+				colnames(xx) = colnames(x)
+				x = xx
 				p <- .jcall(mxe, "[D", "predict", lambdas, .jarray(colnames(x)), .jarray(x)) 
 				p[p == -9999] <- NA
 				naind <- as.vector(attr(x, "na.action"))
@@ -109,3 +112,4 @@ setMethod('predict', signature(object='MaxEnt'),
 		out
 	}
 )
+

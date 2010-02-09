@@ -9,10 +9,14 @@
 \alias{bioclim,matrix,missing-method}
 \alias{bioclim,data.frame,missing-method}
 
+
 \title{bioclim}
 
+
 \description{
-The BIOCLIM environmental similarity algorithm that has been extensively used for species distribution modeling.
+The BIOCLIM environmental similarity algorithm that has been extensively used for species distribution modeling. BIOCLIM is a classic 'climate-envelope-model'. Although it generally performs poorly in model comparison (Elith et al. 2006, Hijmans and Graham, 2006), it is still used, among other reasons because the algorithm is easy to understand and thus useful in teaching species distribution modeling.
+The BIOCLIM algorithm computes the similarity of a location by comparing the values of environmental variables at any location to a percentile 
+distribution of the values at known locations of occurence ('training sites'). The closer to the 50th percentile (the median), the more suitable the location is. The tails of the distribution are not distinguished, that is, 10 percentile is treated as equivalent to 90 percentile. In this implementation in R, the values of the upper tail values are transformed to the lower tail, and the minimum percentile score across all the environmental variables is used (i.e. BIOCLIM using an approach like Liebig's law of the minimum). This value is substracted from 1 and then mutlipled with two so that the results are between 0 and 1. The reason for scaling this way is that the results become more like that of other distributon modeling methods and are thus easier to interpret. The value 1 will rarely be observed as it would require a location that has the median value of the training data for all the variables considered. The value 0 is very common as it is assinged to all cells with a value of an environmental variable that is outside the percentile distribution (the range of the training data) for at least one of the variables.
 }
 
 
@@ -27,22 +31,6 @@ bioclim(x, p, ...)
   \item{...}{ Additional arguments }
 }
 
-
-\details{
-BIOCLIM is a classic 'climate-envelope-model'. Although it does rather poorly in species distribution model comparisons (Elith et al. 2006, Hijmans and Graham, 2006), 
-it is still used, among other reasons because the algorith is easy to understand and thus useful in teaching species distribution modeling.
-The BIOCLIM algorithm computes the similarity of a location by comparing the values of environmental variables at the location to percentile 
-distributions of the values at known locations of occurence ('training sites'). 
-The closer to the 50th percentile (the median), the more similar the location is. The two tails are not distinguished, i.e., 10 percentile is
-equivalent to 90 percentile. In this implementation in R, the values upper tail values are transformed to the lower tail, and the minimum percentile 
-score across all the environmental variables is used. This value is substracted from 1 and then mutlipled with two so that the results are between 0 and 1. 
-The reason for scaling this way is that the results become more like that of other distributon modeling methods and are thus easoer to interpret.
-The value 1 will rarely be observed as it would require a location that has the median value of the training data for all the variables considered. The value 0 
-is very common as it is assinged to all cells with a value of an environmental variable that is outside the percentile distribtions (the range of the training data).
-
-DIVA-GIS (\url{www.diva-gis.org}) is a windows (and mac with some effort) program that has also implemented bioclim together with a number of methods
-to visually explore the environmental distribution of sets of points in the context of the bioclim model./
-}
 
 
 \value{
@@ -88,8 +76,6 @@ bc <- bioclim(v)
 #or
 sp <- SpatialPoints(pts)
 bc <- bioclim(logo, pts)
-
-
 }
 
 \keyword{spatial}
