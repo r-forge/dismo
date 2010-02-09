@@ -3,14 +3,14 @@
 \alias{NSWtrain}
 \alias{NSWbackground}
 \alias{NSWtest}
-\alias{NSWeval}
+
 
 \docType{data}
 
 \title{New South Wales species distribution data}
 
 \description{
-NSW (New South Wales, a state in Australia) species distribution data. There are four data sets with training (NSWtrain), background or pseudo-absence (NSWbackground), test (NSWtest), and evaluation (NSWeval) data for 54 species from 8 biological groups. 
+Species occurence data for 54 species from 8 biological groups in New South Wales (NSW, a state in Australia) and associated environmental data. There are three data sets with training (NSWtrain), background or pseudo-absence (NSWbackground), and test (NSWtest). The training data principally consist of environmental variables at locations where the species where observed (presence only), and at random locations for background data. The test data are presence/absence observations on hte same species, independent from the training data.
 
 
 Species and site variables:
@@ -52,7 +52,6 @@ Latitude and latitude are in geographical coordinates using the WGS84 datum.
 data(NSWtrain)
 data(NSWbackground)
 data(NSWtest)
-data(NSWeval)
 }
 
 \author{Simon Ferrier}
