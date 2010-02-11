@@ -1,5 +1,7 @@
 import("rJava")
 importFrom("graphics", plot, points, pairs, boxplot)
-importFrom("stats", density)
+importFrom("stats", density, predict)
 importFrom("raster", predict)
+exportClasses(DistModel, Bioclim, Domain, MaxEnt, ConvexHull)
+exportMethods("predict")
 exportPattern("^[^\\.]")
