@@ -34,24 +34,20 @@ setMethod ('show' , 'DistModel',
 		cat('variables:', colnames(object@presence), '\n\n')
 		pp <- nrow(object@presence)
 		cat('\npresence points:', pp, '\n')
-		if (pp < 25) {
+		if (pp < 10) {
 			print(object@presence)
 		} else {
-			print(object@presence[1:25,])
-			cat('\n')
-			cat('  (... ...  ...)\n')
-			cat('\n')
+			print(object@presence[1:10,])
+			cat('  (... ...  ...)\n\n')
 		}
 		if (object@hasabsence) {
 			pp <- nrow(object@absence)
 			cat('\nabsence points:', pp, '\n')
-			if (pp < 25) {
+			if (pp < 10) {
 				print(object@absence)
 			} else {
-				print(object@absence[1:25,])
-				cat('\n')
-				cat('  (... ...  ...)\n')
-				cat('\n')
+				print(object@absence[1:10,])
+				cat('  (... ...  ...)\n\n')
 			}
 		}
 	}

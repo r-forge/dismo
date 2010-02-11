@@ -2,12 +2,14 @@
 
 \docType{methods}
 
+\alias{predict}
 \alias{predict,Bioclim-method}
 \alias{predict,Domain-method}
 \alias{predict,Mahalanobis-method}
 \alias{predict,MaxEnt-method}
+\alias{predict,ConvexHull-method}
 
-\title{Model predictions}
+\title{Distribution model predictions}
 
 \description{
 Make a RasterLayer with a prediction based on a model object. Provide a Raster* object with the independent variables. The layerNames in the Raster* object should include those expected by the model. 
@@ -18,7 +20,7 @@ Make a RasterLayer with a prediction based on a model object. Provide a Raster* 
 \code{predict(object, x, ext=NULL, filename='', progress='text', ...)}
   
 \tabular{rll}{  
-  \tab  \code{object}  \tab A fitted model of class Bioclim, Domain, MaxEnt, or Mahalanobis (classes that inherit from DistModel)\cr
+  \tab  \code{object}  \tab A fitted model of class Bioclim, Domain, MaxEnt, ConvexHull, or Mahalanobis (classes that inherit from DistModel)\cr
   \tab  \code{x} \tab A Raster* object \cr
   \tab  \code{ext} \tab An Extent object that can be used to make a prediction for a sub-region of \code{x}. You can also supply an 
   object that can be coerced to an Extent object by \code{\link[raster]{extent}}; such as a Raster* or Spatial* object \cr
@@ -41,7 +43,9 @@ A RasterLayer or, if \code{x} is a matrix), a vector.
 }
 
 \seealso{
-\code{ \link[dismo]{maxent}, \link[dismo]{bioclim}, \link[dismo]{mahal}, link[dismo]{domain}}
+For spatial predictions with GLM, GAM, BRT, randomForest, etc., see \link[raster]{predict} in the Raster package.
+
+To fit models related to this predict method, see \code{ \link[dismo]{maxent}, \link[dismo]{bioclim}, \link[dismo]{mahal}, \link[dismo]{domain}, \link[dismo]{convHull}}
 }
 
 \author{ Robert J. Hijmans}
