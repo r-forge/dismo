@@ -25,6 +25,15 @@ if (!isGeneric("mahal")) {
 setMethod('mahal', signature(x='matrix', p='missing'), 
 	function(x, p, ...) {
 		m <- new('Mahalanobis')
+		
+		for (i in ncol(x):1) {
+			if (is.factor(x[,i])) {
+				warning('variable "', colnames(x)[i], '" was removed because it is a factor (categorical)')
+				x <- x[, -i]
+			}
+		}
+		if (ncol(x) == 0) {	stop('no usable variables') 	}
+		
 		m@presence <- x
 		m@cov <- var(x)
 		m
@@ -58,72 +67,3 @@ setMethod('mahal', signature(x='Raster', p='SpatialPoints'),
 	}
 )
 
-
-setMethod('predict', signature(object='Mahalanobis'), 
-function(object, x, ext=NULL, filename='', progress='text', ...) {
-
-	if (! (extends(class(x), 'Raster')) ) {
-		if (! all(colnames(object@presence) %in% colnames(x)) ) {
-			stop('missing variables in matrix ')
-		}
-		x <- x[ , colnames(object@presence),drop=FALSE]
-		mah <- 1 - apply(data.frame(x), 1, FUN=function(z) min( mahalanobis(object@presence, z, object@cov)))
-		return(mah)
-		
-	} else {
-		if (! all(colnames(object@presence) %in% layerNames(x)) ) {
-			stop('missing variables in Raster object ')
-		}
-	
-		out <- raster(x)
-
-		if (!is.null(ext)) {
-			ext <- intersectExtent(extent(ext), extent(x))
-			out <- crop(out, ext)
-			firstrow <- rowFromY(x, yFromRow(out, 1))
-			firstcol <- colFromX(x, xFromCol(out, 1))
-			ncols <- colFromX(x, xFromCol(out, ncol(out))) - firstcol + 1
-		} else {
-			firstrow <- 1
-			firstcol <- 1
-			ncols <- ncol(x)
-		}
-
-		if (canProcessInMemory(out, 2)) {
-			inmem <- TRUE
-			v <- matrix(NA, ncol=nrow(out), nrow=ncol(out))
-		} else {
-			inmem <- FALSE
-			if  (filename == '') {
-				filename <- rasterTmpFile()
-				if (getOption('verbose')) { cat('writing raster to:', filename)	}						
-			}
-		}
-
-		cn <- colnames(object@presence)
-		pb <- pbCreate(nrow(out), type=progress)
-		for (r in 1:nrow(out)) {
-
-			rr <- firstrow + r - 1
-			vals <- getValuesBlock(x, rr, 1, firstcol, ncols)
-
-			vals <- vals[,cn,drop=FALSE]
-			mah <- 1 - apply(data.frame(vals), 1, FUN=function(z) min( mahalanobis(object@presence, z, object@cov)))
-			if (inmem) {
-				v[,r] <- mah
-			} else {
-				out <- setValues(out, mah)
-				out <- writeRaster(out, filename, ...)
-			}
-			pbStep(pb, r) 
-		} 
-		if (inmem) {
-			out <- setValues(out, as.vector(v))
-			if (filename != '') {
-				out <- writeRaster(out, filename, ...)
-			}
-		}
-		pbClose(pb)
-		return(out)
-	}
-})

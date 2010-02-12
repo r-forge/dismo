@@ -27,6 +27,15 @@ if (!isGeneric("bioclim")) {
 setMethod('bioclim', signature(x='matrix', p='missing'), 
 	function(x, p, ...) {
 		bc <- new('Bioclim')
+		
+		for (i in ncol(x):1) {
+			if (is.factor(x[,i])) {
+				warning('variable "', colnames(x)[i], '" was removed because it is a factor (categorical)')
+				x <- x[, -i]
+			}
+		}
+		if (ncol(x) == 0) {	stop('no usable variables') 	}
+		
 		bc@presence <- x
 		bc@min <- apply(x, 2, min)
 		bc@max <- apply(x, 2, max)
