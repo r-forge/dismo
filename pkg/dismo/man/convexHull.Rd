@@ -11,6 +11,7 @@
 
 \description{
 The Convex Hull model predicts that a species is present at sites inside the convex hull of a set of training points, and absent outside that hull.
+I.e. this is the spatial convex hull, not an environmental hull.
 }
 
 
@@ -18,12 +19,10 @@ The Convex Hull model predicts that a species is present at sites inside the con
 convHull(p, ...)
 }
  
-
 \arguments{
-  \item{p}{ two column matrix, data.frame or SpatialPoints* object}
+  \item{p}{point locations (presence). Two column matrix, data.frame or SpatialPoints* object}
   \item{...}{ Additional arguments, currently not used }
 }
-
 
 
 \value{
@@ -52,11 +51,14 @@ predict(ch, test)
 
 plot(r)
 polygon(ch@hull, border='red', lwd=2)
-points(train, col='blue', pch=20, cex=2)
+points(train, col='red', pch=20, cex=2)
 points(test, col='black', pch=20, cex=2)
 
 pr = predict(ch, r, progress='')
-plot(pr)
+plot(r, legend=F)
+plot(pr, add=T, col='blue')
+points(test, col='black', pch=20, cex=2)
+points(train, col='red', pch=20, cex=2)
 }
 
 \keyword{spatial}
