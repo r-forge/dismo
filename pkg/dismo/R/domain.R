@@ -48,9 +48,29 @@ setMethod('domain', signature(x='data.frame', p='missing'),
 setMethod('domain', signature(x='matrix', p='missing'), 
 	function(x, p, ...) {
 		d <- new('Domain')
-		d@presence <- x
+		for (i in ncol(x):1) {
+			if (is.factor(x[,i])) {
+				warning('variable "', colnames(x)[i], '" was removed because it is a factor (categorical)')
+				x <- x[, -i]
+			}
+		}
+		if (ncol(x) == 0) {	stop('no usable variables') 	}
+		
 		r <- apply(x, 2, FUN=function(x){range(x, na.rm=TRUE)})
+		d@presence <- x
 		d@range <-  abs(r[2,] - r[1,])
+		norange = which(d@range == 0)
+		if (length(norange) > 0) {
+			for (i in length(norange):1) {
+				index = norange[i]
+				warning('variable "', colnames(d@presence)[index], '" was removed because it has no variation for the training points')
+				d@presence <- d@presence[, -index]
+				d@range <- d@range[-index]
+			}
+		}
+		if (ncol(d@presence) == 0) {
+			stop('no usable variables')
+		}
 		d
 	}
 )
