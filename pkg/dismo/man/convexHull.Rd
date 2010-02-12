@@ -55,7 +55,7 @@ points(train, col='red', pch=20, cex=2)
 points(test, col='black', pch=20, cex=2)
 
 pr = predict(ch, r, progress='')
-plot(r, legend=F)
+plot(r, legend=FALSE)
 plot(pr, add=T, col='blue')
 points(test, col='black', pch=20, cex=2)
 points(train, col='red', pch=20, cex=2)
