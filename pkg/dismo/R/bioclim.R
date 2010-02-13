@@ -30,7 +30,7 @@ setMethod('bioclim', signature(x='matrix', p='missing'),
 		
 		for (i in ncol(x):1) {
 			if (is.factor(x[,i])) {
-				warning('variable "', colnames(x)[i], '" was removed because it is a factor (categorical)')
+				warning('variable "', colnames(x)[i], '" was removed because it is a factor (categorical variable)')
 				x <- x[, -i]
 			}
 		}

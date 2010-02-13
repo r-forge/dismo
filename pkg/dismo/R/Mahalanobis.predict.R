@@ -16,6 +16,7 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 		return(mah)
 		
 	} else {
+	
 		if (! all(colnames(object@presence) %in% layerNames(x)) ) {
 			stop('missing variables in Raster object ')
 		}
@@ -46,29 +47,37 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 		}
 
 		cn <- colnames(object@presence)
-		pb <- pbCreate(nrow(out), type=progress)
-		for (r in 1:nrow(out)) {
 
-			rr <- firstrow + r - 1
-			vals <- getValuesBlock(x, rr, 1, firstcol, ncols)
+		tr <- blockSize(out, n=nlayers(x)+2)
+		pb <- pbCreate(tr$n, type=progress)	
+		for (i in 1:tr$n) {
+			rr <- firstrow + tr$rows[i] - 1
+			vals <- getValuesBlock(x, row=rr, nrows=tr$size, firstcol, ncols)
 
 			vals <- vals[,cn,drop=FALSE]
-			mah <- 1 - apply(data.frame(vals), 1, FUN=function(z) min( mahalanobis(object@presence, z, object@cov)))
+			res <- 1 - apply(data.frame(vals), 1, FUN=function(z) min( mahalanobis(object@presence, z, object@cov)))
+
 			if (inmem) {
-				v[,r] <- mah
+				res <- matrix(res, nrow=ncol(out))
+				v[,tr$rows[i]:dim(res)[2]] <- res
 			} else {
-				out <- setValues(out, mah)
-				out <- writeRaster(out, filename, ...)
+				writeValues(out, res, tr$rows[i])
 			}
-			pbStep(pb, r) 
+			pbStep(pb, i) 
+
 		} 
 		if (inmem) {
 			out <- setValues(out, as.vector(v))
 			if (filename != '') {
 				out <- writeRaster(out, filename, ...)
 			}
+		} else {
+			out <- writeStop(out)	
 		}
+
 		pbClose(pb)
 		return(out)
 	}
 })
+
+
