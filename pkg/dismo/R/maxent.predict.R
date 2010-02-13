@@ -45,16 +45,20 @@ setMethod('predict', signature(object='MaxEnt'),
 			if (!canProcessInMemory(out, 3) & filename == '') {
 				filename <- rasterTmpFile()
 			}
-				# check with model object?
-				
+			
 			if (filename == '') {
 				v <- matrix(ncol=nrow(out), nrow=ncol(out))
+			} else {
+				out <- writeStart(out, filename=filename, ... )
 			}
-			pb <- pbCreate(nrow(out), type=progress)
-			cv <- rep(NA, times=ncol(out))
-			for (r in 1:nrow(out)) {
-				rr <- firstrow + r - 1
-				rowvals <- getValuesBlock(x, rr, 1, firstcol, ncols)
+			
+			tr <- blockSize(out, n=nlayers(x)+3)
+			pb <- pbCreate(tr$n, type=progress)	
+			cv <- rep(NA, times= ncol(x) * tr$size)
+			
+			for (i in 1:tr$n) {
+				rr <- firstrow + tr$rows[i] - 1
+				rowvals <- getValuesBlock(x, row=rr, nrows=tr$size)
 				rowvals <- rowvals[,variables,drop=FALSE]
 				rowv <- na.omit(rowvals)
 				res <- cv
@@ -69,16 +73,18 @@ setMethod('predict', signature(object='MaxEnt'),
 				}
 				res[res == -9999] <- NA
 				if (filename != '') {
-					out <- setValues(out, res, r)
-					out <- writeRaster(out, filename=filename, ...)
+					writeValues(out, res, tr$rows[i])
 				} else {
-					v[,r] <- res
+					res = matrix(res, nrow=ncol(out))
+					v[,tr$rows[i]:dim(res)[2]] <- res
 				}
-				pbStep(pb, r) 
+				pbStep(pb, i) 
 			} 
 			pbClose(pb)
 			if (filename  == '') {
 				out <- setValues(out, as.vector(v))
+			} else {
+				out <- writeStop(out)
 			}
 		} else {
 			if (inherits(x, "Spatial")) {
