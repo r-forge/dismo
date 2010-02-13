@@ -22,7 +22,7 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 			stop('missing variables in x ')
 		}
 		
-		dom <- matrix(ncol=length(colnames(object@presence)), nrow=nrow(x))
+		dom <- matrix(ncol=length(colnames(object@presence)), nrow=nrow(x) )
 		ln <- colnames(object@presence)
 		for (i in 1:ncol(dom)) {
 			dom[,i] <- domdist(object, ln[i], x[,ln[i]])
@@ -61,30 +61,35 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 		}
 
 		ln <- colnames(object@presence)
-		dom <- matrix(ncol=nlayers(x), nrow=ncols)
-		pb <- pbCreate(nrow(out), type=progress)
-		for (r in 1:nrow(out)) {
 
-			rr <- firstrow + r - 1
-			vals <- getValuesBlock(x, rr, 1, firstcol, ncols)
+		tr <- blockSize(out, n=nlayers(x)+2)
 
-			for (i in 1:ncol(dom)) {
-				dom[,i] <- domdist(object, ln[i], vals[,ln[i]])
+		dom <- matrix(ncol=nlayers(x), nrow=ncols*tr$size )
+
+		pb <- pbCreate(tr$n, type=progress)	
+		for (i in 1:tr$n) {
+			rr <- firstrow + tr$rows[i] - 1
+			vals <- getValuesBlock(x, row=rr, nrows=tr$size, firstcol, ncols)
+
+			for (j in 1:ncol(dom)) {
+				dom[,j] <- domdist(object, ln[j], vals[,ln[j]])
 			}
-			ddom <- apply(dom, 1, min)
+			res <- apply(dom, 1, min)
 			if (inmem) {
-				v[,r] <- ddom
+				res <- matrix(res, nrow=ncol(out))
+				v[,tr$rows[i]:dim(res)[2]] <- res
 			} else {
-				out <- setValues(out, ddom)
-				out <- writeRaster(out, filename, ...)
+				writeValues(out, res, tr$rows[i])
 			}
-			pbStep(pb, r) 
+			pbStep(pb, i) 
 		} 
 		if (inmem) {
 			out <- setValues(out, as.vector(v))
 			if (filename != '') {
-				out <- writeRaster(out, filename, ...)
+				out <- writeRaster(out, filename=filename, ...)
 			}
+		} else {
+			out <- writeStop(out)	
 		}
 		pbClose(pb)
 		return(out)

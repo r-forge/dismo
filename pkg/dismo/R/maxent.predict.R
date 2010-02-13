@@ -52,13 +52,13 @@ setMethod('predict', signature(object='MaxEnt'),
 				out <- writeStart(out, filename=filename, ... )
 			}
 			
-			tr <- blockSize(out, n=nlayers(x)+3)
+			tr <- blockSize(out, n=nlayers(x)+2)
 			pb <- pbCreate(tr$n, type=progress)	
 			cv <- rep(NA, times= ncol(x) * tr$size)
 			
 			for (i in 1:tr$n) {
 				rr <- firstrow + tr$rows[i] - 1
-				rowvals <- getValuesBlock(x, row=rr, nrows=tr$size)
+				rowvals <- getValuesBlock(x, row=rr, nrows=tr$size, firstcol, ncols)
 				rowvals <- rowvals[,variables,drop=FALSE]
 				rowv <- na.omit(rowvals)
 				res <- cv

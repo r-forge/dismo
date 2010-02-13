@@ -65,49 +65,37 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 		}
 
 		ln <- colnames(object@presence)
-		pb <- pbCreate(nrow(out), type=progress)
-		
-		bbc <- matrix(0, ncol=nlayers(x), nrow=ncols)
-	#	for (r in 1:nrow(out)) {
-		for (r in 1:nrow(out)) {
-			rr <- firstrow + r - 1
+		tr <- blockSize(out, n=nlayers(x)+2)
+		bbc <- matrix(0, ncol=nlayers(x), nrow=ncols * tr$size)
+		pb <- pbCreate(tr$n, type=progress)	
+		for (i in 1:tr$n) {
+			rr <- firstrow + tr$rows[i] - 1
+			vals <- getValuesBlock(x, row=rr, nrows=tr$size, firstcol, ncols)
 			bc <- bbc
-			vals <- getValuesBlock(x, rr, 1, firstcol, ncols)
 			na <- as.vector(attr(na.omit(vals), 'na.action'))
 			bc[na] <- NA
-			i <- (apply(t(vals) >= object@min, 2, all) & apply(t(vals) <= object@max, 2, all))
-			i[is.na(i)] <- FALSE
+			k <- (apply(t(vals) >= object@min, 2, all) & apply(t(vals) <= object@max, 2, all))
+			k[is.na(k)] <- FALSE
 			for (j in 1:length(ln)) {
-				bc[i,j] <- percRank( object@presence[ ,ln[j]], vals[i, ln[j]] )
+				bc[k,j] <- percRank( object@presence[ ,ln[j]], vals[k, ln[j]] )
 			}
-			if (inmem) {
-				v[,r] <- apply(bc, 1, min)
-			} else {
-				out <- setValues(out, apply(bc, 1, min))
-				out <- writeRaster(out, filename, ...)
-			}
-			pbStep(pb, r) 
-		} 
 
-#		for (r in 1:nrow(out)) {
-#			bc <- matrix(ncol=nlayers(x), nrow=ncol(x))
-#			vals <- getValues(x, r)
-#			for (i in 1:length(ln)) {
-#				bc[,i] <- percRank(object@presence[,ln[i]], vals[,ln[i]])
-#			}
-###			} else {
-#				out <- setValues(out, apply(bc, 1, min))
-#				out <- writeRaster(out, filename, ...)
-#			}
-#			pbStep(pb, r) 
-#		} 
-#	}
-	
+			res <- apply(bc, 1, min)
+			if (inmem) {
+				res <- matrix(res, nrow=ncol(out))
+				v[,tr$rows[i]:dim(res)[2]] <- res
+			} else {
+				writeValues(out, res, tr$rows[i])
+			}
+			pbStep(pb, i) 
+		} 
 		if (inmem) {
 			out <- setValues(out, as.vector(v))
 			if (filename != '') {
 				out <- writeRaster(out, filename, ...)
 			}
+		} else {
+			out <- writeStop(out)
 		}
 		pbClose(pb)
 		return(out)
