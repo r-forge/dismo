@@ -75,8 +75,9 @@ setMethod('predict', signature(object='MaxEnt'),
 				if (filename != '') {
 					writeValues(out, res, tr$rows[i])
 				} else {
-					res = matrix(res, nrow=ncol(out))
-					v[,tr$rows[i]:dim(res)[2]] <- res
+					res = matrix(res, nrow=ncol(out))		
+					cols = tr$rows[i]:(tr$rows[i]+dim(res)[2]-1)
+					v[, cols] <- res
 				}
 				pbStep(pb, i) 
 			} 
