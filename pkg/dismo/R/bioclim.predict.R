@@ -83,7 +83,8 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 			res <- apply(bc, 1, min)
 			if (inmem) {
 				res <- matrix(res, nrow=ncol(out))
-				v[,tr$rows[i]:dim(res)[2]] <- res
+				cols = tr$rows[i]:(tr$rows[i]+dim(res)[2]-1)
+				v[ , cols] <- res
 			} else {
 				writeValues(out, res, tr$rows[i])
 			}
