@@ -57,6 +57,9 @@ gbm.step(data, gbm.x, gbm.y, offset = NULL, fold.vector = NULL, tree.complexity 
   \item{\dots}{Logical. allows for any additional plotting parameters}
 }
 
+\note{
+This and other boosted regression trees (BRT) functions in the dismo package do not work if you use only one predictor. There is an easy work around: make a dummy variable with a constant value and then fit a model with two predictors, the one of interest and the dummy variable, which will be ignored by the model fitting as it has no useful information.
+}
 
 \value{
 object of S3 class gbm
