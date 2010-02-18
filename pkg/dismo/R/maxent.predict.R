@@ -23,23 +23,22 @@ setMethod('predict', signature(object='MaxEnt'),
 		mxe <- .jnew("mebridge") 
 		filename <- trim(filename)
 		if (inherits(x, "Raster")) {
-			out <- raster(x)
 			
 			if (! all(colnames(object@presence)  %in%  layerNames(x) )) {
 				stop('missing layers (or wrong names)')
 			}
 			
+			out <- raster(x)
 			if (!is.null(ext)) {
-				ext <- intersectExtent(extent(ext), extent(x))
 				out <- crop(out, ext)
 				firstrow <- rowFromY(x, yFromRow(out, 1))
 				firstcol <- colFromX(x, xFromCol(out, 1))
-				ncols <- colFromX(x, xFromCol(out, ncol(out))) - firstcol + 1
 			} else {
 				firstrow <- 1
 				firstcol <- 1
-				ncols <- ncol(x)
 			}
+			ncols <- ncol(out)
+		
 			
 			filename <- trim(filename)
 			if (!canProcessInMemory(out, 3) & filename == '') {
@@ -54,14 +53,13 @@ setMethod('predict', signature(object='MaxEnt'),
 			
 			tr <- blockSize(out, n=nlayers(x)+2)
 			pb <- pbCreate(tr$n, type=progress)	
-			cv <- rep(NA, times= ncol(x) * tr$size)
 			
 			for (i in 1:tr$n) {
-				rr <- firstrow + tr$rows[i] - 1
-				rowvals <- getValuesBlock(x, row=rr, nrows=tr$size, firstcol, ncols)
+				rr <- firstrow + tr$row[i] - 1
+				rowvals <- getValuesBlock(x, row=rr, nrows=tr$nrows[i], firstcol, ncols)
 				rowvals <- rowvals[,variables,drop=FALSE]
+				res <- rep(NA, times=nrow(rowvals))
 				rowv <- na.omit(rowvals)
-				res <- cv
 				if (length(rowv) > 0) {
 					p <- .jcall(mxe, "[D", "predict", lambdas, .jarray(colnames(rowv)), .jarray(rowv)) 
 					naind <- as.vector(attr(rowv, "na.action"))
@@ -73,10 +71,10 @@ setMethod('predict', signature(object='MaxEnt'),
 				}
 				res[res == -9999] <- NA
 				if (filename != '') {
-					writeValues(out, res, tr$rows[i])
+					writeValues(out, res, tr$row[i])
 				} else {
 					res = matrix(res, nrow=ncol(out))		
-					cols = tr$rows[i]:(tr$rows[i]+dim(res)[2]-1)
+					cols = tr$row[i]:(tr$row[i]+dim(res)[2]-1)
 					v[, cols] <- res
 				}
 				pbStep(pb, i) 

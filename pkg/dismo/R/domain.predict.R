@@ -36,18 +36,15 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 		}
 		
 		out <- raster(x)
-		
 		if (!is.null(ext)) {
-			ext <- intersectExtent(exent(ext), extent(x))
 			out <- crop(out, ext)
 			firstrow <- rowFromY(x, yFromRow(out, 1))
 			firstcol <- colFromX(x, xFromCol(out, 1))
-			ncols <- colFromX(x, xFromCol(out, ncol(out))) - firstcol + 1
 		} else {
 			firstrow <- 1
 			firstcol <- 1
-			ncols <- ncol(x)
 		}
+		ncols <- ncol(out)
 		
 		if (canProcessInMemory(out, 2)) {
 			inmem=TRUE
@@ -68,8 +65,8 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 
 		pb <- pbCreate(tr$n, type=progress)	
 		for (i in 1:tr$n) {
-			rr <- firstrow + tr$rows[i] - 1
-			vals <- getValuesBlock(x, row=rr, nrows=tr$size, firstcol, ncols)
+			rr <- firstrow + tr$row[i] - 1
+			vals <- getValuesBlock(x, row=rr, nrows=tr$nrows[i], firstcol, ncols)
 
 			for (j in 1:ncol(dom)) {
 				dom[,j] <- domdist(object, ln[j], vals[,ln[j]])
@@ -77,10 +74,10 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 			res <- apply(dom, 1, min)
 			if (inmem) {
 				res <- matrix(res, nrow=ncol(out))
-				cols <- tr$rows[i]:(tr$rows[i]+dim(res)[2]-1)
+				cols <- tr$row[i]:(tr$row[i]+dim(res)[2]-1)
 				v[, cols] <- res
 			} else {
-				writeValues(out, res, tr$rows[i])
+				writeValues(out, res, tr$row[i])
 			}
 			pbStep(pb, i) 
 		} 
