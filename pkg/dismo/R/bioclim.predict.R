@@ -37,17 +37,15 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 
 	} else {
 		out <- raster(x)
-		if (!is.null(ext)) {
-			ext <- intersectExtent(extent(ext), extent(x))
+		if (! is.null(ext)) {
 			out <- crop(out, ext)
 			firstrow <- rowFromY(x, yFromRow(out, 1))
 			firstcol <- colFromX(x, xFromCol(out, 1))
-			ncols <- colFromX(x, xFromCol(out, ncol(out))) - firstcol + 1
 		} else {
 			firstrow <- 1
 			firstcol <- 1
-			ncols <- ncol(x)
 		}
+		ncols <- ncol(out)
 		
 		if (! all(colnames(object@presence) %in% layerNames(x)) ) {
 			stop('missing variables in Raster object')
@@ -66,12 +64,11 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 
 		ln <- colnames(object@presence)
 		tr <- blockSize(out, n=nlayers(x)+2)
-		bbc <- matrix(0, ncol=nlayers(x), nrow=ncols * tr$size)
 		pb <- pbCreate(tr$n, type=progress)	
 		for (i in 1:tr$n) {
-			rr <- firstrow + tr$rows[i] - 1
-			vals <- getValuesBlock(x, row=rr, nrows=tr$size, firstcol, ncols)
-			bc <- bbc
+			rr <- firstrow + tr$row[i] - 1
+			vals <- getValuesBlock(x, row=rr, nrows=tr$nrows[i], firstcol, ncols)
+			bc <- matrix(0, ncol=ncol(vals), nrow=nrow(vals))
 			na <- as.vector(attr(na.omit(vals), 'na.action'))
 			bc[na] <- NA
 			k <- (apply(t(vals) >= object@min, 2, all) & apply(t(vals) <= object@max, 2, all))
@@ -82,11 +79,11 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 
 			res <- apply(bc, 1, min)
 			if (inmem) {
-				res <- matrix(res, nrow=ncol(out))
-				cols = tr$rows[i]:(tr$rows[i]+dim(res)[2]-1)
+				res <- matrix(res, nrow=ncols)
+				cols = tr$row[i]:(tr$row[i]+dim(res)[2]-1)
 				v[ , cols] <- res
 			} else {
-				writeValues(out, res, tr$rows[i])
+				writeValues(out, res, tr$row[i])
 			}
 			pbStep(pb, i) 
 		} 

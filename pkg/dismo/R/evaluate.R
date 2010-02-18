@@ -41,17 +41,13 @@ setClass('ModelEvaluation',
 evaluateROCR <- function(model, p, a, x) {
 	require(ROCR)
 	if (!missing(x)) {
-		p <- predict(model, xyValues(x, p))
-		a <- predict(model, xyValues(x, a))
-	} else if (is.matrix(p) & is.matrix(a)) {
-			if (ncol(p) >= ncol(model@presence) & nrow(p) >= nrow(model@presence) ) {
-			p <- predict(model, p)
-			a <- predict(model, a)
-		} else if (is.vector(p) & is.vector(a)) {
+		p <- predict(model, data.frame(xyValues(x, p)))
+		a <- predict(model, data.frame(xyValues(x, a)))
+	} else if (is.vector(p) & is.vector(a)) {
 			# do nothing
-		} else {
-			stop('I do not undertand these data')
-		}
+	} else {
+		p <- predict(model, data.frame(p))
+		a <- predict(model, data.frame(a))
 	}
 	p <- na.omit(p)
 	a <- na.omit(a)
@@ -66,18 +62,16 @@ evaluateROCR <- function(model, p, a, x) {
 
 evaluate <- function(p, a, model, x=NULL, tr) {
 	if (!missing(x)) {
-		p <- predict(model, xyValues(x, p))
-		a <- predict(model, xyValues(x, a))
-	} else if (is.matrix(p) & is.matrix(a)) {
-			if (ncol(p) >= ncol(model@presence) & nrow(p) >= nrow(model@presence) ) {
-			p <- predict(model, p)
-			a <- predict(model, a)
-		} else if (is.vector(p) & is.vector(a)) {
+		p <- predict(model, data.frame(xyValues(x, p)))
+		a <- predict(model, data.frame(xyValues(x, a)))
+	} else if (is.vector(p) & is.vector(a)) {
 			# do nothing
-		} else {
-			stop('I do not undertand these data')
-		}
+	} else {
+		p <- predict(model, data.frame(p))
+		a <- predict(model, data.frame(a))
 	}
+	p <- na.omit(p)
+	a <- na.omit(a)
 
 	if (missing(tr)) {
 		pr = range(c(0,p,1))

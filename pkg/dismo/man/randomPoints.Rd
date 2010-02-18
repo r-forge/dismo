@@ -2,7 +2,7 @@
 \alias{randomPoints}
 
 \title{
-random points
+Random points
 }
 
 \description{
