@@ -7,6 +7,8 @@
 
 biogeomancer <- function(country='', adm1='', adm2='', locality='', singleRecord=TRUE, progress='text') {
 
+	if (! require(XML)) stop('You need to install the XML package to be able use this function')
+
 	d <- data.frame(country, adm1, adm2, locality)
 	d[is.na(d)] <- ''
 	pb <- pbCreate(dim(d)[1], type=progress)
