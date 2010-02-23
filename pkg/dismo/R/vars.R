@@ -4,15 +4,14 @@
 #
 # based on:
 # MkBCvars.AML 
-# #
 # Author Robert Hijmans
 # January 2006  
 # Museum of Vertebrate Zoology, UC Berkeley
 #
 # Version 2.3
 #
-# funciton to create19 BIOCLIM variables from 
-# monthly Tmin, Tmax, and Precipitation data
+# function to create19 BIOCLIM variables from 
+# monthly T-min, T-max, and Precipitation data
 #
 # BIO1 = Annual Mean Temperature
 # BIO2 = Mean Diurnal Range (Mean of monthly (max temp - min temp))
@@ -47,6 +46,13 @@ if (!isGeneric("biovars")) {
 	setGeneric("biovars", function(prec, tmin, tmax, ...)
 		standardGeneric("biovars"))
 }	
+
+
+setMethod('biovars', signature(prec='vector', tmin='vector', tmax='vector'), 
+	function(prec, tmin, tmax, filename='', ...) {
+		biovars(t(as.matrix(prec)), t(as.matrix(tmin)), t(as.matrix(tmax)))
+	}
+)
 
 
 setMethod('biovars', signature(prec='Raster', tmin='Raster', tmax='Raster'), 
@@ -96,16 +102,15 @@ setMethod('biovars', signature(prec='Raster', tmin='Raster', tmax='Raster'),
 )
 
 
-setMethod('biovars', signature(prec='vector', tmin='vector', tmax='vector'), 
-	function(prec, tmin, tmax, filename='', ...) {
-		biovars(t(as.matrix(prec)), t(as.matrix(tmin)), t(as.matrix(tmax)))
-	}
-)
 
 
 setMethod('biovars', signature(prec='matrix', tmin='matrix', tmax='matrix'), 
 	function(prec, tmin, tmax, filename='', ...) {
 
+		if (nrow(prec) != nrow(tmin) | nrow(tmin) != nrow(tmax) ) {
+			stop('prec, tmin and tmax should have same length')
+		}
+	
 		window <- function(x)  { 
 			lng <- length(x)
 			x <- c(x,  x[1:3])
@@ -115,6 +120,7 @@ setMethod('biovars', signature(prec='matrix', tmin='matrix', tmax='matrix'),
 		}
 		
 		p <- matrix(nrow=nrow(prec), ncol=19)
+		colnames(p) = paste('bio', 1:19, sep='')
 
 		tavg <- (tmin + tmax) / 2
 # P1. Annual Mean Temperature 
@@ -140,19 +146,22 @@ setMethod('biovars', signature(prec='matrix', tmin='matrix', tmax='matrix'),
 # P15. Precipitation Seasonality(Coefficient of Variation) 
 # the "1 +" is to avoid strange CVs for areas where mean rainfaill is < 1)
 		p[,15] <- apply(prec+1, 1, cv)
+		
+# precip by quarter (3 months)		
 		wet <- t(apply(prec, 1, window))
 # P16. Precipitation of Wettest Quarter 
 		p[,16] <- apply(wet, 1, max)
+# P17. Precipitation of Driest Quarter 
 		p[,17] <- apply(wet, 1, min)
-
-# P8. Mean Temperature of Wettest Quarter 
 		tmp <- t(apply(tavg, 1, window)) / 3
-		wetmnt <- cbind(1:nrow(p), apply(wet, 1, which.max))
-		p[,8] <- tmp[wetmnt]
+		
+# P8. Mean Temperature of Wettest Quarter 
+		wetqrt <- cbind(1:nrow(p), apply(wet, 1, which.max))
+		p[,8] <- tmp[wetqrt]
 
 # P9. Mean Temperature of Driest Quarter 
-		drymnt <- cbind(1:nrow(p), apply(wet, 1, which.min))
-		p[,9] <- tmp[drymnt]
+		dryqrt <- cbind(1:nrow(p), apply(wet, 1, which.min))
+		p[,9] <- tmp[dryqrt]
 
 # P10 Mean Temperature of Warmest Quarter 
 		p[,10] <- apply(tmp, 1, max)
@@ -162,11 +171,11 @@ setMethod('biovars', signature(prec='matrix', tmin='matrix', tmax='matrix'),
 
 # P18. Precipitation of Warmest Quarter 
 		hot <- cbind(1:nrow(p),apply(tmp, 1, which.max))
-		p[,18] <- prec[hot]
+		p[,18] <- wet[hot]
 
 # P19. Precipitation of Coldest Quarter 
 		cold <- cbind(1:nrow(p), apply(tmp, 1, which.min))
-		p[,19] <- prec[cold]
+		p[,19] <- wet[cold]
 		return(p)	
 	}
 )
