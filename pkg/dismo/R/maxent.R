@@ -51,22 +51,6 @@ setMethod ('show' , 'MaxEnt',
 )	
 
 
-.getMatrix <- function(x) {
-	if (inherits(x, 'SpatialPoints')) {
-		x <- coordinates(x)
-	} else if (inherits(x, 'matrix')) {
-		x <- data.frame(x)
-	}
-	if (! class(x) == 'data.frame' ) {
-		stop('data should be  a matrix, data.frame, or SpatialPoints* object')
-	}
-	if (dim(x)[2] != 2) {
-		stop('presence or absence coordiantes data should be a matrix or data.frame with 2 columns' ) 	
-	}
-	colnames(x) <- c('x', 'y')
-	return(x)
-} 
-
 
 if (!isGeneric("maxent")) {
 	setGeneric("maxent", function(x, p, ...)
@@ -88,6 +72,24 @@ setMethod('maxent', signature(x='SpatialGridDataFrame', p='ANY'),
 		maxent(x, p, a, factors=factors, ...)
 	}
 )
+
+
+.getMatrix <- function(x) {
+	if (inherits(x, 'SpatialPoints')) {
+		x <- data.frame(coordinates(x))
+	} else if (inherits(x, 'matrix')) {
+		x <- data.frame(x)
+	}
+	if (! class(x) == 'data.frame' ) {
+		stop('data should be  a matrix, data.frame, or SpatialPoints* object')
+	}
+	if (dim(x)[2] != 2) {
+		stop('presence or absence coordiantes data should be a matrix or data.frame with 2 columns' ) 	
+	}
+	colnames(x) <- c('x', 'y')
+	return(x)
+} 
+
 
 setMethod('maxent', signature(x='Raster', p='ANY'), 
 	function(x, p, a=NULL, factors=NULL, ...) {
