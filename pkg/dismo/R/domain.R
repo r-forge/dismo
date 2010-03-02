@@ -35,28 +35,36 @@ setMethod('domain', signature(x='Raster', p='matrix'),
 setMethod('domain', signature(x='Raster', p='data.frame'), 
 	function(x, p, ...) {
 		m <- xyValues(x, p)
+		
 		domain(m)
 	}
 )
 
 setMethod('domain', signature(x='data.frame', p='missing'), 
 	function(x, p, ...) {
-		domain(as.matrix(x))
-	}
-)
 
-setMethod('domain', signature(x='matrix', p='missing'), 
-	function(x, p, ...) {
-		d <- new('Domain')
 		for (i in ncol(x):1) {
 			if (is.factor(x[,i])) {
 				warning('variable "', colnames(x)[i], '" was removed because it is a factor (categorical)')
 				x <- x[, -i]
 			}
 		}
+	
+		domain(as.matrix(x))
+	}
+)
+
+setMethod('domain', signature(x='matrix', p='missing'), 
+	function(x, p, ...) {
+		
+		x = na.omit(x)
+		
 		if (ncol(x) == 0) {	stop('no usable variables') 	}
+		if (nrow(x) < 2) {	stop('insufficient records') 	}
 		
 		r <- apply(x, 2, FUN=function(x){range(x, na.rm=TRUE)})
+
+		d <- new('Domain')
 		d@presence <- x
 		d@range <-  abs(r[2,] - r[1,])
 		norange = which(d@range == 0)
