@@ -27,14 +27,12 @@ if (!isGeneric("bioclim")) {
 setMethod('bioclim', signature(x='matrix', p='missing'), 
 	function(x, p, ...) {
 		bc <- new('Bioclim')
+
+		d = dim(x)
+		x = na.omit(x)
 		
-		for (i in ncol(x):1) {
-			if (is.factor(x[,i])) {
-				warning('variable "', colnames(x)[i], '" was removed because it is a factor (categorical variable)')
-				x <- x[, -i]
-			}
-		}
 		if (ncol(x) == 0) {	stop('no usable variables') 	}
+		if (nrow(x) < 2) {	stop('insufficient records') 	}
 		
 		bc@presence <- x
 		bc@min <- apply(x, 2, min)
@@ -45,6 +43,12 @@ setMethod('bioclim', signature(x='matrix', p='missing'),
 
 setMethod('bioclim', signature(x='data.frame', p='missing'), 
 	function(x, p, ...) {
+		for (i in ncol(x):1) {
+			if (is.factor(x[,i])) {
+				warning('variable "', colnames(x)[i], '" was removed because it is a factor (categorical variable)')
+				x <- x[, -i]
+			}
+		}
 		bioclim(as.matrix(x))
 	}
 )
