@@ -218,7 +218,7 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 
 
 .meTmpDir <- function() {
-	return( paste(dirname(tempdir()), '/R_maxent_tmp', sep="") )
+	return( paste(dirname(tempdir()), '/R_raster_tmp/maxent', sep="") )
 }
 
 
