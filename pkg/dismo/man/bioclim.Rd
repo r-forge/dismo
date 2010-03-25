@@ -59,7 +59,7 @@ Robert J. Hijmans
 
 
 \examples{
-logo <- stack(system.file("pictures/Rlogo.jpg", package="rgdal"), bands=-1)
+logo <- stack(system.file("external/rlogo.grd", package="raster"))
 #presence data
 pts <- matrix(c(48.243420, 48.243420, 47.985820, 52.880230, 49.531423, 46.182616, 54.168232, 69.624263, 83.792291, 85.337894, 74.261072, 83.792291, 
                  95.126713, 84.565092, 66.275456, 41.803408, 25.832176, 3.936132, 18.876962, 17.331359,7.048974, 13.648543, 26.093446, 28.544714, 39.104026, 44.572240, 

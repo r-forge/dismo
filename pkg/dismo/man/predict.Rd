@@ -50,7 +50,7 @@ To fit a model that can be used with this predict method, see \code{ \link[dismo
 \author{ Robert J. Hijmans}
 
 \examples{
-logo <- stack(system.file("pictures/Rlogo.jpg", package="rgdal"), bands=-1)
+logo <- stack(system.file("external/rlogo.grd", package="raster"))
 pts <- matrix(c(48, 48, 48, 53, 50, 46, 54, 70, 84, 85, 74, 84, 95, 85, 66, 42, 26, 4, 19, 17, 7, 14, 26, 29, 39, 45, 51, 56, 46, 38, 31, 22, 34, 60, 70, 73, 63, 46, 43, 28), ncol=2)
 b <- bioclim(logo, pts)
 # prediction for a sub-region
