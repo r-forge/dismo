@@ -5,7 +5,7 @@
 # Licence GPL v3
 
 
-pointInPolygon <- function(xy, polygons, fun=NULL) {
+.pointsInPolygons <- function(xy, polygons, fun=NULL) {
 # based on similar function in sp (overlay) by Pebesma and Bivand
 # and calling a C function from the SP package
 	polygons = polygons@polygons
@@ -16,7 +16,7 @@ pointInPolygon <- function(xy, polygons, fun=NULL) {
 	for (i in 1:length(polygons)) {
 		poly <- polygons[[i]]
 		e = extent(bbox(poly))
-		inbox <- xy[,1] >= e@xmin & xy[,2] <= e@xmax & xy[,2] >= e@ymin & xy[,2] <= e@ymax
+		inbox <- xy[,1] >= e@xmin & xy[,1] <= e@xmax & xy[,2] >= e@ymin & xy[,2] <= e@ymax
 		p = xy[inbox, ,drop=FALSE]
 		if (nrow(p) > 0) {
 			res2 = vector(length=nrow(p))
@@ -42,6 +42,7 @@ pointInPolygon <- function(xy, polygons, fun=NULL) {
 	}
 	return(result)
 }
+
 
 # a =  pointInPolygon(xy, wrld_simpl)
 # b = apply(a, 1, max)

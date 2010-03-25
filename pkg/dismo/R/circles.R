@@ -4,8 +4,36 @@
 # Version 0.1
 # Licence GPL v3
 
-circles <- function(xy, d, n=360, lonlat=TRUE, r=6378137 ) {
-	d <- d[1]
+
+
+
+.avgDist <- function(xy, lonlat=TRUE, r=6378137) {
+	xy <- unique(xy)
+	if (lonlat) { 
+		dtype <- 'GreatCircle' 
+	} else { 
+		dtype <- 'Euclidean' 
+	}
+	xy <- as.matrix(xy[,1:2])
+	d <- matrix(nrow=nrow(xy), ncol=nrow(xy))
+	if (lonlat) {
+		for (i in 1:nrow(xy)) { 
+			d[,i] <- pointDistance(xy[i,], xy, type='GreatCircle', r=r)
+		}
+	} else {
+		for (i in 1:nrow(xy)) { 
+			d[,i] <- pointDistance(xy[i,], xy, type='Euclidean', r=r)
+		}
+	}
+	mean(apply(d, 1, median))
+}
+
+
+.generateCircles <- function(xy, d, n=360, lonlat=TRUE, r=6378137 ) {
+	if (missing(d)) {
+		d <- .avgDist(xy, lonlat=lonlat, r=r) 
+	}
+	xy <- as.matrix(xy[,1:2])
 	n <- max(4, round(n))
 	toRad <- pi/180
 	brng <- 1:n * 360/n
@@ -35,4 +63,46 @@ circles <- function(xy, d, n=360, lonlat=TRUE, r=6378137 ) {
 	}
 	return( SpatialPolygons( pols ) )
 }
+
+
+setClass('CirclesRange',
+	contains = 'DistModel',
+	representation (
+		circles='SpatialPolygons'
+	),	
+	prototype (	
+	),
+	validity = function(object)	{
+		return(TRUE)
+	}
+)
+
+
+if (!isGeneric("circles")) {
+	setGeneric("circles", function(p, ...)
+		standardGeneric("circles"))
+}	
+
+
+setMethod('circles', signature(p='matrix'), 
+	function(p, d, lonlat=TRUE, ...) {
+		ci <- new('CirclesRange')
+		ci@presence <- p
+		ci@circles <- .generateCircles(p, d, lonlat=lonlat)
+		return(ci)
+	}
+)
+
+
+setMethod('circles', signature(p='data.frame'), 
+	function(p, ...) {
+		circles(as.matrix(p), ...)
+	}
+)
+
+setMethod('circles', signature(p='SpatialPoints'), 
+	function(p, ...) {
+		circles(coordinates(p), ...)
+	}
+)
 

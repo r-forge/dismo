@@ -1,5 +1,5 @@
-\name{shp}
-\alias{shp}
+\name{shapefile}
+\alias{shapefile}
 
 \title{
 read a shapefile
@@ -11,11 +11,11 @@ Simple wrapper around readOGR (rgdal package)
 
 
 \usage{
-shp(filename)
+shapefile(filename)
 }
  
 \arguments{
-  \item{filename}{shapefile name}
+  \item{filename}{Character. Full filename of a ESRI shapefile}
 }
 
 \value{
