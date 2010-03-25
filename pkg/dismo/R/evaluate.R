@@ -20,12 +20,12 @@ setClass('ModelEvaluation',
 		CCR = 'vector', # correct classification rate
 		TPR = 'vector', # sensitivity, or true positive rate
 		TNR = 'vector', # specificity, or true negative rate
-		FPR ='vector', # False positive rate
-		FNR ='vector', # False negative rate
+		FPR ='vector',  # False positive rate
+		FNR ='vector',  # False negative rate
 		PPP = 'vector',
 		NPP = 'vector',
 		MCR = 'vector', # misclassification rate
-		OR = 'vector', # odds ratio
+		OR = 'vector',  # odds ratio
 		kappa = 'vector'
 	),	
 	prototype (	
@@ -161,3 +161,5 @@ setMethod ('show' , 'ModelEvaluation',
 #		cat('kappa :', object@kappa,'\n')
 	}
 )	
+
+

@@ -5,9 +5,9 @@
 # Licence GPL v3
 
 
-hulls <- function(xy, n=1) {
-	xy <- unique(  na.omit(xy) )
-    if (nrow(xy) < 3) { stop ('insuficient number of points to make a hull; you need at least 3 unique points' ) }
+.generateHulls <- function(xy, n=1) {
+	xy <- unique(  na.omit(xy[, 1:2]) )
+    if (nrow(xy) < 3) { stop ('Insuficient number of points to make a hull; you need at least 3 unique points' ) }
     n <- pmax(1, round(n))
     n <- pmin(n, floor(nrow(xy) / 3))
     n = unique(n)

@@ -21,12 +21,17 @@ convHull(p, ...)
  
 \arguments{
   \item{p}{point locations (presence). Two column matrix, data.frame or SpatialPoints* object}
-  \item{...}{ Additional arguments, currently not used }
+  \item{...}{ Additional arguments. See details }
+}
+
+
+\details{
+You can supply an argument n (>= 1) to get n convex hulls around subset of the points. You can also set n=1:x, to get a set of overlapping polygons consisting of 1 to x parts. I.e. the first polygon has 1 part, the second has 2 parts, and x has x parts.
 }
 
 
 \value{
-An object of class 'convHull'
+An object of class 'ConvexHull'
 }
 
 
@@ -35,7 +40,7 @@ Robert J. Hijmans
 }
 
 \seealso{
-\code{\link[dismo]{predict}, \link[dismo]{maxent}, \link[dismo]{domain}, \link[dismo]{mahal}}
+\code{\link[dismo]{predict}, \link[dismo]{geoDist}, \link[dismo]{maxent}, \link[dismo]{domain}, \link[dismo]{mahal}}
 }
 
 
@@ -50,7 +55,7 @@ ch <- convHull(train)
 predict(ch, test)
 
 plot(r)
-polygon(ch@hull, border='red', lwd=2)
+plot(ch@hull, border='red', lwd=2, add=TRUE)
 points(train, col='red', pch=20, cex=2)
 points(test, col='black', pch=20, cex=2)
 

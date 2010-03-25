@@ -8,7 +8,7 @@
 setClass('ConvexHull',
 	contains = 'DistModel',
 	representation (
-		hull='matrix'
+		hull='SpatialPolygonsDataFrame'
 	),	
 	prototype (	
 	),
@@ -25,16 +25,10 @@ if (!isGeneric("convHull")) {
 
 
 setMethod('convHull', signature(p='matrix'), 
-	function(p, ...) {
-		p <- p[,1:2]
-		p <- unique(p)
-		if (nrow(p) < 3) { stop('you need at least 3 (unique) points to make a convex hull') }
-		h <- chull(p)
-		h <- p[h,]
-		h <- rbind(h, h[1,])
+	function(p, n=1, ...) {
 		ch <- new('ConvexHull')
 		ch@presence <- p
-		ch@hull <- h
+		ch@hull <- .generateHulls(p, n)
 		return(ch)
 	}
 )
@@ -42,13 +36,13 @@ setMethod('convHull', signature(p='matrix'),
 
 setMethod('convHull', signature(p='data.frame'), 
 	function(p, ...) {
-		convHull(as.matrix(p))
+		convHull(as.matrix(p), ...)
 	}
 )
 
 setMethod('convHull', signature(p='SpatialPoints'), 
 	function(p, ...) {
-		convHull(coordinates(p))
+		convHull(coordinates(p), ...)
 	}
 )
 

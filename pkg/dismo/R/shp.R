@@ -5,13 +5,13 @@
 # Licence GPL v3
 
 
-shp <- function(filename) {
+shapefile <- function(filename) {
 	if (!(require(rgdal))) {
-		stop('This functions requires the rgdal package; please install it')
+		stop('This function requires the rgdal package; please install it')
 	}
 	fn <- basename(filename) 
 	ext(fn) <- ''
-	vec <- readOGR(filename, fn) 
+	vec <- readOGR(dirname(filename), fn) 
 	return(vec)
 }
 
