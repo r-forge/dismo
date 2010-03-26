@@ -10,7 +10,7 @@
 \title{New South Wales species distribution data}
 
 \description{
-Species occurence data for 54 species from 8 biological groups in New South Wales (NSW, a state in Australia) and associated environmental data. There are three data sets with training (NSWtrain), background or pseudo-absence (NSWbackground), and test (NSWtest). The training data principally consist of environmental variables at locations where the species where observed (presence only), and at random locations for background data. The test data are presence/absence observations on hte same species, independent from the training data.
+Species occurence data for 54 species from 8 biological groups in New South Wales (NSW, a state in Australia) and associated environmental data. There are three data sets with training (NSWtrain), background (NSWbackground), and test (NSWtest) data. The training data principally consist of environmental variables at locations where the species where observed (presence only), and at random locations for background data. The test data are presence/absence observations on hte same species, independent from the training data.
 
 
 Species and site variables:
@@ -44,7 +44,7 @@ vegsys \tab broad vegetation type \tab 1 = Rainforest, 2 = Moist open forest, 3 
 }
 All of the predictors except 'vegsys' can be treated as continuous, or at least ranked, variables. However, the types in 'vegsys' are not ranked in any way, and this variable must therefore be treated as categorical (unordered) when fitting models.   
 
-Latitude and latitude are in geographical coordinates using the WGS84 datum.
+Latitude and latitude are in geographical coordinates, WGS84 datum.
 
 }
 
