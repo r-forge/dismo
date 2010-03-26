@@ -1,0 +1,11 @@
+Package: disdat
+Type: Package
+Title: Data for species distribution modeling
+Version: 0.0.0
+Date: 22-March-2010
+Depends: R (>= 2.7.0)
+Author: multiple
+Maintainer: <r.hijmans@gmail.com>
+Description: Data sets for testing species distribution models
+License: GPL (>=3)
+LazyLoad: yes
