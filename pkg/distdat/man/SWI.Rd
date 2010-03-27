@@ -4,7 +4,6 @@
 \alias{SWIbackground}
 \alias{SWItest}
 
-
 \docType{data}
 
 \title{Switzerland species distribution data}
@@ -47,7 +46,6 @@ data(SWItest)
 Training data set is a forest inventory data set. A regular point lattice across Switzerland located on a 1km national grid. The lattice points that do contain forest according to the national definition within the Swiss forest inventory are sampled in the field. The data originate from the 1985 national inventory, actually collected from 1982-1986.
 
 Test data set is from forest plots. A forest vegetation data base containing irregularly and nonsystematically sampled forest vegetation relevees throughout Switzerland. Dates: records start in 1913. The majority of the plots was collected after 1920, and about 3/4th of the data were sampled after 1940. The data base ends in 1998, but most records are from 1994 and earlier. The individual authors had their own local sampling design or used preferential sampling techniques. From the original data base, selected roughly 14,100 relevees that included minimal data standards such as coordinates. 
-
 }
 
 \keyword{datasets}
