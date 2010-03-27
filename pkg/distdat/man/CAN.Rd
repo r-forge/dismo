@@ -43,7 +43,7 @@ data(CANtest)
 \author{M. Peck, M. Cadman, Falk Huettmann}
 
 \source{
-Training data are 'Ontario Nest Records' from the Royal Ontario Museum (ROM) obtain from M. Peck for NCEAS project. Temporal Span 1870-2002 (most from 1960-2001).  Methods of Georeferencing: Coordinates derived from map by ROM; some locations ground-truthed with GPS. Taxonomic Authorities: individual nest recorders.
+Training data are 'Ontario Nest Records' from the Royal Ontario Museum (ROM) obtain from M. Peck for NCEAS project. Temporal Span 1870-2002 (most from 1960-2001). Methods of Georeferencing: Coordinates derived from map by ROM; some locations ground-truthed with GPS. Taxonomic Authorities: individual nest recorders.
 
 Test data: the Breeding Bird Atlas (BBA) Data for Ontario, provided by M. Cadman.
 
