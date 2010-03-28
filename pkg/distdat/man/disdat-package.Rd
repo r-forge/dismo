@@ -13,22 +13,32 @@ Species distribution modeling
 This package consists of a collection of datasets that can be used to compare species distribution models. There are data for 6 regions in the world, for a total of xxx species. Each data set has presence-only training data to build models, and presence/absence data to evaluate models.
 
 The data were compiled and used by a species distribution modelling working group sponsored by the National Center for Ecological Analysis and Synthesis (NCEAS), at UC Santa Barbara, USA. 
-
 }
 
 \details{
-\tabular{ll}{
-Package: \tab disdat\cr
-Type: \tab Package\cr
-Version: \tab 0.0\cr
-Date: \tab 28-March-2010\cr
-License: \tab GPL 3\cr
-LazyLoad: \tab yes\cr
-}
+Test data have these fields in common:
+\tabular{ll}{  
+Code \tab Description \cr
+spid \tab Code to identify a species \cr
+genus \tab genus  \cr
+species \tab species \cr
+longitude \tab latitude  \cr
+latitude \tab longitude  \cr
+x \tab Easting  \cr
+y \tab Northing \cr
+pa \tab  presence (1) or absence or background sample (0) \cr
 }
 
+Longtude and latitude have the WGS84 datum.
+
+
+
+
+}
+
+
 \author{
-Robert J. Hijmans, Jane Elith and Steven Phillips.
+Jane Elith, Catherine Graham, Robert J. Hijmans, Steven Phillips.
 }
 
 \references{
