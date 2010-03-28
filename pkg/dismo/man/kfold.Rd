@@ -30,6 +30,7 @@ Robert J. Hijmans
 }
 
 \examples{
+if (require(disdat)) {
 data(NSWtrain)
 # a single species
 srsp1 <- subset(NSWtrain, spid=='srsp1')
@@ -44,6 +45,7 @@ k[NSWtrain$spid=='srsp1']
 table(k[NSWtrain$spid=='srsp1'])
 
 k[NSWtrain$spid=='ousp5']
+}
 }
 
 \keyword{spatial}
