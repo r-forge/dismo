@@ -12,22 +12,21 @@
 Species occurence data for 30 plant species (all from the Bignoniaceae family) from South America (SA) and associated environmental data. There are three data sets with training (SAtrain), background (SAbackground), and test (SAtest) data. The training data principally consist of environmental variables at locations where the species where observed (presence only), and at random locations for background data. The test data are presence/absence observations on the same species, independent from the training data.
 
 
-Species and site variables:
-\tabular{ll}{  
-Code \tab Description \cr
-recordid \tab  \cr
-spid \tab  \cr
-genus \tab genus  \cr
-species \tab species \cr
-Longitude \tab latitude  \cr
-Latitude \tab longitude  \cr
-pa \tab  presence (1) or absence (0) \cr
-}
 
-Environmental variables:
+Environmental variables were extracted from WorldClim:
 \tabular{llll}{  
 Code \tab Description \tab Units \tab Type\cr
-rainann \tab   \tab   \tab  Cont\cr
+sabio1  \tab  Annual mean temperature    \tab  degrees C  \tab  Continuous  \cr
+sabio2  \tab  Mean Diurnal Range (Mean of monthly (max temp - min temp))  \tab  degrees C  \tab  Continuous  \cr
+sabio4  \tab  Temperature Seasonality (standard deviation *100)  \tab  degrees C  \tab  Continuous  \cr
+sabio5  \tab  Max Temperature of Warmest Month  \tab  degrees C  \tab  Continuous  \cr
+sabio6  \tab  Min Temperature of Coldest Month  \tab  degrees C  \tab  Continuous  \cr
+sabio7  \tab  Temperature Annual Range \tab  degrees C  \tab  Continuous  \cr
+sabio8  \tab  Mean Temperature of Wettest Quarter   \tab  mm  \tab  Continuous  \cr
+sabio12  \tab  Annual Precipitation  \tab  mm  \tab  Continuous  \cr
+sabio15  \tab  Precipitation Seasonality (Coefficient of Variation)  \tab  mm  \tab  Continuous  \cr
+sabio17  \tab  Precipitation of Driest Quarter  \tab  mm  \tab  Continuous  \cr
+sabio18  \tab  Precipitation of Warmest Quarter  \tab  mm  \tab  Continuous  \cr
 }
 
 Latitude and latitude are in geographical coordinates using the WGS84 datum.

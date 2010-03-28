@@ -12,26 +12,22 @@
 Species occurence data for 20 bird species from Ontario, a province in Canada (CAN) and associated environmental data. There are three data sets with training (CANtrain), background (CANbackground), and test (CANtest) data. The training data principally consist of environmental variables at locations where the species where observed (presence only), and at random locations for background data. The test data are presence/absence observations on the CANme species, independent from the training data.
 
 
-Species and site variables:
-\tabular{ll}{  
-Code \tab Description \cr
-recordid \tab  \cr
-spid \tab  \cr
-genus \tab genus  \cr
-species \tab species \cr
-Longitude \tab latitude  \cr
-Latitude \tab longitude  \cr
-pa \tab  presence (1) or absence (0) \cr
-}
 
 Environmental variables:
 \tabular{llll}{  
 Code \tab Description \tab Units \tab Type\cr
-rainann \tab   \tab   \tab  Cont\cr
+Onttemp  \tab  Annual mean temperature   \tab  degrees C  \tab  Continuous \cr
+Onttemp4  \tab  April temperature  \tab  degrees C  \tab  Continuous \cr
+Ontveg  \tab  Vegetation   \tab  none  \tab  Categorical \cr
+Ontprec  \tab  Annual Precipitation  \tab  mm  \tab  Continuous \cr
+Ontprecsd  \tab  Precipitation Seasonality (Coefficient of Variation)  \tab  mm  \tab  Continuous \cr
+Ontprec4  \tab  Precipitation of Driest Quarter  \tab  mm  \tab  Continuous \cr
+Onttemsd  \tab  Temperature standard deviation   \tab  degrees C  \tab  Continuous \cr
+alt  \tab  Digital elevation   \tab  m  \tab  Continuous \cr
+asp2  \tab  Aspect  \tab  ranges from 0 to 1  \tab  Continuous \cr
+ontslp  \tab  Slope   \tab  degrees  \tab  Continuous \cr
+watdist  \tab  Distance from Hudson Bay  \tab  m  \tab  Continuous \cr
 }
-
-Latitude and latitude are in geographical coordinates using the WGS84 datum.
-
 }
 
 \usage{
