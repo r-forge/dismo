@@ -30,10 +30,6 @@ pa \tab  presence (1) or absence or background sample (0) \cr
 }
 
 Longtude and latitude have the WGS84 datum.
-
-
-
-
 }
 
 
