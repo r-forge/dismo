@@ -1,0 +1,254 @@
+\documentclass{article}
+
+\usepackage{natbib}
+\usepackage{graphics}
+\usepackage{amsmath}
+\usepackage{indentfirst}
+\usepackage{hanging}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+
+% \VignetteIndexEntry{Species distribution modeling with R}
+% \VignetteDepends{dismo}
+% \VignetteKeyword{spatial}
+
+\newcommand{\R}{{\normalfont\textsf{R }}{}}
+
+\SweaveOpts{keep.source=TRUE}
+
+\begin{document}
+
+
+\title{Species distribution modeling with R}
+\author{Robert J. Hijmans}
+\maketitle
+
+
+\section{Introduction}
+
+This document is an introduction to species distribution modeling in R. Species distribution modeling (SDM) is also known under other names including envelope-modeling and niche-modeling. In these models, locations of occurrence (and perhaps non-occurrence) of a species (or other phenomenon), are used to extract values from spatial predictor variables. These extracted values are used to fit a model predicting presence/absence, or another measure associated with the points. This model can then be used to predict the likelihood of presence at all locations of an area of interest (and perhaps in a future climate).
+
+This is not a general introduction to species distribution modeling itself. We assume that you are familiar with most of the concepts in this field. If in doubt, you could consult Richard Pearson's introduction to the subject: \url{http://biodiversityinformatics.amnh.org/index.php?section_id=111}. More advanced readers may want to have a look at the recent review paper by Elith and Leathwick (2009).
+
+We also assume that you are already familiar with the R language and environment. It would be useful if you already had some experience with statistical model fitting (e.g. the glm function) and with the spatial data handling packages raster and sp.
+
+This document uses functions from the '\verb@dismo@' and the '\verb@raster@' packages. If you want to test, or build on, some of the examples presented here, make sure you have the latest versions of these libraries, and their dependencies, installed. If you are using a recent version of \R, you can do that with: 
+
+install.packages(c('rJava', 'XML', 'sp', 'rgdal', 'raster'))
+
+install.packages("dismo", repos="http://R-Forge.R-project.org")
+
+
+\section{Occurence data}
+
+Data preparation is often the most time consuming part of a species distribution modeling project. You need to collect a sufficient number of presence (and perhaps absence) data of acceptable quality. You also need to have accurate and relevant spatial predictor variables. A particular concern for species distribution modeling is whether, apart from the species identification, the coordinates of the location data are accurate and precise (but see the 'uncertainty' section). 
+
+Importing occurrence data into R is easy. But collecting, georeferencing, and cross-checking coordinate data is tedious and should not all be done in R. Discussions about species distribution modeling often focus on comparing modeling methods, but if you are dealing with species with few and uncertain records, your focus probably ought to be on improving the point locality data. All methods do better if you have an unbiased sample without error (Graham et al., 2007) and a relatively large sample size (Wisz et al., 2008).
+
+
+\subsection{Data import}
+
+In most cases you will have point locality data in file. Here is an example of using read.table to read the records in a text file. We are using a example file that is installed with the dismo package, and for that reason we use a complex way to construct the filename, but you can replace that with your own filename (remember to use forward slashes!)
+
+<<sdm1>>=
+library(dismo)
+filename <- paste(system.file(package="dismo"), '/ex/bradypus.csv', sep='')
+filename
+occurrence <- read.table(filename, header=TRUE, sep=',')
+head(occurrence)
+@
+
+You can also read such data directly out of Excel or from a database (see e.g. the RODBC package). No matter how you do it, the objective is to get a matrix (or a data.frame) with at least 2 columns to hold the coordinates (typically longitude and latitude), and perhaps a third column to indicate the species if you are modeling multiple species (and you may have many more species); or a column to indicate whether this is a 'presence' or an 'absence' record (a much used convention is to code presence with a 1 and absence with a 0). 
+
+If you do not have any species distribution data you can use the 'gbif' function to download records from GBIF (\url{http://www.gbif.org/}).
+The data used below were downloaded with the function 
+
+sac = gbif('solanum', 'acaule', geo=FALSE)
+
+Many records may not have coordinates. Out of the 699 records that gbif returned (March 2010), there were only 54 records with coordinates. 
+
+<<sdm2>>=
+data(sac)
+dim(sac)
+sacgeo = subset(sac, !is.na(lat) & !is.na(lon))
+dim(sacgeo)
+sacgeo[1:4,c(1:5,7:10) ]
+@
+
+
+Here is a simple way to make a map of the occurrence localities of Solanum acaule:
+
+<<fig=TRUE, echo=TRUE>>=
+library(maptools)
+data(wrld_simpl)
+plot(wrld_simpl, xlim=c(-130,10), ylim=c(-60,60))
+points(sacgeo$lon, sacgeo$lat, col='red')
+@
+
+
+\subsection{Cross-checking}
+
+Solanum acaule is a species that occurs in the high Andes of Peru and Bolivia. Do you see any errors? There are three records that have plausible latitudes, but longitudes of zero, which is clearly wrong, as it puts them in the Atlantic Ocean, south of West Africa. The gbif function (with default arguments) removes records that have (0, 0) as coordinates, but not if one of the coordinates is zero. 
+
+Let's have a look at these records:
+<<sdm3>>=
+lonzero = subset(sac, lon==0)
+lonzero[, 1:13]
+@
+
+The records are from Bolivia (BOL), Peru (PER) and Argentina (ARG), again showing the coordinates are in error. Another issue is revealed:  each record occurs twice. This could happen because plant samples are often split and send to multiple herbariums. But in this case it seems that a single GBIF data provider (IPK) has these record duplicated in its database. 
+
+It is important to cross-check coordinates by visual and other means. One approach is to compare the country (and lower level administrative subdivisions) of the site as specified by the records, with the country implied by the coordinates (Hijmans et al., 1999). In the example below we use the 'coordinates' function from the sp package to create a SpatialPointsDataFrame, and then the 'overlay' function, also from the sp package, to do a point in polygon query with the countries polygons.
+
+<<sdm4>>=
+library(sp)
+coordinates(sacgeo) = ~lon+lat
+ov = overlay(sacgeo, wrld_simpl)
+cntr = as.character(wrld_simpl@data$NAME[ov])
+which(is.na(cntr))
+i = which(cntr != sacgeo@data$country)
+cbind(cntr, sacgeo@data$country)[i,]
+@
+
+Note that the polygons that we used in the example above are not very precise, and they should not be used in a real analysis (see \url{http://www.gadm.org/} for more detailed administrative division files, or use the 'getData('gadm',  )' function from the raster package. The overlay function returns indices (row numbers), and we use these in the next line to get the country for each point. Then we ask which countries are 'NA' (i.e., points in oceans), and which countries have non matching names (in this case these are all caused by using abbreviations in stead of full names).
+
+
+\subsection{Georeferencing}
+
+If you have records with locality descriptions but no coordinates, you should consider georeferencing these. Not all the records can be georeferenced. Sometimes even the country is unknown (country=="UNK"). Here we select only records that do not have coordinates, but that do have a locality description.
+
+<<sdm5>>=
+georef = subset(sac, (is.na(lon) | is.na(lat)) & ! is.na(locality) )
+dim(georef)
+georef[1:3,1:13]
+@
+
+Interestingly, the first record is an old acquaintance. The first records, with catalog number WKS 30048 was also in the set of records that had a longitude of zero degrees. This time it seems that it is served to gbif via another institution 'DEU' (I suspect that these duplicates occur because GBIF has records from aggregators such as EURISCO and national nodes, as well as from individual institutes). 
+
+We recommend using a tool like biogeomancer: \url{http://bg.berkeley.edu/latest} (Guralnick et al., 2006) to georeference textual locality descriptions. A nice feature of biogemancer is that it attempts to capture the uncertainty associated with each georeference (Wieczorek et al., 2004). The dismo package has a function {\bf biogeomancer()} that you can use for this, and that we demonstrate below, but its use is generally not recommended because you really need a detailed map interface for accurate georeferencing. 
+
+Here is an example for one of the records with longitude = 0
+
+<<sdm6>>=
+args(biogeomancer)
+b = biogeomancer('Peru', locality=lonzero$locality[3], progress='')
+b
+lonzero$lat[3]
+@
+
+Note that the uncertainty (expressed in meters) is quite high, and that the latitude is rather different from the original latitude (whereas the original latitude might in fact be correct). 
+
+
+
+\section{Background (random absence) data}
+
+
+\section{Spatial predictors}
+
+Spatial predictors are raster (grid) type data. Each predictor is a 'layer' representing a variable of interest, and can include climatic, soil and terrain, vegetation, land use, and other variables. These data are typically stored in files in some kind of GIS format. Almost all relevant formats can be used (including ESRI grid, geoTiff, IDRISI, and many more). Avoid ascii files if you can (too slow). For any particular study the layers all should have the same spatial extent, resolution, and origin. This allows to make a 'RasterStack', a collection of 'RasterLayer' objects, from them (see the raster package for more info). 
+
+<<sdm9>>=
+files <- list.files(path=paste(system.file(package="dismo"), '/ex', sep=''),
+                    pattern='grd', full.names=TRUE )
+files
+predictors <- stack(files)
+layerNames(predictors)
+# drop a few predictors
+predictors <- dropLayer(predictors, c(3,4,5,7,8,9,10,12))
+layerNames(predictors)
+
+<<sdm10, fig=TRUE, echo=TRUE>>=
+plot(predictors)
+@
+
+<<sdm11, fig=TRUE, echo=TRUE>>=
+plot(predictors, 1)
+points(occurrence[,2:3])
+@
+
+You can use the 'getData' function from the raster package to download WorldClim climate data \url{http://www.worldclim.org} (Hijmans et al., 2004)
+
+\section{Model fitting}
+
+\section{Model predictions}
+
+\section{Model evaluation}
+
+\subsection{k-fold partitioning}
+
+\section{Uncertainty}
+
+\section{Model averaging}
+
+\section{Model transfer in space and time}
+
+\section{Profile models}
+
+\subsection{Bioclim}
+
+\subsection{Domain}
+
+\subsection{Mahalanobis}
+
+
+\section{Regression models}
+
+\subsection{Generalized Linear Models}
+
+\subsection{Generalized Additive Models}
+
+
+\section{Machine learning models}
+
+\subsection{Maxent}
+
+\subsection{Boosted Regression Trees}
+
+\subsection{Random Forest}
+
+
+\section{Geographic models}
+
+\subsection{Distance}
+
+\subsection{Convex hulls}
+
+\subsection{Circles}
+
+
+\section{Multi-species models}
+
+\subsection{mars}
+
+\subsection{gdm}
+
+
+\section{References}
+\begin{hangparas}{3em}{1}
+
+\noindent Elith, J., C.H. Graham, R.P. Anderson, M. Dudik, S. Ferrier, A. Guisan, R.J. Hijmans, F. Huettmann, J. Leathwick, A. Lehmann, J. Li, L.G. Lohmann, B. Loiselle, G. Manion, C. Moritz, M. Nakamura, Y. Nakazawa, J. McC. Overton, A.T. Peterson, S. Phillips, K. Richardson, R. Scachetti-Pereira, R. Schapire, J. Soberon, S. Williams, M. Wisz and N. Zimmerman, 2006. Novel methods improve prediction of species' distributions from occurrence data. Ecography 29: 129-151. \url{http://dx.doi.org/10.1111/j.2006.0906-7590.04596.x}
+
+\noindent Elith, J. and J.R. Leathwick, 2009. Species Distribution Models: Ecological Explanation and Prediction Across Space and Time. Annual Review of Ecology, Evolution, and Systematics 40: 677-697. \url{http://dx.doi.org/10.1146/annurev.ecolsys.110308.120159}
+
+\noindent Fielding, A.H. and J.F. Bell, 1997. A review of methods for the assessment of prediction errors in conservation presence/absence models. Environmental Conservation 24: 38-49
+
+\noindent Graham, C.H., J. Elith, R.J. Hijmans, A. Guisan, A.T. Peterson, B.A. Loiselle and the NCEAS Predicting Species Distributions Working Group, 2007. The influence of spatial errors in species occurrence data used in distribution models. Journal of Applied Ecology 45: 239-247 
+
+\noindent Guralnick, R.P., J. Wieczorek, R. Beaman, R.J. Hijmans and the BioGeomancer Working Group, 2006. BioGeomancer:  Automated georeferencing to map the world's biodiversity data. PLoS Biology 4: 1908-1909. \url{http://dx.doi.org/10.1371/journal.pbio.0040381}
+
+\noindent Hijmans, R.J., M. Schreuder, J. de la Cruz and L. Guarino, 1999. Using GIS to check coordinates of germplasm accessions. Genetic Resources and Crop Evolution 46: 291-296.
+
+\noindent Hijmans, R.J., S.E. Cameron, J.L. Parra, P.G. Jones and A. Jarvis, 2005. Very high resolution interpolated climate surfaces for global land areas. International Journal of Climatology 25: 1965-1978. \url{http://dx.doi.org/10.1002/joc.1276}
+
+\noindent Phillips, S.J., R.P. Anderson, R.E. Schapire, 2006. Maximum entropy modeling of species geographic distributions. Ecological Modelling 190: 231-259.
+
+\noindent Wieczorek, J., Q. Guo and R.J. Hijmans, 2004. The point-radius method for georeferencing point localities and calculating associated uncertainty. International Journal of Geographic Information Science 18: 745-767.
+
+\noindent Wisz, M.S., R.J. Hijmans, J. Li, A.T. Peterson, C.H. Graham, A. Guisan, and the NCEAS Predicting Species Distributions Working Group, 2008. Effects of sample size on the performance of species distribution models. Diversity and Distributions 14: 763-773. 
+
+
+\end{hangparas}
+
+
+\end{document}
+
