@@ -25,7 +25,7 @@ setMethod('predict', signature(object='GeographicDistance'),
 			if ( inherits(x, 'SpatialPoints') )  { x = coordinates(x) }
 			
 			res <- vector(length=nrow(x))
-			for (i in nrow(x)) {
+			for (i in 1:nrow(x)) {
 				res[i] <- min( pointDistance(x[i,], object@presence) )
 			}
 			
