@@ -9,7 +9,8 @@ setClass('GeographicDistance',
 	contains = 'DistModel',
 	representation (
 		presence='matrix',
-		absence='matrix'
+		absence='matrix',
+		lonlat='logical'
 	),	
 	prototype (	
 	),
@@ -26,35 +27,37 @@ if (!isGeneric("geoDist")) {
 
 
 setMethod('geoDist', signature(p='matrix'), 
-	function(p, a, ...) {
+	function(p, a, lonlat, ...) {
 		gd <- new('GeographicDistance')
 		gd@presence <- p
 		if (! missing(a)) {
 			gd@absence <- a
 		}
+		gd@lonlat <- lonlat
 		return(gd)
 	}
 )
 
 
 setMethod('geoDist', signature(p='data.frame'), 
-	function(p, a, ...) {
+	function(p, a, lonlat, ...) {
 		p <- as.matrix(p)
 		if (missing(a)) { 
-			geoDist(p, ...) 
+			geoDist(p, lonlat, ...) 
 		} else {
-			geoDist(p, a=as.matrix(a), ...)
+			geoDist(p, a=as.matrix(a), lonlat, ...)
 		}
 	}
 )
 
 setMethod('geoDist', signature(p='SpatialPoints'), 
-	function(p, a, ...) {
+	function(p, a, lonlat, ...) {
+		if (missing(lonlat)) lonlat <- isLonLat(p)
 		p <- coordinates(p)
 		if (missing(a)) { 
-			geoDist(p, ...) 
+			geoDist(p, lonlat=lonlat, ...) 
 		} else {
-			geoDist(p, a=coordinates(a), ...)
+			geoDist(p, a=coordinates(a), lonlat=lonlat, ...)
 		}
 	}
 )
