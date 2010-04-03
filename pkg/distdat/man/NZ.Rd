@@ -28,7 +28,7 @@ tseas  \tab  Temperature seasonality  \tab  deg C  \tab  Continuous  \cr
 vpd  \tab  Mean October vapor pressure deficit at 9 AM  \tab  kPa  \tab  Continuous  \cr
 }
 
-"NZ map grid" projection. Units are meters.
+x y data are in "New Zealand map grid" projection. Units are meters.
 
 }
 
