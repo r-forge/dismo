@@ -24,7 +24,7 @@ if (!isGeneric("idwModel")) {
 
 setMethod('idwModel', signature(p='matrix', a='matrix'), 
 	function(p, a, ...) {
-		v <- new('invDistWeightModel')
+		v <- new('InvDistWeightModel')
 		v@model <- list( .idw(p[,1:2,drop=FALSE], a[,1:2,drop=FALSE]) )
 		return(v)
 	}
