@@ -37,6 +37,7 @@ setMethod('predict', signature(object='InvDistWeightModel'),
 			}
 			
 			xx <- predict(object@model[[1]], x)
+			xx <- xx@data[,1]
 		}
 		
 		return(xx)
