@@ -14,7 +14,6 @@ if (!isGeneric("predict")) {
 setMethod('predict', signature(object='InvDistWeightModel'), 
 	function(object, x, ext=NULL, filename='', mask=FALSE, progress='text', ...) {
 	
-		nc <- nrow(object@hull@data)
 		if ( extends(class(x), 'Raster'))  {
 			if (! mask) {
 				x = raster(x)
