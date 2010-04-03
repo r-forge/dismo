@@ -43,9 +43,9 @@ setMethod('geoDist', signature(p='data.frame'),
 	function(p, a, lonlat, ...) {
 		p <- as.matrix(p)
 		if (missing(a)) { 
-			geoDist(p, lonlat, ...) 
+			geoDist(p, lonlat=lonlat, ...) 
 		} else {
-			geoDist(p, a=as.matrix(a), lonlat, ...)
+			geoDist(p, a=as.matrix(a), lonlat=lonlat, ...)
 		}
 	}
 )
