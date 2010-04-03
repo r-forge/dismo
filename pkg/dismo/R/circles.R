@@ -31,7 +31,7 @@
 
 .generateCircles <- function(xy, d, n=360, lonlat=TRUE, r=6378137 ) {
 	if (missing(d)) {
-		d <- .avgDist(xy, lonlat=lonlat, r=r) 
+		d <- .avgDist(xy, lonlat=lonlat, r=r) / 2
 	}
 	xy <- as.matrix(xy[,1:2])
 	n <- max(4, round(n))
@@ -85,7 +85,7 @@ if (!isGeneric("circles")) {
 
 
 setMethod('circles', signature(p='matrix'), 
-	function(p, d, lonlat=TRUE, ...) {
+	function(p, d, lonlat, ...) {
 		ci <- new('CirclesRange')
 		ci@presence <- p
 		ci@circles <- .generateCircles(p, d, lonlat=lonlat)
@@ -95,14 +95,15 @@ setMethod('circles', signature(p='matrix'),
 
 
 setMethod('circles', signature(p='data.frame'), 
-	function(p, ...) {
-		circles(as.matrix(p), ...)
+	function(p, lonlat, ...) {
+		circles(as.matrix(p), lonlat=lonlat, ...)
 	}
 )
 
 setMethod('circles', signature(p='SpatialPoints'), 
-	function(p, ...) {
-		circles(coordinates(p), ...)
+	function(p, lonlat, ...) {
+		if (missing(lonlat)) lonlat <- isLonLat(p)
+		circles(coordinates(p), lonlat=lonlat, ...)
 	}
 )
 

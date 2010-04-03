@@ -47,7 +47,7 @@ pts <- matrix(c(17, 42, 85, 70, 19, 53, 26, 84, 84, 46, 48, 85, 4, 95, 48, 54, 6
 train <- pts[1:12, ]
 test <- pts[13:20, ]
 				 
-cc <- circles(train)
+cc <- circles(train, lonlat=FALSE)
 predict(cc, test)
 
 plot(r)
