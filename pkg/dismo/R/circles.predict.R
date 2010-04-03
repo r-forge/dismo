@@ -15,15 +15,15 @@ setMethod('predict', signature(object='CirclesRange'),
 			if (! is.null(ext)) { 
 				x = crop(x, ext) 
 			}
-			
-			xx = polygonsToRaster(object@circles, raster(x), field=-1, overlap='sum', mask=FALSE, updateRaster=FALSE, updateValue="NA", getCover=FALSE, filename=filename, silent=TRUE, progress=progress, ...)
+			xx = polygonsToRaster(object@circles, raster(x), field=-1, overlap='sum', mask=FALSE, updateRaster=FALSE, updateValue="NA", getCover=FALSE, silent=TRUE, progress=progress)
 			if (mask) {
 				xx <- mask(xx, x)
 			}
+			nc = length(object@circles@polygons) 
+			fun = function(x){x / nc }
+			xx <- calc(xx, fun=fun, filename=filename, progress=progress, ...)
 			return(xx)
-			
 		} else {
-		
 			if (! inherits(x, 'SpatialPoints') )  {
 				x = data.frame(x[,1:2])
 				colnames(x) = c('x', 'y')
@@ -31,7 +31,6 @@ setMethod('predict', signature(object='CirclesRange'),
 			}
 			v <- .pointsInPolygons(x, object@circles, sum) / length(object@circles@polygons) 
 			return(v)
-			
 		}
 	}
 )

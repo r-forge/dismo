@@ -11,7 +11,7 @@ if (!isGeneric("predict")) {
 		standardGeneric("predict"))
 }	
 
-setMethod('predict', signature(object='ConvexHull'), 
+setMethod('predict', signature(object='InvDistWeightModel'), 
 	function(object, x, ext=NULL, filename='', mask=FALSE, progress='text', ...) {
 	
 		nc <- nrow(object@hull@data)
@@ -22,14 +22,12 @@ setMethod('predict', signature(object='ConvexHull'),
 			if (! is.null(ext)) { 
 				x = crop(x, ext) 
 			}
-			
-			xx = polygonsToRaster(object@hull, raster(x), field=-1, overlap='sum', mask=FALSE, updateRaster=FALSE, updateValue="NA", getCover=FALSE, silent=TRUE, progress=progress)
 			if (mask) {
-				xx <- mask(xx, x)
-			}
-			fun = function(x){x / nc }
-			xx <- calc(xx, fun=fun, filename=filename, progress=progress, ...)
-			return(xx)
+				xx <- interpolate(x, object@model[[1]], progress=progress)
+				xx <- mask(xx, x, filename=filename, progress=progress, ...)
+			} else {
+				xx <- interpolate(x, object@model[[1]], filename=filename, progress=progress, ...)
+			}			
 			
 		} else {
 		
@@ -38,10 +36,11 @@ setMethod('predict', signature(object='ConvexHull'),
 				colnames(x) = c('x', 'y')
 				coordinates(x) = ~ x + y
 			}
-			v <- .pointsInPolygons(x, object@hull, sum) / nc
-			return(v)
 			
+			xx <- predict(object@model[[1]], x)
 		}
+		
+		return(xx)
 	}
 )
 
