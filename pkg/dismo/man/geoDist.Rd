@@ -19,7 +19,8 @@ geoDist(p, ...)
  
 \arguments{
   \item{p}{point locations (presence). Two column matrix, data.frame or SpatialPoints* object}
-  \item{...}{ Additional arguments. You can supply an additional argument 'a' for absence points. Argument 'a' should be of the same class as argument 'p' }
+  \item{...}{ Additional arguments. You must supply a lonlat= argument (logical), unless p is a SpatialPoints* object. 
+  You can also supply an additional argument 'a' for absence points (currently ignored). Argument 'a' should be of the same class as argument 'p' }
 }
 
 
@@ -44,7 +45,7 @@ pts <- matrix(c(17, 42, 85, 70, 19, 53, 26, 84, 84, 46, 48, 85, 4, 95, 48, 54, 6
 train <- pts[1:12, ]
 test <- pts[13:20, ]
 				 
-gd <- geoDist(train)
+gd <- geoDist(train, lonlat=FALSE)
 predict(gd, test)
 
 p = predict(gd, r, progress='')
