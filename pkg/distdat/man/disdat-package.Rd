@@ -16,19 +16,6 @@ The data were compiled and used by a species distribution modelling working grou
 }
 
 \details{
-Test data have these fields in common:
-\tabular{ll}{  
-Code \tab Description \cr
-spid \tab Code to identify a species \cr
-genus \tab genus  \cr
-species \tab species \cr
-longitude \tab latitude  \cr
-latitude \tab longitude  \cr
-x \tab Easting  \cr
-y \tab Northing \cr
-pa \tab  presence (1) or absence or background sample (0) \cr
-}
-
 Longtude and latitude have the WGS84 datum.
 }
 
@@ -40,7 +27,7 @@ Jane Elith, Catherine Graham, Robert J. Hijmans, Steven Phillips.
 \references{
 The main reference for the this data set is:
 
-J. Elith, C.H. Graham, R.P. Anderson, M. Dudik, S. Ferrier, A. Guisan, R.J. Hijmans, F. Huettmann, J. Leathwick, A. Lehmann, J. Li, L.G. Lohmann, B. Loiselle, G. Manion, C. Moritz, M. Nakamura, Y. Nakazawa, J. McC. Overton, A.T. Peterson, S. Phillips, K. Richardson, R. Scachetti-Pereira, R. Schapire, J. Soberón, S. Williams, M. Wisz and N. Zimmerman, 2006. Novel methods improve prediction of species' distributions from occurrence data. Ecography 29: 129-151. \url{http://dx.doi.org/10.1111/j.2006.0906-7590.04596.x}
+J. Elith, C.H. Graham, R.P. Anderson, M. Dudik, S. Ferrier, A. Guisan, R.J. Hijmans, F. Huettmann, J. Leathwick, A. Lehmann, J. Li, L.G. Lohmann, B. Loiselle, G. Manion, C. Moritz, M. Nakamura, Y. Nakazawa, J. McC. Overton, A.T. Peterson, S. Phillips, K. Richardson, R. Scachetti-Pereira, R. Schapire, J. Soberon, S. Williams, M. Wisz and N. Zimmerman, 2006. Novel methods improve prediction of species' distributions from occurrence data. Ecography 29: 129-151. \url{http://dx.doi.org/10.1111/j.2006.0906-7590.04596.x}
 
 
 Other papers using these data include:
