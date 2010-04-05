@@ -177,7 +177,7 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 		d <- .meTmpDir()
 		dirout <- paste(d, '/out', sep='')
 		if (! file.exists(dirout)) {
-			dir.create(dirout, showWarnings=TRUE )
+			dir.create(dirout, recursive=TRUE, showWarnings=TRUE)
 		}
 
 		pv <- x[p==1, ,drop=FALSE]
