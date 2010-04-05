@@ -63,16 +63,16 @@ You can also read such data directly out of Excel or from a database (see e.g. t
 If you do not have any species distribution data you can use the 'gbif' function to download records from GBIF (\url{http://www.gbif.org/}).
 The data used below were downloaded with the function 
 
-sac = gbif('solanum', 'acaule', geo=FALSE)
+acaule = gbif('solanum', 'acaule', geo=FALSE)
 
 Many records may not have coordinates. Out of the 699 records that gbif returned (March 2010), there were only 54 records with coordinates. 
 
 <<sdm2>>=
-data(sac)
-dim(sac)
-sacgeo = subset(sac, !is.na(lat) & !is.na(lon))
-dim(sacgeo)
-sacgeo[1:4,c(1:5,7:10) ]
+data(acaule)
+dim(acaule)
+acgeo = subset(acaule, !is.na(lat) & !is.na(lon))
+dim(acgeo)
+acgeo[1:4,c(1:5,7:10) ]
 @
 
 
@@ -82,7 +82,7 @@ Here is a simple way to make a map of the occurrence localities of Solanum acaul
 library(maptools)
 data(wrld_simpl)
 plot(wrld_simpl, xlim=c(-130,10), ylim=c(-60,60))
-points(sacgeo$lon, sacgeo$lat, col='red')
+points(acgeo$lon, acgeo$lat, col='red')
 @
 
 
@@ -92,7 +92,7 @@ Solanum acaule is a species that occurs in the high Andes of Peru and Bolivia. D
 
 Let's have a look at these records:
 <<sdm3>>=
-lonzero = subset(sac, lon==0)
+lonzero = subset(acaule, lon==0)
 lonzero[, 1:13]
 @
 
@@ -102,12 +102,12 @@ It is important to cross-check coordinates by visual and other means. One approa
 
 <<sdm4>>=
 library(sp)
-coordinates(sacgeo) = ~lon+lat
-ov = overlay(sacgeo, wrld_simpl)
+coordinates(acgeo) = ~lon+lat
+ov = overlay(acgeo, wrld_simpl)
 cntr = as.character(wrld_simpl@data$NAME[ov])
 which(is.na(cntr))
-i = which(cntr != sacgeo@data$country)
-cbind(cntr, sacgeo@data$country)[i,]
+i = which(cntr != acgeo@data$country)
+cbind(cntr, acgeo@data$country)[i,]
 @
 
 Note that the polygons that we used in the example above are not very precise, and they should not be used in a real analysis (see \url{http://www.gadm.org/} for more detailed administrative division files, or use the 'getData('gadm',  )' function from the raster package. The overlay function returns indices (row numbers), and we use these in the next line to get the country for each point. Then we ask which countries are 'NA' (i.e., points in oceans), and which countries have non matching names (in this case these are all caused by using abbreviations in stead of full names).
@@ -118,7 +118,7 @@ Note that the polygons that we used in the example above are not very precise, a
 If you have records with locality descriptions but no coordinates, you should consider georeferencing these. Not all the records can be georeferenced. Sometimes even the country is unknown (country=="UNK"). Here we select only records that do not have coordinates, but that do have a locality description.
 
 <<sdm5>>=
-georef = subset(sac, (is.na(lon) | is.na(lat)) & ! is.na(locality) )
+georef = subset(acaule, (is.na(lon) | is.na(lat)) & ! is.na(locality) )
 dim(georef)
 georef[1:3,1:13]
 @
@@ -207,7 +207,14 @@ You can use the 'getData' function from the raster package to download WorldClim
 \subsection{Random Forest}
 
 
-\section{Geographic models}
+\section{Multi-species models}
+
+\subsection{mars}
+
+\subsection{gdm}
+
+
+\section{Geographic models (presence-only)}
 
 \subsection{Distance}
 
@@ -216,11 +223,12 @@ You can use the 'getData' function from the raster package to download WorldClim
 \subsection{Circles}
 
 
-\section{Multi-species models}
+\section{Geographic models (presence-absence)}
 
-\subsection{mars}
+\subsection{Inverse distance}
 
-\subsection{gdm}
+\subsection{Voronoi hulls}
+
 
 
 \section{References}

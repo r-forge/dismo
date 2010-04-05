@@ -32,7 +32,7 @@ evaluateROCR(model, p, a, x)
 }
 
 \value{
-An object of class "prediction" (define in the ROCR package)
+An object of class "prediction" (defined in the ROCR package)
 }
 
 \author{
