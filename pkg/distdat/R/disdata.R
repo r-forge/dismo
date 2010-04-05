@@ -44,3 +44,18 @@ getDisData <- function(region, type) {
 	d <- get(load(x, thisenvir), thisenvir)
 	return(d)
 }
+
+
+envnames <- function(region) {
+	regions = c('AWT', 'CAN', 'NSW', 'NZ', 'SA', 'SWI')
+	if (! region %in% regions) {
+		stop('unknown region: ', region, '. Should be one of: ', regions)
+	}
+	if (region=='AWT') return( c('bc01', 'bc04', 'bc05', 'bc06', 'bc12', 'bc15', 'bc17', 'bc20', 'bc31', 'bc33', 'slope', 'topo', 'tri') )
+	if (region=='CAN') return( c('alt', 'asp2', 'ontprec', 'ontprec4', 'ontprecsd', 'ontslp', 'onttemp', 'onttempsd', 'onttmin4', 'ontveg', 'watdist') )
+	if (region=='NSW') return( c("disturb", "mi", "rainann", "rugged", "soildepth", "soilfert", "solrad", "tempann", "topo", "vegsys", "cti", "raindq", "tempmin") )
+	if (region=='NZ') return( c('age', 'deficit', 'dem', 'hillshade', 'mas', 'mat', 'r2pet', 'rain', 'slope', 'sseas', 'toxicats', 'tseas', 'vpd')	)
+	if (region=='SA') return( c('sabio1', 'sabio2', 'sabio4', 'sabio5', 'sabio6', 'sabio7', 'sabio8', 'sabio12', 'sabio15', 'sabio17', 'sabio18') )
+	if (region=='SWI') return( c("bcc", "calc", "ccc", "ddeg", "nutri", "pday", "precyy", "sfroyy", "slope", "sradyy", "swb", "tavecc", "topo") )
+}
+
