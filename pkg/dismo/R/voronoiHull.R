@@ -71,3 +71,9 @@ setMethod('voronoiHull', signature(p='SpatialPoints', a='SpatialPoints'),
 	return(polys)
 }
 
+
+setMethod("plot", signature(x='VoronoiHull', y='missing'), 
+	function(x, ...) {
+		plot(x@hull[x@hull@data[,1]==1, ], ...)
+	}
+)

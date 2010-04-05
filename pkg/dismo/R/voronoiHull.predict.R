@@ -5,11 +5,9 @@
 # Licence GPL v3
 
 
-setMethod('predict', signature(object='ConvexHull'), 
+setMethod('predict', signature(object='VoronoiHull'), 
 	function(object, x, ext=NULL, filename='', mask=FALSE, progress='text', ...) {
 	
-		np <- nrow(object@hull@data)
-
 		if ( extends(class(x), 'Raster'))  {
 			if (! mask) {
 				x = raster(x)
@@ -18,11 +16,12 @@ setMethod('predict', signature(object='ConvexHull'),
 				x = crop(x, ext) 
 			}
 			
-			xx = polygonsToRaster(object@hull, raster(x), field=-1, overlap='max', mask=FALSE, updateRaster=FALSE, updateValue="NA", getCover=FALSE, silent=TRUE, progress=progress)
 			if (mask) {
-				xx <- mask(xx, x)
+				xx = polygonsToRaster(object@hull, raster(x), field=-1, overlap='max', mask=FALSE, updateRaster=FALSE, updateValue="NA", getCover=FALSE, silent=TRUE, progress=progress)
+				xx <- mask(xx, x, filename=filename, progress=progress, ...)
+			} else {
+				xx = polygonsToRaster(object@hull, raster(x), filename=filename, field=-1, overlap='max', mask=FALSE, updateRaster=FALSE, updateValue="NA", getCover=FALSE, silent=TRUE, progress=progress, ...)
 			}
-			fun = function(x){x / np }
 			xx <- calc(xx, fun=fun, filename=filename, progress=progress, ...)
 			return(xx)
 			
@@ -33,9 +32,10 @@ setMethod('predict', signature(object='ConvexHull'),
 				colnames(x) = c('x', 'y')
 				coordinates(x) = ~ x + y
 			}
-			v <- .pointsInPolygons(x, object@hull, max) / np
-			return(v)
 			
+			v <- .pointsInPolygons(x, object@hull[object@hull@data[,1]==1,], max) 
+			
+			return(v)
 		}
 	}
 )

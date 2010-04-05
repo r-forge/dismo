@@ -22,24 +22,20 @@ setMethod('predict', signature(object='InvDistWeightModel'),
 				x = crop(x, ext) 
 			}
 			if (mask) {
-				xx <- interpolate(x, object@model[[1]], progress=progress)
+				xx <- interpolate(x, object@model[[1]], progress=progress, debug.level=0)
 				xx <- mask(xx, x, filename=filename, progress=progress, ...)
 			} else {
 				xx <- interpolate(x, object@model[[1]], filename=filename, progress=progress, ...)
-			}			
-			
+			}				
 		} else {
-		
 			if (! inherits(x, 'SpatialPoints') )  {
 				x = data.frame(x[,1:2])
 				colnames(x) = c('x', 'y')
 				coordinates(x) = ~ x + y
 			}
-			
-			xx <- predict(object@model[[1]], x)
+			xx <- predict(object@model[[1]], x, debug.level=0)
 			xx <- xx@data[,1]
 		}
-		
 		return(xx)
 	}
 )
