@@ -64,7 +64,12 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 		dom <- matrix(ncol=nlayers(x), nrow=ncols*tr$size )
 
 		pb <- pbCreate(tr$n, type=progress)	
+		
 		for (i in 1:tr$n) {
+			if (i == tr$n) {
+				dom <- matrix(ncol=nlayers(x), nrow=ncols*tr$nrows[i] )
+			}
+		
 			rr <- firstrow + tr$row[i] - 1
 			vals <- getValuesBlock(x, row=rr, nrows=tr$nrows[i], firstcol, ncols)
 
@@ -73,14 +78,13 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 			}
 			res <- apply(dom, 1, min)
 			if (inmem) {
-				res <- matrix(res, nrow=ncol(out))
-				cols <- tr$row[i]:(tr$row[i]+dim(res)[2]-1)
-				v[, cols] <- res
+				v[, tr$row[i]:(tr$row[i]+tr$nrows[i]-1)] <- matrix(res, nrow=ncol(out))
 			} else {
 				writeValues(out, res, tr$row[i])
 			}
 			pbStep(pb, i) 
 		} 
+		
 		if (inmem) {
 			out <- setValues(out, as.vector(v))
 			if (filename != '') {
@@ -92,5 +96,7 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 		pbClose(pb)
 		return(out)
 	}
-})
+}
+
+)
 
