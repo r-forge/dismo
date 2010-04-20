@@ -55,6 +55,9 @@ Steven J. Phillips, Robert P. Anderson, Robert E. Schapire, 2006. Maximum entrop
 }
 
 \examples{
+
+jar <- paste(system.file(package="dismo"), "/java/maxent.jar", sep='')
+if (!file.exists(jar)) {
 # get predictor variables
 predictors <- stack(list.files(path=paste(system.file(package="dismo"), '/ex', sep=''), pattern='grd', full.names=TRUE ))
 plot(predictors)
@@ -99,6 +102,7 @@ testa <- predict(me, avtest)
 e = evaluate(p=testp, a=testa)
 e
 plot(e, 'ROC')
+}
 }
 
 \keyword{spatial}
