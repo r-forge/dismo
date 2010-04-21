@@ -66,7 +66,7 @@ randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=5, 
 	cells <- na.omit(vals)[,1]
 
 	if (length(cells) >= n) { 
-			cells <- cells[1:n]
+			cells <- sample(cells, n)
 	} else {
 		frac <- length(cells) / n
 		if (frac < 0.1) {
