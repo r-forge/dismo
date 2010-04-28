@@ -10,7 +10,9 @@ Species distribution modeling
 }
 
 \description{
-This package implements a few species distribution models, including an R link to maxent, and native implementations of older models Bioclim and Domain. It also provides a number of funcitons that can assist in using Boosted Regresssion Trees as well as general functions such as sampling background points, k-fold sampling, and evaluation statistics that are useful for these methods other methods available in R such as GLM, GAM, and RandomForest.
+This package implements a few species distribution models, including an R link to the 'maxent' model, and native implementations of Bioclim and Domain. It also provides a number of functions that can assist in using Boosted Regresssion Trees.
+
+In addition there are a number of functions, such sampling background points, k-fold sampling, and for model evaluation (AUC) that are useful for these and for other species distribution modeling methods available in R (e.g. GLM, GAM, and RandomForest).
 }
 
 \author{
