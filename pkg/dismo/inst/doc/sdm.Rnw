@@ -19,20 +19,20 @@
 \begin{document}
 
 
-\title{Species distribution modeling with R}
+\title{Species distribution modeling with \R}
 \author{Robert J. Hijmans}
 \maketitle
 
 
 \section{Introduction}
 
-This document is an introduction to species distribution modeling in R. Species distribution modeling (SDM) is also known under other names including envelope-modeling and niche-modeling. In these models, locations of occurrence (and perhaps non-occurrence) of a species (or other phenomenon), are used to extract values from spatial predictor variables. These extracted values are used to fit a model predicting presence/absence, or another measure associated with the points. This model can then be used to predict the likelihood of presence at all locations of an area of interest (and perhaps in a future climate).
+This document is an introduction to species distribution modeling with \R. Species distribution modeling (SDM) is also known under other names including envelope-modeling and niche-modeling. In these models, locations of occurrence (and perhaps non-occurrence) of a species (or other phenomenon), are used to extract values from spatial predictor variables. These extracted values are used to fit a model predicting presence/absence, or another measure associated with the points. This model can then be used to predict the likelihood of presence at all locations of an area of interest (and perhaps in a future climate).
 
 This is not a general introduction to species distribution modeling itself. We assume that you are familiar with most of the concepts in this field. If in doubt, you could consult Richard Pearson's introduction to the subject: \url{http://biodiversityinformatics.amnh.org/index.php?section_id=111}. More advanced readers may want to consult a recent review of the field by Elith and Leathwick (2009).
 
 We also assume that you are already familiar with the R language and environment. It would be useful if you already had some experience with statistical model fitting (e.g. the glm function) and with the spatial data handling packages raster and sp.
 
-This document uses functions from the '\verb@dismo@' and the '\verb@raster@' packages. If you want to test, or build on, some of the examples presented here, make sure you have the latest versions of these libraries, and their dependencies, installed. If you are using a recent version of \R, you can do that with: 
+This document uses functions from the '\verb@dismo@' and the '\verb@raster@' packages (but we also refer to other packages such as \verb@BIOMOD@). If you want to test, or build on, some of the examples presented here, make sure you have the latest versions of these libraries, and their dependencies, installed. If you are using a recent version of \R, you can do that with: 
 
 install.packages(c('rJava', 'XML', 'sp', 'rgdal', 'raster'))
 
@@ -149,13 +149,13 @@ dismo has a function to sample random points (background data) from a study area
 files <- list.files(path=paste(system.file(package="dismo"), '/ex', sep=''),
                     pattern='grd', full.names=TRUE )
 mask <- raster(files[[1]])
-bg <- randomPoints(mask, 1000 )
+bg <- randomPoints(mask, 500 )
 par(mfrow=c(1,2))
 plot(!is.na(mask), legend=FALSE)
 points(bg, cex=0.5)
 # now with an extent
-e = extent(-75, -55, -39, -18)
-bg2 <- randomPoints(mask, 100, ext=e)
+e = extent(-80, -53, -39, -22)
+bg2 <- randomPoints(mask, 50, ext=e)
 plot(!is.na(mask), legend=FALSE)
 plot(e, add=TRUE, col='red')
 points(bg2, cex=0.5)
@@ -188,19 +188,31 @@ You can use the 'getData' function from the raster package to download WorldClim
 
 \section{Model fitting}
 
+Model fitting is almost the same for any of the methods applied. You collect. 
+
 \section{Model predictions}
+
 
 \section{Model evaluation}
 
+Model evaluation typically consists of creating model training and a model testing data sets through random sampling (in some cases, e.g. Elith et al., 2006, training and test data are from different sources and pre-defined).
+
 \subsection{k-fold partitioning}
+
 
 \section{Uncertainty}
 
+
 \section{Model averaging}
+
+
 
 \section{Model transfer in space and time}
 
+
 \section{Profile models}
+
+The three methods described here are all implemented in the dismo package.
 
 \subsection{Bioclim}
 
@@ -216,13 +228,23 @@ You can use the 'getData' function from the raster package to download WorldClim
 \subsection{Generalized Additive Models}
 
 
+
 \section{Machine learning models}
+
+There is a variety of machine learning (sometimes referred to data mining) methods in R. For a long time there have been packages to do Artifical Neural Networks (ANN) and Classification and Regressin Trees (CART). More recent methods include Random Forests, Boosted Regression Trees, and Support Vector Machines. Through the dismo package you can also use the Maxent program, that implements the most widely used method (maxent) in species distribution modeling. 
 
 \subsection{Maxent}
 
+The way Maxent is implemented is a bit different from other methods. It depends on an external library that you need to download and put in the 'java' folder of the dismo package. See ?maxent
+
+
 \subsection{Boosted Regression Trees}
 
+See the dedicated vignette.
+
+
 \subsection{Random Forest}
+
 
 
 \section{Multi-species models}
@@ -231,6 +253,10 @@ You can use the 'getData' function from the raster package to download WorldClim
 
 \subsection{gdm}
 
+
+\section{Geographic models}
+
+The 'geographic models' described here are not commonly used in species distribution modeling. They are an attempt to formalize methods to draw 'expert range maps'. They can also be interpreted as null-models.
 
 \section{Geographic models (presence-only)}
 
@@ -246,6 +272,7 @@ You can use the 'getData' function from the raster package to download WorldClim
 \subsection{Inverse distance}
 
 \subsection{Voronoi hulls}
+
 
 
 
