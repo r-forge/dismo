@@ -4,16 +4,16 @@
 # Version 0.1
 # Licence GPL v3
 
-pointValues <- function(stack, p, a, uniquecells=TRUE, na.rm=TRUE) {
-	if (class(p) == 'SpatialPoints' | class(p) == 'SpatialPointsDataFrame') {
+pointValues <- function(x, p, a, uniquecells=TRUE, na.rm=TRUE) {
+	if (inherits(p, 'SpatialPoints')) {
 		p <- coordinates(p)
 	}
-	if (class(a) == 'SpatialPoints' | class(a) == 'SpatialPointsDataFrame') {
+	if (inherits(a, 'SpatialPoints')) {
 		a <- coordinates(a)
 	}
 	pa <- rbind(cbind(1,p), cbind(0,a))
 	np <- nrow(pa)
-	cell <- cellFromXY(stack, pa[,2:3])
+	cell <- cellFromXY(x, pa[,2:3])
 	cell <- na.omit(cell)
 	if (length(cell) < np) {
 		frac <- length(cell) / np
@@ -27,7 +27,7 @@ pointValues <- function(stack, p, a, uniquecells=TRUE, na.rm=TRUE) {
 			warning("unique cells=", frac," times total" ) 
 		}
 	} 
-	vals <- cbind(pa[,1], cellValues(stack, cell))
+	vals <- cbind(pa[,1], cellValues(x, cell))
 	if (is.null(colnames(vals))) {
 		colnames(vals) <- c('presabs', 'value')
 	} else {

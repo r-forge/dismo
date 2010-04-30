@@ -27,13 +27,14 @@ function (data,                        # the input dataframe
   verbose = TRUE,                      # to control reporting
   learning.rate = 0.001,               # controls speed of the gradient descent
   n.trees = 2000,                      # default number of trees
-  train.fraction = 1,  
   bag.fraction = 0.5,                  # varies random sample size for each new tree
   family = "bernoulli",                # can be any of bernoulli, poisson, gaussian, laplace - note quotes
   keep.data = FALSE,                   # keep original data
   var.monotone = rep(0, length(gbm.x)) # constrain to positive (1) or negative monontone (-1)
   ) 
 {
+    train.fraction = 1
+
     if (! require(gbm) ) { stop ('you need to install the gbm package to run this function') }
 
 # setup input data and assign to position one

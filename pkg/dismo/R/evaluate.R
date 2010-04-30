@@ -3,43 +3,9 @@
 # Version 0.1
 # Licence GPL v3
 
-setClass('ModelEvaluation',
-	representation (
-		presence = 'vector',
-		absence = 'vector',
-		np = 'integer',
-		na = 'integer',
-		auc = 'numeric',
-		pauc = 'numeric',
-		cor = 'numeric',
-		pcor = 'numeric',
-		t = 'vector',
-		confusion = 'matrix',
-		prevalence = 'vector',
-		ODP = 'vector', # overall diagnostic power
-		CCR = 'vector', # correct classification rate
-		TPR = 'vector', # sensitivity, or true positive rate
-		TNR = 'vector', # specificity, or true negative rate
-		FPR ='vector',  # False positive rate
-		FNR ='vector',  # False negative rate
-		PPP = 'vector',
-		NPP = 'vector',
-		MCR = 'vector', # misclassification rate
-		OR = 'vector',  # odds ratio
-		kappa = 'vector'
-	),	
-	prototype (	
-		np = as.integer(0),
-		na = as.integer(0)
-	),
-	validity = function(object)	{
-		return(TRUE)
-	}
-)
-
 
 evaluateROCR <- function(model, p, a, x) {
-	require(ROCR)
+	if (require(ROCR)) {
 	if (!missing(x)) {
 		p <- predict(model, data.frame(xyValues(x, p)))
 		a <- predict(model, data.frame(xyValues(x, a)))
@@ -57,6 +23,7 @@ evaluateROCR <- function(model, p, a, x) {
 	labels = c( rep(1, length(p)), rep(0, length(a)) )
 	pred <- prediction( predictions, labels)
 	return(pred)
+	}
 }
 
 

@@ -52,3 +52,40 @@ setMethod ('show' , 'DistModel',
 		}
 	}
 )	
+
+
+
+setClass('ModelEvaluation',
+	representation (
+		presence = 'vector',
+		absence = 'vector',
+		np = 'integer',
+		na = 'integer',
+		auc = 'numeric',
+		pauc = 'numeric',
+		cor = 'numeric',
+		pcor = 'numeric',
+		t = 'vector',
+		confusion = 'matrix',
+		prevalence = 'vector',
+		ODP = 'vector', # overall diagnostic power
+		CCR = 'vector', # correct classification rate
+		TPR = 'vector', # sensitivity, or true positive rate
+		TNR = 'vector', # specificity, or true negative rate
+		FPR ='vector',  # False positive rate
+		FNR ='vector',  # False negative rate
+		PPP = 'vector',
+		NPP = 'vector',
+		MCR = 'vector', # misclassification rate
+		OR = 'vector',  # odds ratio
+		kappa = 'vector'
+	),	
+	prototype (	
+		np = as.integer(0),
+		na = as.integer(0)
+	),
+	validity = function(object)	{
+		return(TRUE)
+	}
+)
+

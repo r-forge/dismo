@@ -19,7 +19,7 @@ randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=5, 
 	if (missing(p)) { 
 		excludep <- FALSE
 	} else {
-		if (class(p) == 'SpatialPoints' | class(p) == 'SpatialPointsDataFrame') {
+		if (inherits(p, 'SpatialPoints')) {
 			p <- coordinates(p)
 		}
 	}
