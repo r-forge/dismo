@@ -7,22 +7,21 @@ point values
 
 
 \description{
-.. description ...
+Extract values from a Raster* object for point locations. 
 }
 
 
 \usage{
-pointValues(stack, p, a, uniquecells = TRUE, na.rm = TRUE)
+pointValues(x, p, a, uniquecells = TRUE, na.rm = TRUE)
 }
  
 \arguments{
-  \item{stack}{}
-  \item{p}{}
-  \item{a}{}
-  \item{uniquecells}{}
-  \item{na.rm}{}
+  \item{x}{A Raster* object}
+  \item{p}{Points. Two-colum matrix or data.frame; or a SpatialPoints* object}
+  \item{a}{Additional points (absences). Two-colum matrix or data.frame; or a SpatialPoints* object}
+  \item{uniquecells}{Logical. If \code{TRUE}, each cell can be included only once (i.e. 'duplicate' points are removed) }
+  \item{na.rm}{Logical. If \code{TRUE}, cell values of NA are not returned}
 }
-
 
 
 \value{

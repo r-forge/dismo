@@ -55,14 +55,12 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 				filename <- rasterTmpFile()
 				if (getOption('verbose')) { cat('writing raster to:', filename)	}						
 			}
+			out <- writeStart(out, filename=filename, ... )
 		}
-
+		
 		ln <- colnames(object@presence)
-
 		tr <- blockSize(out, n=nlayers(x)+2)
-
 		dom <- matrix(ncol=nlayers(x), nrow=ncols*tr$size )
-
 		pb <- pbCreate(tr$n, type=progress)	
 		
 		for (i in 1:tr$n) {
