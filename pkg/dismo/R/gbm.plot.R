@@ -91,10 +91,10 @@ function(gbm.object,                # a gbm object - could be one from gbm.step
 			n.pages <- n.pages + 1
 		}
 
-		if (plot.count == 0) {
-			x11(width = 11, height = 8)
-			par(mfrow = plot.layout)
-		}
+		par(mfrow = plot.layout)
+#		if (plot.count == 0) {
+#			x11(width = 11, height = 8)
+#		}
 
 		plot.count <- plot.count + 1
 
