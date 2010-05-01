@@ -8,7 +8,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{hyperref}
 
-% \VignetteIndexEntry{Species distribution modeling with R}
+% \VignetteIndexEntry{Species distribution modeling with \R}
 % \VignetteDepends{dismo}
 % \VignetteKeyword{spatial}
 
