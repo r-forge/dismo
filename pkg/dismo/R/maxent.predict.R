@@ -71,7 +71,7 @@ setMethod('predict', signature(object='MaxEnt'),
 				}
 				res[res == -9999] <- NA
 				if (filename != '') {
-					writeValues(out, res, tr$row[i])
+					out <- writeValues(out, res, tr$row[i])
 				} else {
 					res = matrix(res, nrow=ncol(out))		
 					cols = tr$row[i]:(tr$row[i]+dim(res)[2]-1)

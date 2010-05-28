@@ -78,7 +78,7 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 			if (inmem) {
 				v[, tr$row[i]:(tr$row[i]+tr$nrows[i]-1)] <- matrix(res, nrow=ncol(out))
 			} else {
-				writeValues(out, res, tr$row[i])
+				out <- writeValues(out, res, tr$row[i])
 			}
 			pbStep(pb, i) 
 		} 
