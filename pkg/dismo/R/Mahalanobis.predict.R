@@ -60,7 +60,7 @@ function(object, x, ext=NULL, filename='', progress='text', ...) {
 				cols = tr$row[i]:(tr$row[i]+dim(res)[2]-1)
 				v[, cols] <- res
 			} else {
-				writeValues(out, res, tr$row[i])
+				out <- writeValues(out, res, tr$row[i])
 			}
 			pbStep(pb, i) 
 
