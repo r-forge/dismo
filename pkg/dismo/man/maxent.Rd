@@ -67,8 +67,8 @@ occ <- read.table(occurence, header=TRUE, sep=',')[,-1]
 # witholding a 20% sample for testing 
 fold <- kfold(occ, k=5)
 occtrain <- occ[fold != 1, ]
-# fit model, ecoreg is a categorical variable
-me <- maxent(predictors, occ, factors='ecoreg')
+# fit model, biome is a categorical variable
+me <- maxent(predictors, occ, factors='biome')
 # plot showing importance of each variable
 plot(me)
 # predict to entire dataset
