@@ -11,6 +11,7 @@ public class mebridge {
 	public static void main(String args[]) {
 	}
 	
+	
 
 	public double predict (String lambda, String[] vars, double[] vals) {
 		Evaluate eval=null;
@@ -32,10 +33,16 @@ public class mebridge {
 		return( eval.evaluate() );
 	}
 	
-	public double[] predict (String lambda, String[] vars, double[][] vals) {
+	public double[] predict (String lambda, String[] vars, double[][] vals, String cmd) {
 		Evaluate eval=null;
 		try {
 			eval = new Evaluate(lambda);
+			density.Params params = eval.getParams();	
+			
+			//Params params = new Params();
+			//params = new Evaluate.getParams();
+			//density.Params object that you can use to set parameters.
+			
 		} catch (java.io.IOException e) {}
 		double[] p = new double[vals.length];
 		for (int i=0; i<p.length; i++) {

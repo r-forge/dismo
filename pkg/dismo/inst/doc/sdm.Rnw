@@ -60,8 +60,8 @@ In most cases you will a file with point locality data representing the known di
 library(dismo)
 filename <- paste(system.file(package="dismo"), '/ex/bradypus.csv', sep='')
 filename
-occurrence <- read.table(filename, header=TRUE, sep=',')
-head(occurrence)
+bradypus <- read.table(filename, header=TRUE, sep=',')
+head(bradypus)
 @
 
 You can also read such data directly out of Excel or from a database (see e.g. the \verb@RODBC@ package). No matter how you do it, the objective is to get a matrix (or a \verb@data.frame@) with at least 2 columns to hold the coordinates (typically longitude and latitude). In many cases you will have additional columns, e.g., a column to indicate the species if you are modeling multiple species; and a column to indicate whether this is a 'presence' or an 'absence' record (a much used convention is to code presence with a 1 and absence with a 0). 
@@ -189,7 +189,7 @@ plot(predictors)
 <<sdm11, fig=TRUE, echo=TRUE>>=
 plot(predictors, 1)
 plot(wrld_simpl, add=TRUE)
-points(occurrence[,2:3], col='red', cex=0.5)
+points(bradypus[,2:3], col='red', cex=0.5)
 points(acgeo, col='blue', pch='x', cex=0.5)
 @
 
@@ -197,14 +197,27 @@ The example above uses data representing 'bioclimatic variables' from the WorldC
 (\url{http://www.worldwildlife.org/science/data/item1875.html}, Olsen et al., 2001). You can go to these websites if you want higher resolution data. You can also use the \texttt{getData} function from the \texttt{raster} package to download WorldClim climate data (as well as other geographic data).
 
 
+\section{Extracting values from rasters}
+
+We now have a set of predictor variables (rasters) and occurence points. The next step is to extract the values of the predictors at the locations of the points. (This step can be skipped for the modeling methods that are implemented in the dismo package). This is very straightfoward thing to do using the xyValues function from the raster package. In the example below we use that function first for the \textit{Bradypus} occurence points, then for 500 random background points. We combine these into a single \texttt{data.frame} in which the first column (variable 'pb') indicates whether this is a presence or a background point.
+
+<<sdm12, echo=TRUE>>=
+presvals <- xyValues(predictors, bradypus[,2:3])
+backgr <- randomPoints(predictors, 500)
+absvals <- xyValues(predictors, backgr)
+pb <- c(rep(1, nrow(presvals)), rep(0, nrow(absvals)))
+data <- data.frame(cbind(pb, rbind(presvals, absvals)))
+head(data)
+tail(data)
+@
+
 \section{Model fitting}
 
-Model fitting is almost the same for all of the modeling methods that exist in \R. You either provide a formula identifying the dependent and independent variables, or you provide these as a vector and matrix (data.frame).
+Model fitting is quite similar accross the modeling methods that exist in \R. You either provide a formula identifying the dependent and independent variables, accompanied with a data.frame that holds these variables; or you provide these as a two seperate arguments (typically a vector for the dependent variable and a matrix (data.frame) for the independent variables.
 
 A simple formula could look like: 
 
 y ~ x1 + x2
-
 
 
 
