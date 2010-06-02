@@ -194,47 +194,149 @@ points(acgeo, col='blue', pch='x', cex=0.5)
 The example above uses data representing 'bioclimatic variables' from the WorldClim database (\url{http://www.worldclim.org}, Hijmans et al., 2004) and 'terrestiral biome' data from the WWF
 (\url{http://www.worldwildlife.org/science/data/item1875.html}, Olsen et al., 2001). You can go to these websites if you want higher resolution data. You can also use the \texttt{getData} function from the \texttt{raster} package to download WorldClim climate data (as well as other geographic data).
 
+Variable selection is obviously important, particularly of the objective of a study is explanation. See, e.g., Austin and Smith (1987), Austin (2002). In SDM, the objective tends to be prediction, in which case variable selection might be less important (as long as there are enough variables with different spatial patterns); but this is an area that needs further research. 
+
 
 \section{Extracting values from rasters}
 
-We now have a set of predictor variables (rasters) and occurence points. The next step is to extract the values of the predictors at the locations of the points. (This step can be skipped for the modeling methods that are implemented in the dismo package). This is very straightfoward thing to do using the xyValues function from the raster package. In the example below we use that function first for the \textit{Bradypus} occurence points, then for 500 random background points. We combine these into a single \texttt{data.frame} in which the first column (variable 'pb') indicates whether this is a presence or a background point.
+We now have a set of predictor variables (rasters) and occurence points. The next step is to extract the values of the predictors at the locations of the points. (This step can be skipped for the modeling methods that are implemented in the dismo package). This is very straightfoward thing to do using the xyValues function from the raster package. In the example below we use that function first for the \textit{Bradypus} occurence points, then for 500 random background points. We combine these into a single \texttt{data.frame} in which the first column (variable 'pb') indicates whether this is a presence or a background point. 'biome' is catagorical variable (called a 'factor' in \R) and it is important to explicitly define it that way (so that it won't be treated like any other numerical variable).
 
 <<sdm12, echo=TRUE>>=
 presvals <- xyValues(predictors, bradypus[,2:3])
 backgr <- randomPoints(predictors, 500)
 absvals <- xyValues(predictors, backgr)
 pb <- c(rep(1, nrow(presvals)), rep(0, nrow(absvals)))
-data <- data.frame(cbind(pb, rbind(presvals, absvals)))
-head(data)
-tail(data)
+sdmdata <- data.frame(cbind(pb, rbind(presvals, absvals)))
+sdmdata[,'biome'] = as.factor(sdmdata[,'biome'])
+head(sdmdata)
+tail(sdmdata)
+summary(sdmdata)
+pairs(sdmdata[,2:5], cex=0.1, fig=TRUE)
 @
 
 \section{Model fitting}
 
-Model fitting is quite similar accross the modeling methods that exist in \R. You either provide a formula identifying the dependent and independent variables, accompanied with a data.frame that holds these variables; or you provide these as a two seperate arguments (typically a vector for the dependent variable and a matrix (data.frame) for the independent variables.
+Model fitting is quite similar accross the modeling methods that exist in \R. Most methods take a '\texttt{formula}' identifying the dependent and independent variables, accompanied with a \texttt{data.frame} that holds these variables. 
 
-A simple formula could look like: 
+A simple formula could look like: \texttt{y ~ x1 + x2 + x3}, i.e. y is a function of x1, x2, and x3. Another example is \texttt{y ~ .}, which means that y is a function of all other variables in the \texttt{data.frame} provided to the function. See \texttt{help('formula')} for more details about the formula syntax. In the example below, the function '\texttt{glm}' is used to fit generalized linear models. \texttt{glm} returns a model object.
+<<sdm13, echo=TRUE>>=
+m1 = glm(pb ~ bio1 + bio5 + bio12, data=sdmdata)
+class(m1)
+summary(m1)
 
-y ~ x1 + x2
+m2 = glm(pb ~ ., data=sdmdata)
+m2
+@
 
+Models implemented in dismo do not use a formula (and most models only take presence points). For example:
 
+<<sdm13b, echo=TRUE, fig=TRUE>>=
+bc = bioclim(sdmdata[,c('bio1', 'bio5', 'bio12')])
+bc
+pairs(bc)
+@
 
 
 \section{Model predictions}
 
+Different modeling methods return differt type of 'model' objects (typically they have the same name as the modeling method used). All of these 'model' objects, irrespective of their exact class, can be used to with the \texttt{predict} function to make predictions for any combination of values of the independent variables. This is illusrated in the example below where we make predictions with model object 'm1' for three records with values for variables bio1, bio5 and bio12 (the variables used in the example above to create object m1)
 
-
+<<sdm14, echo=TRUE>>=
+bio1 = c(40, 150, 200)
+bio5 = c(60, 115, 290)
+bio12 = c(600, 1600, 1700)
+pd = data.frame(cbind(bio1, bio5, bio12))
+pd
+predict(m1, pd)
+predict(bc, pd)
+@
 
 
 
 \section{Model evaluation}
 
-Model evaluation typically consists of creating model training and a model testing data sets through random sampling (in some cases, e.g. Elith et al., 2006, training and test data are from different sources and pre-defined).
+Traditional measures of fit used in regression, such as r\super{2} and textit{p}-values have little place in species distribution modeling. For some methods these metrics do not apply. But even if they do, they should normally not be used as all the classic assumptions on which they are based (independence of data, normality of distributions) are typically strongly violated. In stead, most modelers rely on cross-validation. This consists of creating a model with one 'training' data set, and testing it with another data set of known occurences. Typically, training and testing data are created through random sampling (without replacement) from a single data set. Only in a few cases, e.g. Elith et al., 2006, training and test data are from different sources and pre-defined.
+
+Different measures can be used to evaluate the quality of a prediction (Fielding and Bell, 1997), perhaps depending on the goal of the study. Many measueres are 'threshold dependent'. That means that a threshold must be set first (e.g. 0.5). Predicted values above that threshold indicate a prediction of 'presence', and values below the threshold indicate 'absence'. Some measures emphasize the weight of false absences, others give more weight to false presences. Cohen's \textit{kappa} is an example of a threshold dependent model evaluation statistic.
+
+Much used statistics that are threshold independent are the correlation coefficient and the Area Under the Receiver Operator Curve (AUROC, generally further abbreviated to AUC). AUC is a measure of rank-correlation. If it is high, it indicates that high predicted scores tend to be areas of known presence and locations with lower model prediction scores tend to areas where the species is known to be absent (or a random point). An AUC score of 0.5 means that the model is as good as a random guess.
+
+We illustrate the computation of the correlation coefficient, AUC with two random variables. p (presence) represents the predicted value for 50 known cases (locations) where the species is present. and a (absence) represents the predicted value for 50 known cases (locations) where the species is absent. First create and explore the two random variables:
+
+<<sdm15, echo=TRUE, fig=TRUE>>=
+p = rnorm(50, mean=0.7, sd=0.3)
+a = rnorm(50, mean=0.4, sd=0.4)
+par(mfrow=c(1, 2))
+plot(sort(p), col='red', pch=21)
+points(sort(a), col='blue', pch=24)
+legend(1, 0.9 * max(a,p), c('presence', 'absence'), pch=c(21,24), col=c('red', 'blue'))
+
+comb = c(p,a)
+group = c(rep('presence', length(p)), rep('absence', length(a)))
+boxplot(comb~group, col=c('blue', 'red'))
+@
+
+The two variables clearly have different distributions, and the values for 'presence' tend to be higher than for 'absence'. Below we compute the correlation coeficient and the AUC:
+
+<<sdm16, echo=TRUE>>=
+group = c(rep(1, length(p)), rep(0, length(a))) 
+cor.test(comb, group)
+mv <- wilcox.test(p,a)
+auc <- as.numeric(mv$statistic) / (length(p) * length(a))
+auc
+@
+
+The dismo package makes computing these, and other, statistics easier:
+
+<<sdm17, echo=TRUE, fig=TRUE>>=
+e = evaluate(p=p, a=a)
+class(e)
+e
+par(mfrow=c(1, 2))
+plot(e, 'kappa')
+plot(e, 'ROC')
+@
+
+<<sdm18, echo=TRUE, fig=TRUE>>=
+par(mfrow=c(1, 2))
+density(e)
+boxplot(e)
+@
+
+The ROCR package has similar functionality.
+
+Now back to some real, presence-only, data. We'll divide the data in two random sets, one for training, one for testing.
+
+<<sdm19, echo=TRUE>>=
+rand <- round(0.75 * runif(nrow(sdmdata)))
+traindata <- sdmdata[rand==0,]
+traindata <- traindata[traindata[,1] == 1, 2:9]
+testdata <- sdmdata[rand==1,]
+bc <- bioclim(traindata)
+e <- evaluate(testdata[testdata==1,], testdata[testdata==0,], bc)
+e
+@
 
 
 \subsection{k-fold partitioning}
 
+<<sdm20, echo=TRUE>>=
+k <- 5
+occ <- sdmdata[sdmdata[,1] == 1, 2:9]
+abs  <- sdmdata[sdmdata[,1] == 0, 2:9]
+fold <- kfold(occ, k)
+e <- list()
+for (i in 1:k) {
+	train <- occ[fold != i,]
+	test <- occ[fold == i,]
+	bc <- bioclim(train)
+	e[[i]] <- evaluate(p=test, a=abs, bc)
+}	
 
+auc = sapply(e, function(x)slot(x, 'auc'))
+auc
+mean(auc)
+@
 
 
 \section{Dealing with uncertainty}
@@ -252,6 +354,10 @@ Model evaluation typically consists of creating model training and a model testi
 \section{Model averaging}
 
 
+
+\section{Modeling methods}
+
+profile, regression, machine learning
 
 
 
@@ -310,6 +416,9 @@ The article by Elith, Leathwick and Hastie (2009) describes the use of BRT in th
 
 \subsection{Random Forest}
 
+library(randomForest)
+m1 = randomForest(data[,c('bio1', 'bio5', 'bio12')], sdmdata[,'bio1'])
+
 
 \subsection{Support Vector Machines}
 
@@ -350,10 +459,17 @@ The 'geographic models' described here are not commonly used in species distribu
 
 
 
+\section{Mechanistic models}
+
 
 
 \section{References}
 \begin{hangparas}{3em}{1}
+
+
+\noindent Austin MP, 2002. Spatial prediction of species distribution: an interface between ecological theory and statistical modelling. Ecological Modelling 157:101-18.
+
+\noindent Austin, M.P., and T.M. Smith, 1989. A new model for the continuum concept. Vegetatio 83:35-47.
 
 \noindent Breiman, L., 2001. Statistical Modeling: The Two Cultures. Statistical Science 16: 199-215.
 
