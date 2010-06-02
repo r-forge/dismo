@@ -12,9 +12,7 @@
 % \VignetteDepends{dismo}
 % \VignetteKeyword{spatial}
 
-<<echo=false>>=
-options(width=60)
-@
+% options(width=65)
 
 \newcommand{\super}[1]{\ensuremath{^{\textrm{#1}}}}
 \newcommand{\sub}[1]{\ensuremath{_{\textrm{#1}}}}
@@ -256,15 +254,32 @@ Model evaluation typically consists of creating model training and a model testi
 
 
 
+
 \section{Profile methods}
 
 The three methods described here are all implemented in the dismo package.
 
 \subsection{Bioclim}
 
+The BIOCLIM algorithm has been extensively used for species distribution modeling. BIOCLIM is a classic 'climate-envelope-model'. Although it generally does not perform as good as some other modeling methods (Elith et al. 2006, Hijmans and Graham, 2006), it is still used, among other reasons because the algorithm is easy to understand and thus useful in teaching species distribution modeling. The BIOCLIM algorithm computes the similarity of a location by comparing the values of environmental variables at any location to a percentile distribution of the values at known locations of occurence ('training sites'). The closer to the 50th percentile (the median), the more suitable the location is. The tails of the distribution are not distinguished, that is, 10 percentile is treated as equivalent to 90 percentile. In this implementation in R, the values of the upper tail values are transformed to the lower tail, and the minimum percentile score across all the environmental variables is used (i.e. BIOCLIM using an approach like Liebig's law of the minimum). This value is substracted from 1 and then mutlipled with two so that the results are between 0 and 1. The reason for scaling this way is that the results become more like that of other distributon modeling methods and are thus easier to interpret. The value 1 will rarely be observed as it would require a location that has the median value of the training data for all the variables considered. The value 0 is very common as it is assinged to all cells with a value of an environmental variable that is outside the percentile distribution (the range of the training data) for at least one of the variables.
+
+
 \subsection{Domain}
 
+The Domain algorithm (Carpenter et al. 1993) that has been extensively used for species distribution modeling. It did not perform very well in a model comparison (Elith et al. 2006) and very poorly when assessing climate change effects (Hijmans and Graham, 2006). The Domain algorithm computes the Gower distance between environmental variables at any location and those at any of the known locations of occurence ('training sites'). 
+
+
+The distance between the environment at point A and those of the known occurences for a single climate variable is calculated as
+the absolute difference in the values of that variable divided by the range of the variable across all known occurence points (i.e., the distance is scaled by the range of observations). For each variable the minimum distance beteen a site and any of the training points is taken. The Gower distance is then the mean of these distances over all environmental variables. The Domain algorithm assigns to a place the distance to the closest known occurence (in environmental space). 
+
+
+To integrate over environmental variables, the distance to any of the variables is used. This distance is substracted from one, and (in this R implementation) values below zero are truncated so that the scores are between 0 (low) and 1 (high).
+
+
+
 \subsection{Mahalanobis}
+
+The \texttt{mahal} function implements a species distribution model based on the Mahalanobis distance (Mahalanobis, 1936). Mahalanobis distance takes into account the correlations of the variables in the data set, and it is not dependent on the scale of measurements.
 
 
 \section{Regression models}
@@ -280,19 +295,24 @@ The three methods described here are all implemented in the dismo package.
 There is a variety of machine learning (sometimes referred to data mining) methods in R. For a long time there have been packages to do Artifical Neural Networks (ANN) and Classification and Regressin Trees (CART). More recent methods include Random Forests, Boosted Regression Trees, and Support Vector Machines. Through the dismo package you can also use the Maxent program, that implements the most widely used method (maxent) in species distribution modeling. 
 
 \subsection{Maxent}
+The maxent (Maximum Entropy) species distribution model (see references below). The function uses presence and 'background' data for a number of locations, and the values of a number of predictors (independent variables) for those locations. The result is a predictive model that can be used to predict the suitability of other locations, for example to predict the entire range of a species, or its potential range in another region, or under changed conditions. 
 
-The way Maxent is implemented is a bit different from other methods. It depends on an external library that you need to download and put in the 'java' folder of the dismo package. See ?maxent
+The way Maxent is implemented in dismo is a bit different from other methods. This function uses the maxent species distribution model software, which is a java program that you can download from \url{http://www.cs.princeton.edu/~schapire/maxent/}. Put the file 'maxent.jar' in the 'java' folder of this package. That is the folder returned by \texttt{system.file("java", package="dismo")}. Please note that this program (\texttt{maxent.jar}) can not be redistributed or used for commercial purposes. 
+
 
 
 \subsection{Boosted Regression Trees}
 
-See the dedicated vignette.
+Boosted Regression Trees (BRT) is, unfortunately, known by a large number of different names. It was developed by Friedman (2001), who referred to it as a "Gradient Boosting Machine" (GBM). It is also known as "Gradient Boost", "Stochastic Gradient Boosting", "Gradient Tree Boosting". The method is implemented in the '\texttt{gbm}' package in \R. 
+
+The article by Elith, Leathwick and Hastie (2009) describes the use of BRT in the context of species distribution modeling. Their article is accompanied by a number of R functions and a tutorial. The functions have been slightly adjusted and incorporated into the 'dismo' package. These funcitons extend the funcitons in the '\texttt{gbm}' package, with the goal to make these easier to apply to ecological data, and to enhance interpretation.  The adapted tutorial is available as a vignette to the dismo package. You can access it via the index of the help pages, or with this command: \texttt{vignette('gbm', 'dismo')}
 
 
 \subsection{Random Forest}
 
 
 \subsection{Support Vector Machines}
+
 
 
 \subsection{Other methods}
@@ -305,6 +325,7 @@ Neural networks
 \subsection{mars}
 
 \subsection{gdm}
+
 
 
 
@@ -330,22 +351,44 @@ The 'geographic models' described here are not commonly used in species distribu
 
 
 
+
 \section{References}
 \begin{hangparas}{3em}{1}
 
+\noindent Breiman, L., 2001. Statistical Modeling: The Two Cultures. Statistical Science 16: 199-215.
+
+\noindent Carpenter G., A.N. Gillison and J. Winter, 1993. Domain: a flexible modelling procedure for  mapping potential distributions of plants and animals. Biodiversity Conservation 2:667-680.
+
 \noindent Elith, J., C.H. Graham, R.P. Anderson, M. Dudik, S. Ferrier, A. Guisan, R.J. Hijmans, F. Huettmann, J. Leathwick, A. Lehmann, J. Li, L.G. Lohmann, B. Loiselle, G. Manion, C. Moritz, M. Nakamura, Y. Nakazawa, J. McC. Overton, A.T. Peterson, S. Phillips, K. Richardson, R. Scachetti-Pereira, R. Schapire, J. Soberon, S. Williams, M. Wisz and N. Zimmerman, 2006. Novel methods improve prediction of species' distributions from occurrence data. Ecography 29: 129-151. \url{http://dx.doi.org/10.1111/j.2006.0906-7590.04596.x}
 
-\noindent Elith, J. and J.R. Leathwick, 2009. Species Distribution Models: Ecological Explanation and Prediction Across Space and Time. Annual Review of Ecology, Evolution, and Systematics 40: 677-697. \url{http://dx.doi.org/10.1146/annurev.ecolsys.110308.120159}
+\noindent Elith, J. and J.R. Leathwick, 2009. Species Distribution Models: Ecological Explanation and Prediction Across Space and Time. Annual 
+Review of Ecology, Evolution, and Systematics 40: 677-697. \url{http://dx.doi.org/10.1146/annurev.ecolsys.110308.120159}
+
+\noindent Elith, J., J.R. Leathwick and T. Hastie, 2009. A working guide to boosted regression trees. Journal of Animal Ecology 77: 802-81
+
+\noindent Ferrier, S. and A. Guisan, 2006. Spatial modelling of biodiversity at the community level. Journal of Applied Ecology 43:393-40
 
 \noindent Fielding, A.H. and J.F. Bell, 1997. A review of methods for the assessment of prediction errors in conservation presence/absence models. Environmental Conservation 24: 38-49
 
+\noindent Friedman, J.H., 2001. Greedy function approximation: a gradient boosting machine. The Annals of Statistics 29: 1189-1232. \url{http://www-stat.stanford.edu/~jhf/ftp/trebst.pdf)}
+
 \noindent Graham, C.H., J. Elith, R.J. Hijmans, A. Guisan, A.T. Peterson, B.A. Loiselle and the NCEAS Predicting Species Distributions Working Group, 2007. The influence of spatial errors in species occurrence data used in distribution models. Journal of Applied Ecology 45: 239-247 
 
+\noindent Guisan, A., Thomas C. Edwards, Jr, and Trevor Hastie, 2002. Generalized linear and generalized additive models in studies of species distributions: setting the scene. Ecological Modelling 157: 89-100.
+
 \noindent Guralnick, R.P., J. Wieczorek, R. Beaman, R.J. Hijmans and the BioGeomancer Working Group, 2006. BioGeomancer:  Automated georeferencing to map the world's biodiversity data. PLoS Biology 4: 1908-1909. \url{http://dx.doi.org/10.1371/journal.pbio.0040381}
+
+\noindent Hastie, T., R. Tibshirani and J. Friedman, 2009. The Elements of Statistical Learning: Data Mining, Inference, and Prediction (Second Edition) \url{http://www-stat.stanford.edu/~tibs/ElemStatLearn/}
+
+\noindent Hijmans R.J., and C.H. Graham, 2006. Testing the ability of climate envelope models to predict the effect of climate change on species distributions. Global change biology 12: 2272-2281. \url{http://dx.doi.org/10.1111/j.1365-2486.2006.01256.x}
 
 \noindent Hijmans, R.J., M. Schreuder, J. de la Cruz and L. Guarino, 1999. Using GIS to check coordinates of germplasm accessions. Genetic Resources and Crop Evolution 46: 291-296.
 
 \noindent Hijmans, R.J., S.E. Cameron, J.L. Parra, P.G. Jones and A. Jarvis, 2005. Very high resolution interpolated climate surfaces for global land areas. International Journal of Climatology 25: 1965-1978. \url{http://dx.doi.org/10.1002/joc.1276}
+
+\noindent Mahalanobis, P.C., 1936. On the generalised distance in statistics. Proceedings of the National Institute of Sciences of India 2: 49-55.
+
+\noindent Nix, H.A., 1986. A biogeographic analysis of Australian elapid snakes. In: Atlas of Elapid Snakes of Australia. (Ed.) R. Longmore, pp. 4-15. Australian Flora and Fauna Series Number 7. Australian Government Publishing Service: Canberra.
 
 \noindent Olson, D.M, E. Dinerstein, E.D. Wikramanayake, N.D. Burgess, G.V.N. Powell, E.C. Underwood, J.A. D'amico, I. Itoua, H.E. Strand, J.C. Morrison, C.J. Loucks, T.F. Allnutt, T.H. Ricketts, Y. Kura, J.F. Lamoreux, W.W.Wettengel, P. Hedao, and K.R. Kassem. 2001. Terrestrial Ecoregions of the World: A New Map of Life on Earth. BioScience 51:933-938
 
@@ -357,6 +400,7 @@ The 'geographic models' described here are not commonly used in species distribu
 
 
 \end{hangparas}
+
 
 
 \end{document}
