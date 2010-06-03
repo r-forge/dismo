@@ -60,6 +60,8 @@ filename <- paste(system.file(package="dismo"), '/ex/bradypus.csv', sep='')
 filename
 bradypus <- read.table(filename, header=TRUE, sep=',')
 head(bradypus)
+bradypus <- bradypus[,2:3]
+head(bradypus)
 @
 
 You can also read such data directly out of Excel or from a database (see e.g. the \verb@RODBC@ package). No matter how you do it, the objective is to get a matrix (or a \verb@data.frame@) with at least 2 columns to hold the coordinates (typically longitude and latitude). In many cases you will have additional columns, e.g., a column to indicate the species if you are modeling multiple species; and a column to indicate whether this is a 'presence' or an 'absence' record (a much used convention is to code presence with a 1 and absence with a 0). 
@@ -87,6 +89,8 @@ data(wrld_simpl)
 plot(wrld_simpl, xlim=c(-130,10), ylim=c(-60,60))
 points(acgeo$lon, acgeo$lat, col='red')
 @
+
+The "wrld\_simpl" dataset contains rough country outlines. You can use other datasets of polygons (or lines or points) as well. For example, you can read a shapfile into \R using the \texttt{readOGR} function in the \texttt{rgdal} package or the \texttt{readShapePoly} function in the \texttt{maptools} package.
 
 
 \subsection{Cross-checking}
@@ -153,7 +157,7 @@ Background data, also referred to as 'random absence' is, in many cases, not \te
 
 dismo has a function to sample random points (background data) from a study area. You can use a 'mask' to exclude area with no data \texttt{NA}, e.g. areas not on land. You can use an 'extent' to further restrict the area from which random locations are drawn.
 
-<<fig=TRUE , echo=TRUE>>=
+<<fig=TRUE, width=9, height=6>>=
 files <- list.files(path=paste(system.file(package="dismo"), '/ex', sep=''),
                     pattern='grd', full.names=TRUE )
 mask <- raster(files[[1]])
@@ -171,23 +175,26 @@ points(bg2, cex=0.5)
 
 \section{Predictor variables}
 
-In species distribution modeling, predictor variables are typically organized as raster (grid) type files. Each predictor should be a 'raster' representing a variable of interest. Variables can include climatic, soil and terrain, vegetation, land use, and other variables. These data are typically stored in files in some kind of GIS format. Almost all relevant formats can be used (including ESRI grid, geoTiff, netCDF, IDRISI, and ASCII). Avoid ASCII files if you can, as they tend to considerably slow down processing speed. For any particular study the layers all should have the same spatial extent, resolution, and origin (if necessary, see the '\texttt{raster}' package to prepare your predictor variable data). The set of predictor variables (raster) can be used to make a '\texttt{RasterStack}', which can be thought of as a collection of '\texttt{RasterLayer}' objects(see the \texttt{raster} package for more info). 
+In species distribution modeling, predictor variables are typically organized as raster (grid) type files. Each predictor should be a 'raster' representing a variable of interest. Variables can include climatic, soil and terrain, vegetation, land use, and other variables. These data are typically stored in files in some kind of GIS format. Almost all relevant formats can be used (including ESRI grid, geoTiff, netCDF, IDRISI, and ASCII). Avoid ASCII files if you can, as they tend to considerably slow down processing speed. For any particular study the layers all should have the same spatial extent, resolution, and origin (if necessary, see the '\texttt{raster}' package to prepare your predictor variable data). The set of predictor variables (raster) can be used to make a '\texttt{RasterStack}', which can be thought of as a collection of '\texttt{RasterLayer}' objects (see the \texttt{raster} package for more info). 
 
-<<sdm9>>=
-files <- list.files(path=paste(system.file(package="dismo"), '/ex', sep=''),
-                    pattern='grd', full.names=TRUE )
+Here we make a list of files that are installed with the dismo package and then create a rasterStack from these, show the names of each layer, and finally plot them all.
+
+<<sdm9, fig=TRUE>>=
+files <- list.files(path=paste(system.file(package="dismo"), 
+				'/ex', sep=''), pattern='grd', full.names=TRUE )
 files
 predictors <- stack(files)
+predictors
 layerNames(predictors)
-
-<<sdm10, fig=TRUE, echo=TRUE>>=
 plot(predictors)
 @
+
+We can also make a plot of a single layer in a RasterStack, and plot some additional data on top of it:
 
 <<sdm11, fig=TRUE, echo=TRUE>>=
 plot(predictors, 1)
 plot(wrld_simpl, add=TRUE)
-points(bradypus[,2:3], col='red', cex=0.5)
+points(bradypus, col='red', cex=0.5)
 points(acgeo, col='blue', pch='x', cex=0.5)
 @
 
@@ -201,8 +208,8 @@ Variable selection is obviously important, particularly of the objective of a st
 
 We now have a set of predictor variables (rasters) and occurence points. The next step is to extract the values of the predictors at the locations of the points. (This step can be skipped for the modeling methods that are implemented in the dismo package). This is very straightfoward thing to do using the xyValues function from the raster package. In the example below we use that function first for the \textit{Bradypus} occurence points, then for 500 random background points. We combine these into a single \texttt{data.frame} in which the first column (variable 'pb') indicates whether this is a presence or a background point. 'biome' is catagorical variable (called a 'factor' in \R) and it is important to explicitly define it that way (so that it won't be treated like any other numerical variable).
 
-<<sdm12, echo=TRUE>>=
-presvals <- xyValues(predictors, bradypus[,2:3])
+<<sdm12, fig=TRUE>>=
+presvals <- xyValues(predictors, bradypus)
 backgr <- randomPoints(predictors, 500)
 absvals <- xyValues(predictors, backgr)
 pb <- c(rep(1, nrow(presvals)), rep(0, nrow(absvals)))
@@ -216,9 +223,9 @@ pairs(sdmdata[,2:5], cex=0.1, fig=TRUE)
 
 \section{Model fitting}
 
-Model fitting is quite similar accross the modeling methods that exist in \R. Most methods take a '\texttt{formula}' identifying the dependent and independent variables, accompanied with a \texttt{data.frame} that holds these variables. 
+Model fitting is quite similar accross the modeling methods that exist in \R. Most methods take a '\texttt{formula}' identifying the dependent and independent variables, accompanied with a \texttt{data.frame} that holds these variables. Details on specific methods are provided further down on this document, in the sections on specific modeling methods. 
 
-A simple formula could look like: \texttt{y ~ x1 + x2 + x3}, i.e. y is a function of x1, x2, and x3. Another example is \texttt{y ~ .}, which means that y is a function of all other variables in the \texttt{data.frame} provided to the function. See \texttt{help('formula')} for more details about the formula syntax. In the example below, the function '\texttt{glm}' is used to fit generalized linear models. \texttt{glm} returns a model object.
+A simple formula could look like: \texttt{y \~{} x1 + x2 + x3}, i.e. y is a function of x1, x2, and x3. Another example is \texttt{y \~{} .}, which means that y is a function of all other variables in the \texttt{data.frame} provided to the function. See \texttt{help('formula')} for more details about the formula syntax. In the example below, the function '\texttt{glm}' is used to fit generalized linear models. \texttt{glm} returns a model object.
 <<sdm13, echo=TRUE>>=
 m1 = glm(pb ~ bio1 + bio5 + bio12, data=sdmdata)
 class(m1)
@@ -232,6 +239,7 @@ Models implemented in dismo do not use a formula (and most models only take pres
 
 <<sdm13b, echo=TRUE, fig=TRUE>>=
 bc = bioclim(sdmdata[,c('bio1', 'bio5', 'bio12')])
+class(bc)
 bc
 pairs(bc)
 @
@@ -261,53 +269,48 @@ Different measures can be used to evaluate the quality of a prediction (Fielding
 
 Much used statistics that are threshold independent are the correlation coefficient and the Area Under the Receiver Operator Curve (AUROC, generally further abbreviated to AUC). AUC is a measure of rank-correlation. If it is high, it indicates that high predicted scores tend to be areas of known presence and locations with lower model prediction scores tend to areas where the species is known to be absent (or a random point). An AUC score of 0.5 means that the model is as good as a random guess.
 
-We illustrate the computation of the correlation coefficient, AUC with two random variables. p (presence) represents the predicted value for 50 known cases (locations) where the species is present. and a (absence) represents the predicted value for 50 known cases (locations) where the species is absent. First create and explore the two random variables:
+Below we illustrate the computation of the correlation coefficient, AUC with two random variables. p (presence) represents the predicted value for 50 known cases (locations) where the species is present. and a (absence) represents the predicted value for 50 known cases (locations) where the species is absent. 
 
-<<sdm15, echo=TRUE, fig=TRUE>>=
+Create two variables with random normally distributed values and plot them:
+
+<<sdm15, echo=TRUE, fig=TRUE, width=7,height=5 >>=
 p = rnorm(50, mean=0.7, sd=0.3)
 a = rnorm(50, mean=0.4, sd=0.4)
 par(mfrow=c(1, 2))
 plot(sort(p), col='red', pch=21)
 points(sort(a), col='blue', pch=24)
-legend(1, 0.9 * max(a,p), c('presence', 'absence'), pch=c(21,24), col=c('red', 'blue'))
-
+legend(1, 0.95 * max(a,p), c('presence', 'absence'), pch=c(21,24), col=c('red', 'blue'))
 comb = c(p,a)
 group = c(rep('presence', length(p)), rep('absence', length(a)))
 boxplot(comb~group, col=c('blue', 'red'))
 @
 
+
 The two variables clearly have different distributions, and the values for 'presence' tend to be higher than for 'absence'. Below we compute the correlation coeficient and the AUC:
 
 <<sdm16, echo=TRUE>>=
 group = c(rep(1, length(p)), rep(0, length(a))) 
-cor.test(comb, group)
+cor.test(comb, group)$estimate
 mv <- wilcox.test(p,a)
 auc <- as.numeric(mv$statistic) / (length(p) * length(a))
 auc
 @
 
-The dismo package makes computing these, and other, statistics easier:
+This is how you can computing these, and other statistics, with the dismo package (and see the \texttt{ROCR} package for similar functionality): 
 
-<<sdm17, echo=TRUE, fig=TRUE>>=
+<<sdm17, echo=TRUE, fig=TRUE, width=7,height=5 >>=
 e = evaluate(p=p, a=a)
 class(e)
 e
 par(mfrow=c(1, 2))
-plot(e, 'kappa')
-plot(e, 'ROC')
-@
-
-<<sdm18, echo=TRUE, fig=TRUE>>=
-par(mfrow=c(1, 2))
 density(e)
-boxplot(e)
+boxplot(e, col=c('blue', 'red'))
 @
 
-The ROCR package has similar functionality.
 
-Now back to some real, presence-only, data. We'll divide the data in two random sets, one for training, one for testing.
+Now back to some real data, presence-only in this case. We'll divide the data in two random sets, one for training a Bioclim model, and one for evaluating the model.
 
-<<sdm19, echo=TRUE>>=
+<<sdm19, fig=TRUE>>=
 rand <- round(0.75 * runif(nrow(sdmdata)))
 traindata <- sdmdata[rand==0,]
 traindata <- traindata[traindata[,1] == 1, 2:9]
@@ -315,59 +318,112 @@ testdata <- sdmdata[rand==1,]
 bc <- bioclim(traindata)
 e <- evaluate(testdata[testdata==1,], testdata[testdata==0,], bc)
 e
+plot(e, 'ROC')
 @
 
 
-\subsection{k-fold partitioning}
+\subsection{Data partitioning}
 
+The \texttt{kfold} function facilitates data partitioning. It creates a vector that assinges each row in the data matrix to a a group (between 1 to k).
+
+Let's first create presence and background data. 
 <<sdm20, echo=TRUE>>=
+pres <- sdmdata[sdmdata[,1] == 1, 2:9]
+back <- sdmdata[sdmdata[,1] == 0, 2:9]
+@
+
+The background data will only be used for model testing and does not need to be partitioned. We now partition the data into 5 groups. 
+
+<<sdm20b, echo=TRUE>>=
 k <- 5
-occ <- sdmdata[sdmdata[,1] == 1, 2:9]
-abs  <- sdmdata[sdmdata[,1] == 0, 2:9]
-fold <- kfold(occ, k)
+group <- kfold(pres, k)
+group[1:10]
+unique(group)
+@
+
+Now we can fit and test our model five times. In each run, the records corresponding to one of the five group is only used to evaluate the model, while the other four groups are only used to fit the model. The results are stored in a list called 'e'.
+
+<<sdm20c, echo=TRUE>>=
 e <- list()
 for (i in 1:k) {
-	train <- occ[fold != i,]
-	test <- occ[fold == i,]
+	train <- pres[group != i,]
+	test <- pres[group == i,]
 	bc <- bioclim(train)
-	e[[i]] <- evaluate(p=test, a=abs, bc)
+	e[[i]] <- evaluate(p=test, a=back, bc)
 }	
-
-auc = sapply(e, function(x)slot(x, 'auc'))
-auc
-mean(auc)
 @
 
+We can extract several things from the objects in 'e', but let's restrict ourselves to the AUC values and the "maximum of the sum of the sensitivity (true positive rate) and specificity (true negative rate)" (this is sometimes uses as a threshold for setting cells to presence or absence).
 
-\section{Dealing with uncertainty}
+<<sdm20c, echo=TRUE>>=
+auc <- sapply( e, function(x){slot(x, 'auc')} )
+auc
+mean(auc)
+sapply( e, function(x){ x@t[which.max(x@TPR + x@TNR)] } )
+@
 
-
-
-
-
-\section{Model transfer in space and time}
-
-
-
-
-
-\section{Model averaging}
 
 
 
 \section{Modeling methods}
 
-profile, regression, machine learning
+A large number of algorithms have been used in species distribution modeling. They can be classified as 'profile', 'regression', and 'machine learning' methods. Profile methods only consider 'presence' data, not absence or background data. Regression and machine learning methods use both presence and absence or background data. The distinction between regression and machine learning methods is not sharp, but it is perhaps still useful as way to classify models. Below we discuss examples of these different types of models. 
 
+We will use the same data for all models, except that some models cannot use categorical variables. So we drop that from the predictors stack.
+<<sdm30, echo=TRUE>>=
+pred_nf <- dropLayer(predictors, 'biome')
+@
+
+We'll use the \textit{Bradypus} data for presence of a species. Lets make a training and a testing set.
+<<sdm31, echo=TRUE>>=
+group <- kfold(bradypus, 5)
+pres_train <- bradypus[group != 1, ]
+pres_test <- bradypus[group == 1, ]
+@
+
+Background data for training and a testing set. The first layer in the RasterStack is used as a 'mask'. That ensures that random points only occur within the spatial extent of the rasters, and within cells that are not NA, and that there is only a single absence point per cell.
+
+<<sdm32, echo=TRUE>>=
+backg <- randomPoints(pred_nf, 1000)
+group <- kfold(bg, 5)
+backg_train <- bg[group != 1, ]
+backg_test <- bg[group == 1, ]
+@
 
 
 \section{Profile methods}
 
-The three methods described here are all implemented in the dismo package.
+The three methods described here, Bioclim, Domain, and Mahal. These methods are implemented in the dismo package. The procedures to use these models is therefore the same for all three.  
+
 
 \subsection{Bioclim}
 
-The BIOCLIM algorithm has been extensively used for species distribution modeling. BIOCLIM is a classic 'climate-envelope-model'. Although it generally does not perform as good as some other modeling methods (Elith et al. 2006, Hijmans and Graham, 2006), it is still used, among other reasons because the algorithm is easy to understand and thus useful in teaching species distribution modeling. The BIOCLIM algorithm computes the similarity of a location by comparing the values of environmental variables at any location to a percentile distribution of the values at known locations of occurence ('training sites'). The closer to the 50th percentile (the median), the more suitable the location is. The tails of the distribution are not distinguished, that is, 10 percentile is treated as equivalent to 90 percentile. In this implementation in R, the values of the upper tail values are transformed to the lower tail, and the minimum percentile score across all the environmental variables is used (i.e. BIOCLIM using an approach like Liebig's law of the minimum). This value is substracted from 1 and then mutlipled with two so that the results are between 0 and 1. The reason for scaling this way is that the results become more like that of other distributon modeling methods and are thus easier to interpret. The value 1 will rarely be observed as it would require a location that has the median value of the training data for all the variables considered. The value 0 is very common as it is assinged to all cells with a value of an environmental variable that is outside the percentile distribution (the range of the training data) for at least one of the variables.
+The BIOCLIM algorithm has been extensively used for species distribution modeling. BIOCLIM is a classic 'climate-envelope-model'. Although it generally does not perform as good as some other modeling methods (Elith et al. 2006, Hijmans and Graham, 2006), it is still used, among other reasons because the algorithm is easy to understand and thus useful in teaching species distribution modeling. The BIOCLIM algorithm computes the similarity of a location by comparing the values of environmental variables at any location to a percentile distribution of the values at known locations of occurence ('training sites'). The closer to the 50th percentile (the median), the more suitable the location is. The tails of the distribution are not distinguished, that is, 10 percentile is treated as equivalent to 90 percentile. In the 'dismo' implementation, the values of the upper tail values are transformed to the lower tail, and the minimum percentile score across all the environmental variables is used (i.e. BIOCLIM using an approach like Liebig's law of the minimum). This value is substracted from 1 and then mutliplied with two so that the results are between 0 and 1. The reason for scaling this way is that the results become more like that of other distributon modeling methods and are thus easier to interpret. The value 1 will rarely be observed as it would require a location that has the median value of the training data for all the variables considered. The value 0 is very common as it is assinged to all cells with a value of an environmental variable that is outside the percentile distribution (the range of the training data) for at least one of the variables.
+
+
+Earlier on, we fitted a Bioclim model using data.frame with each row representing the environmental data at known sites of presence of a species. Here we fit a bioclim model simly using the predictors, and the occurence points.
+
+<<sdm33, fig=TRUE>>=
+bc <- bioclim(pred_nf, pres_train)
+plot(bc)
+@
+
+And evaluate it in a similar way:
+<<sdm34, echo=FALSE>>=
+e <- evaluate(pres_test, backg_test, bc, pred_nf)
+e
+@
+
+And make a prediction to a RasterLayer:
+<<sdm35, fig=TRUE>>=
+p = predict(bc, pred_nf, progress='tcltk')
+p
+plot(p)
+plot(wrld_simpl, add=TRUE, border='dark grey')
+points(pres_train, pch='+')
+points(pres_test, col='blue', pch=20 )
+@
+
 
 
 \subsection{Domain}
@@ -391,6 +447,7 @@ The \texttt{mahal} function implements a species distribution model based on the
 \section{Regression models}
 
 \subsection{Generalized Linear Models}
+
 
 \subsection{Generalized Additive Models}
 
@@ -434,6 +491,23 @@ Neural networks
 \subsection{mars}
 
 \subsection{gdm}
+
+
+
+
+\section{Model transfer in space and time}
+
+
+
+
+\section{Model averaging}
+
+
+
+
+\section{Dealing with uncertainty}
+
+
 
 
 
