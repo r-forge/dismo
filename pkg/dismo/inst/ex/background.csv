@@ -1,4 +1,4 @@
-species,x,y,cld6190_ann,dtr6190_ann,ecoreg,frs6190_ann,h_dem,pre6190_ann,pre6190_l10,pre6190_l1,pre6190_l4,pre6190_l7,tmn6190_ann,tmp6190_ann,tmx6190_ann,vap6190_ann
+species,lon,lat,cld6190_ann,dtr6190_ann,ecoreg,frs6190_ann,h_dem,pre6190_ann,pre6190_l10,pre6190_l1,pre6190_l4,pre6190_l7,tmn6190_ann,tmp6190_ann,tmx6190_ann,vap6190_ann
 background,-71.575,8.425,72,102,10,10,987,31,47,14,51,26,140,204,261,187
 background,-62.675,4.725,63,108,10,1,1041,91,83,22,75,170,179,237,305,232
 background,-68.325,-4.725,83,95,10,1,88,72,71,98,98,34,206,262,320,306
