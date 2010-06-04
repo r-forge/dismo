@@ -107,13 +107,13 @@ evaluate <- function(p, a, model, x=NULL, tr) {
 
 setMethod ('show' , 'ModelEvaluation', 
 	function(object) {
-		cat('class       :' , class(object), '\n')
-		cat('n presences :' , object@np, '\n')
-		cat('n absences  :' , object@na, '\n')
-		cat('AUC         :' , object@auc,'\n')
-		cat('p(AUC)      :' , object@pauc,'\n')
-		cat('cor         :' , object@cor,'\n')
-		cat('p(cor)      :' , object@pcor,'\n')
+		cat('class            :' , class(object), '\n')
+		cat('n presences      :' , object@np, '\n')
+		cat('n absences       :' , object@na, '\n')
+		cat('AUC              :' , object@auc,'\n')
+#		cat('p(AUC)      :' , object@pauc,'\n')
+		cat('cor              :' , object@cor,'\n')
+#		cat('p(cor)      :' , object@pcor,'\n')
 #		cat('prevalence  :' , object@prevalence,'\n')
 #		cat('overallDiagnosticPower :', object@overallDiagnosticPower,'\n')
 #		cat('correctClassificationRate :', object@correctClassificationRate,'\n')
@@ -126,6 +126,8 @@ setMethod ('show' , 'ModelEvaluation',
 #		cat('misclassificationRate :', object@misclassificationRate,'\n')
 #		cat('oddsRatio :', object@oddsRatio,'\n')
 #		cat('kappa :', object@kappa,'\n')
+
+		cat('TPR+TNR threshold:', object@t[which.max(object@TPR + object@TNR)], '\n')
 	}
 )	
 

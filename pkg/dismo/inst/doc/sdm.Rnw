@@ -381,13 +381,29 @@ pres_train <- bradypus[group != 1, ]
 pres_test <- bradypus[group == 1, ]
 @
 
-Background data for training and a testing set. The first layer in the RasterStack is used as a 'mask'. That ensures that random points only occur within the spatial extent of the rasters, and within cells that are not NA, and that there is only a single absence point per cell.
+To speed up processing, let's retstruct the predictions to a more restricuted area (defined by a rectangular extent):
+<<sdm32, echo=TRUE>>=
+ext = extent(-90, -32, -33, 23)
+@
+
+Background data for training and a testing set. The first layer in the RasterStack is used as a 'mask'. That ensures that random points only occur within the spatial extent of the rasters, and within cells that are not NA, and that there is only a single absence point per cell. Here we further restrict the background points to be within 15\% of our specified extent 'ext'.
 
 <<sdm32, echo=TRUE>>=
-backg <- randomPoints(pred_nf, 1000)
-group <- kfold(bg, 5)
-backg_train <- bg[group != 1, ]
-backg_test <- bg[group == 1, ]
+backg <- randomPoints(pred_nf, n=1000, ext=ext, extf = 1.25)
+colnames(backg) = c('lon', 'lat')
+group <- kfold(backg, 5)
+backg_train <- backg[group != 1, ]
+backg_test <- backg[group == 1, ]
+@
+
+<<sdm32, fig=TRUE>>=
+r = raster(pred_nf, 1)
+plot(!is.na(r), col=c('white', 'light grey'), legend=FALSE)
+plot(ext, add=TRUE, col='red', lwd=2)
+points(backg_train, pch='-', cex=0.5, col='yellow')
+points(backg_test, pch='-',  cex=0.5, col='black')
+points(pres_train, pch= '+', col='green')
+points(pres_test, pch='+', col='blue')
 @
 
 
@@ -405,7 +421,7 @@ Earlier on, we fitted a Bioclim model using data.frame with each row representin
 
 <<sdm33, fig=TRUE>>=
 bc <- bioclim(pred_nf, pres_train)
-plot(bc)
+plot(bc, a=1, b=2, p=0.85)
 @
 
 And evaluate it in a similar way:
@@ -416,14 +432,19 @@ e
 
 And make a prediction to a RasterLayer:
 <<sdm35, fig=TRUE>>=
-p = predict(bc, pred_nf, progress='tcltk')
-p
-plot(p)
+pb <- predict(pred_nf, bc, ext=ext, progress='')
+pb
+par(mfrow=c(1,2))
+plot(pb, main='Bioclim, raw values')
+plot(wrld_simpl, add=TRUE, border='dark grey')
+threshold <- e@t[which.max(e@TPR + e@TNR)]
+plot(pb > threshold, main='presence/absence')
 plot(wrld_simpl, add=TRUE, border='dark grey')
 points(pres_train, pch='+')
-points(pres_test, col='blue', pch=20 )
 @
 
+
+Please note the order of the arguments in the predict function. In the example above, we used \texttt{predict(pred\_nf, bc)} (first the RasterStack, then the model object), which is  little bit less effecient than predict(bc, pred\_nf) (first the model, than the RasterStack). The reason for using the order we have used, is that this will work for all models, whereas the other option only works for the models defined in the dismo package, such as Bioclim, Domain, and Maxent, but not for models defined in other packages (random forest, boosted regression trees, glm, etc.).
 
 
 \subsection{Domain}
@@ -434,22 +455,102 @@ The Domain algorithm (Carpenter et al. 1993) that has been extensively used for 
 The distance between the environment at point A and those of the known occurences for a single climate variable is calculated as
 the absolute difference in the values of that variable divided by the range of the variable across all known occurence points (i.e., the distance is scaled by the range of observations). For each variable the minimum distance beteen a site and any of the training points is taken. The Gower distance is then the mean of these distances over all environmental variables. The Domain algorithm assigns to a place the distance to the closest known occurence (in environmental space). 
 
-
 To integrate over environmental variables, the distance to any of the variables is used. This distance is substracted from one, and (in this R implementation) values below zero are truncated so that the scores are between 0 (low) and 1 (high).
 
+Below we fit a domain model, evaluate it, and make a prediction. We map the prediction, as well as a map subjectively classified into presence / absence.
+<<sdm36, fig=TRUE, width=9, height=6>>=
+dm <- domain(pred_nf, pres_train)
+e <- evaluate(pres_test, backg_test, dm, pred_nf)
+e
+pd = predict(pred_nf, dm, ext=ext, progress='')
+par(mfrow=c(1,2))
+plot(pd, main='Domain, raw values')
+plot(wrld_simpl, add=TRUE, border='dark grey')
+threshold <- e@t[which.max(e@TPR + e@TNR)]
+plot(pd > threshold, main='presence/absence')
+plot(wrld_simpl, add=TRUE, border='dark grey')
+points(pres_train, pch='+')
+@
 
 
 \subsection{Mahalanobis}
 
 The \texttt{mahal} function implements a species distribution model based on the Mahalanobis distance (Mahalanobis, 1936). Mahalanobis distance takes into account the correlations of the variables in the data set, and it is not dependent on the scale of measurements.
 
+<<sdm37, fig=TRUE>>=
+mm <- mahal(pred_nf, pres_train)
+e <- evaluate(pres_test, backg_test, mm, pred_nf)
+e
+pm = predict(pred_nf, mm, ext=ext, progress='')
+par(mfrow=c(1,2))
+pm[pm < -10] <- -10
+plot(pm, main='Mahalanobis distance')
+plot(wrld_simpl, add=TRUE, border='dark grey')
+threshold <- e@t[which.max(e@TPR + e@TNR)]
+plot(pm > threshold, main='presence/absence')
+plot(wrld_simpl, add=TRUE, border='dark grey')
+points(pres_train, pch='+')
+@
 
 \section{Regression models}
 
+The remaining models need to be fit presence textif{and} absence (background) data. With the exception of 'maxent', we cannot fit the model with a RasterStack and points. Instead, we need to extract the environmental data values ourselves, and fit the models with these values. 
+
+<<sdm40>>=
+train <- rbind(pres_train, backg_train)
+pb_train <- c(rep(1, nrow(pred_train)), rep(0, nrow(backg_train)))
+envtrain <- xyValues(predictors, train)
+envtrain <- data.frame( cbind(pa=pb_train, envtrain) )
+envtrain[,'biome'] = factor(envtrain[,'biome'], levels=1:14)
+head(envtrain)
+
+testpres <- data.frame( xyValues(predictors, pres_test) )
+testbackg <- data.frame( xyValues(predictors, backg_test) )
+testpres[ ,'biome'] = factor(testpres[ ,'biome'], levels=1:14)
+testbackg[ ,'biome'] = factor(testbackg[ ,'biome'], levels=1:14)
+@
+
+
+
 \subsection{Generalized Linear Models}
+
+A generalized linear model (GLM) is a generalization of ordinary least squares regression. Models are fit using maximum likelihood and by allowing the linear model to be related to the response variable via a link function and by allowing the magnitude of the variance of each measurement to be a function of its predicted value. Depending on how a GLM is specified it can be equivalent to (mulitple) linear regression, logistic regression or Poisson regression. See Guisan et al (2002) for an overview of the use of GLM in species distribution modeling.
+
+In \R, GLM is implemented in the 'glm' function, and the link function and error distribution are specfied with the 'family' argument. Examples are:
+
+\texttt{
+family = binomial(link = "logit")
+
+family = gaussian(link = "identity")
+
+family = poisson(link = "log")
+}
+
+Here we fit two basic glm models. All variables are used, but without interaction terms.
+<<sdm41>>=
+gm1 <- glm(pa ~ bio1 + bio5 + bio6 + bio7 + bio8 + bio12 + bio16 + bio17, family = binomial(link = "logit"), data=envtrain)
+gm2 <- glm(pa ~ bio1 + bio5 + bio6 + bio7 + bio8 + bio12 + bio16 + bio17, family = gaussian(link = "identity"), data=envtrain)
+e1 = evaluate(testpres, testbackg, gm1)
+e2 = evaluate(testpres, testbackg, gm2)
+e1
+e2
+@
+
+<<sdm42, fig=TRUE>>=
+pg <- predict(predictors, gm1, ext=ext)
+par(mfrow=c(1,2))
+plot(pg, main='GLM/gaussian, raw values')
+plot(wrld_simpl, add=TRUE, border='dark grey')
+threshold <- e1@t[which.max(e@TPR + e@TNR)]
+plot(pg > threshold, main='presence/absence')
+plot(wrld_simpl, add=TRUE, border='dark grey')
+points(pres_train, pch='+')
+points(backg_train, pch='-', cex=0.25)
+@
 
 
 \subsection{Generalized Additive Models}
+Generalized additive models (GAMs; Hastie and Tibshirani, 1990; Wood, 2006) are an extension to GLMs. In GAMs, the linear predictor is the sum of smoothing functions. This makes GAMs very flexible, and they can fit very complex functions. It also makes them very similar to machine learning methods. In \R gams are implemented in the 'mgcv' package. The 'grasp' package implements species distribution modeling with gam (Lehman et al., 2002). 
 
 
 
@@ -568,6 +669,8 @@ Review of Ecology, Evolution, and Systematics 40: 677-697. \url{http://dx.doi.or
 
 \noindent Guralnick, R.P., J. Wieczorek, R. Beaman, R.J. Hijmans and the BioGeomancer Working Group, 2006. BioGeomancer:  Automated georeferencing to map the world's biodiversity data. PLoS Biology 4: 1908-1909. \url{http://dx.doi.org/10.1371/journal.pbio.0040381}
 
+\noindent Hastie, T.J. and R.J. Tibshirani, 1990. Generalized Additive Models. Chapman \& Hall/CRC.
+
 \noindent Hastie, T., R. Tibshirani and J. Friedman, 2009. The Elements of Statistical Learning: Data Mining, Inference, and Prediction (Second Edition) \url{http://www-stat.stanford.edu/~tibs/ElemStatLearn/}
 
 \noindent Hijmans R.J., and C.H. Graham, 2006. Testing the ability of climate envelope models to predict the effect of climate change on species distributions. Global change biology 12: 2272-2281. \url{http://dx.doi.org/10.1111/j.1365-2486.2006.01256.x}
@@ -575,6 +678,8 @@ Review of Ecology, Evolution, and Systematics 40: 677-697. \url{http://dx.doi.or
 \noindent Hijmans, R.J., M. Schreuder, J. de la Cruz and L. Guarino, 1999. Using GIS to check coordinates of germplasm accessions. Genetic Resources and Crop Evolution 46: 291-296.
 
 \noindent Hijmans, R.J., S.E. Cameron, J.L. Parra, P.G. Jones and A. Jarvis, 2005. Very high resolution interpolated climate surfaces for global land areas. International Journal of Climatology 25: 1965-1978. \url{http://dx.doi.org/10.1002/joc.1276}
+
+\noindent Lehmann, A., J. McC. Overton and J.R. Leathwick, 2002. GRASP: Generalized Regression Analysis and Spatial Predictions. Ecological Modelling 157: 189-207.
 
 \noindent Mahalanobis, P.C., 1936. On the generalised distance in statistics. Proceedings of the National Institute of Sciences of India 2: 49-55.
 
@@ -588,6 +693,7 @@ Review of Ecology, Evolution, and Systematics 40: 677-697. \url{http://dx.doi.or
 
 \noindent Wisz, M.S., R.J. Hijmans, J. Li, A.T. Peterson, C.H. Graham, A. Guisan, and the NCEAS Predicting Species Distributions Working Group, 2008. Effects of sample size on the performance of species distribution models. Diversity and Distributions 14: 763-773. 
 
+\noindent Wood, S., 2006. Generalized Additive Models: An Introduction with \R. Chapman \& Hall/CRC.
 
 \end{hangparas}
 
