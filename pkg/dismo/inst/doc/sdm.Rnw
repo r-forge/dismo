@@ -498,7 +498,7 @@ The remaining models need to be fit presence textif{and} absence (background) da
 
 <<sdm40>>=
 train <- rbind(pres_train, backg_train)
-pb_train <- c(rep(1, nrow(pred_train)), rep(0, nrow(backg_train)))
+pb_train <- c(rep(1, nrow(pres_train)), rep(0, nrow(backg_train)))
 envtrain <- xyValues(predictors, train)
 envtrain <- data.frame( cbind(pa=pb_train, envtrain) )
 envtrain[,'biome'] = factor(envtrain[,'biome'], levels=1:14)
@@ -518,13 +518,11 @@ A generalized linear model (GLM) is a generalization of ordinary least squares r
 
 In \R, GLM is implemented in the 'glm' function, and the link function and error distribution are specfied with the 'family' argument. Examples are:
 
-\texttt{
-family = binomial(link = "logit")
+\texttt{family = binomial(link = "logit")}
 
-family = gaussian(link = "identity")
+\texttt{family = gaussian(link = "identity")}
 
-family = poisson(link = "log")
-}
+\texttt{family = poisson(link = "log")}
 
 Here we fit two basic glm models. All variables are used, but without interaction terms.
 <<sdm41>>=
@@ -559,9 +557,11 @@ Generalized additive models (GAMs; Hastie and Tibshirani, 1990; Wood, 2006) are 
 There is a variety of machine learning (sometimes referred to data mining) methods in R. For a long time there have been packages to do Artifical Neural Networks (ANN) and Classification and Regressin Trees (CART). More recent methods include Random Forests, Boosted Regression Trees, and Support Vector Machines. Through the dismo package you can also use the Maxent program, that implements the most widely used method (maxent) in species distribution modeling. 
 
 \subsection{Maxent}
-The maxent (Maximum Entropy) species distribution model (see references below). The function uses presence and 'background' data for a number of locations, and the values of a number of predictors (independent variables) for those locations. The result is a predictive model that can be used to predict the suitability of other locations, for example to predict the entire range of a species, or its potential range in another region, or under changed conditions. 
 
-The way Maxent is implemented in dismo is a bit different from other methods. This function uses the maxent species distribution model software, which is a java program that you can download from \url{http://www.cs.princeton.edu/~schapire/maxent/}. Put the file 'maxent.jar' in the 'java' folder of this package. That is the folder returned by \texttt{system.file("java", package="dismo")}. Please note that this program (\texttt{maxent.jar}) can not be redistributed or used for commercial purposes. 
+The maxent (Maximum Entropy) species distribution model (Phillips et al., 2004, 2006) is a stand alone Java program. Dismo has a function 'maxent' that communicates with this program. To use it you must first download the program from \url{http://www.cs.princeton.edu/~schapire/maxent/}. Put the file 'maxent.jar' in the 'java' folder of the 'dismo' package. That is the folder returned by \texttt{system.file("java", package="dismo")}. Please note that this program (\texttt{maxent.jar}) can not be redistributed or used for commercial purposes. 
+
+Because maxent is implemented in dismo you can fit it like the profile methods (e.g. Bioclim). That is, you can provide presence points and a RasterStack. 
+However, you can also fit it like the other methods, such as glm. Note, however, that in that case you cannot use the formula notation.
 
 
 
