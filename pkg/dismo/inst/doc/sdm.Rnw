@@ -8,15 +8,15 @@
 \usepackage[utf8]{inputenc}
 \usepackage{hyperref}
 
-% \VignetteIndexEntry{Species distribution modeling with \R}
-% \VignetteDepends{dismo}
-% \VignetteKeyword{spatial}
+\VignetteIndexEntry{Species distribution modeling with R}
+\VignetteDepends{dismo}
+\VignetteKeyword{spatial}
 
 % options(width=65)
 
 \newcommand{\super}[1]{\ensuremath{^{\textrm{#1}}}}
 \newcommand{\sub}[1]{\ensuremath{_{\textrm{#1}}}}
-\newcommand{\R}{{\normalfont\textsf{R}}{}}
+\newcommand{\R}{{\normalfont\textsf{R }}{}}
 
 \SweaveOpts{keep.source=TRUE}
 
@@ -30,7 +30,7 @@
 
 \chapter{Introduction}
 
-This document is an introduction to species distribution modeling with \R. Species distribution modeling (SDM) is also known under other names including envelope-modeling and niche-modeling. In SDM, the following steps are usally taken: (1) locations of occurrence (and perhaps non-occurrence) of a species (or other phenomenon) are compiled. (2) Values from environmental predictor variables (such as climate) at these locations are determined. (3) The envrionmental values are used to fit a model predicting presence/absence, or another measure, such as abundance, associated with the points. (4) The model is used to predict the likelihood of presence at all locations of an area of interest (and perhaps in a future climate).
+This document is an introduction to species distribution modeling with \R. Species distribution modeling (SDM) is also known under other names including envelope-modeling and (environemtal or ecological) niche-modeling. In SDM, the following steps are usally taken: (1) locations of occurrence (and perhaps non-occurrence) of a species (or other phenomenon) are compiled. (2) values of environmental predictor variables (such as climate) at these locations are determined. (3) the envrionmental values are used as to fit a model predicting presence/absence, or another measure, such as abundance, associated with the points. (4) The model is used to predict the likelihood of presence at all locations of an area of interest (and perhaps in a future climate).
 
 This document is not a general introduction to species distribution modeling itself. We assume that you are familiar with most of the concepts in this field. If in doubt, you could consult Richard Pearson's introduction to the subject: \url{http://biodiversityinformatics.amnh.org/index.php?section_id=111}. More advanced readers may want to consult the recent review of the field by Elith and Leathwick (2009).
 
@@ -178,6 +178,11 @@ plot(!is.na(mask), legend=FALSE)
 plot(e, add=TRUE, col='red')
 points(bg2, cex=0.5)
 @
+
+
+
+\chapter{Raster data}
+
 
 \section{Predictor variables}
 
@@ -579,10 +584,17 @@ Because maxent is implemented in dismo you can fit it like the profile methods (
 
 <<sdm46, fig=TRUE, width=9, height=6>>=
 jar <- paste(system.file(package="dismo"), "/java/maxent.jar", sep='')
-if (!file.exists(jar)) {
-    cat('cannot run this example because maxent is not available on this system')
-} else {
+if (file.exists(jar)) {
 	xm <- maxent(predictors, pres_train, factors='biome')
+	plot(xm)
+} else {
+    cat('cannot run this example because maxent is not available on this system')
+	plot(1)
+}
+@
+
+<<sdm47, fig=TRUE, width=9, height=6>>=
+if (file.exists(jar)) {
 	e <- evaluate(pres_test, backg_test, xm, predictors)
 	e
 	px = predict(predictors, xm, ext=ext, progress='')
@@ -593,6 +605,8 @@ if (!file.exists(jar)) {
 	plot(px > threshold, main='presence/absence')
 	plot(wrld_simpl, add=TRUE, border='dark grey')
 	points(pres_train, pch='+')
+} else {	
+	plot(1)
 }
 @
 
@@ -733,8 +747,7 @@ The 'geographic models' described here are not commonly used in species distribu
 
 \noindent Elith, J., C.H. Graham, R.P. Anderson, M. Dudik, S. Ferrier, A. Guisan, R.J. Hijmans, F. Huettmann, J. Leathwick, A. Lehmann, J. Li, L.G. Lohmann, B. Loiselle, G. Manion, C. Moritz, M. Nakamura, Y. Nakazawa, J. McC. Overton, A.T. Peterson, S. Phillips, K. Richardson, R. Scachetti-Pereira, R. Schapire, J. Soberon, S. Williams, M. Wisz and N. Zimmerman, 2006. Novel methods improve prediction of species' distributions from occurrence data. Ecography 29: 129-151. \url{http://dx.doi.org/10.1111/j.2006.0906-7590.04596.x}
 
-\noindent Elith, J. and J.R. Leathwick, 2009. Species Distribution Models: Ecological Explanation and Prediction Across Space and Time. Annual 
-Review of Ecology, Evolution, and Systematics 40: 677-697. \url{http://dx.doi.org/10.1146/annurev.ecolsys.110308.120159}
+\noindent Elith, J. and J.R. Leathwick, 2009. Species Distribution Models: Ecological Explanation and Prediction Across Space and Time. Annual Review of Ecology, Evolution, and Systematics 40: 677-697. \url{http://dx.doi.org/10.1146/annurev.ecolsys.110308.120159}
 
 \noindent Elith, J., J.R. Leathwick and T. Hastie, 2009. A working guide to boosted regression trees. Journal of Animal Ecology 77: 802-81
 
