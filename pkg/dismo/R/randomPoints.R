@@ -30,6 +30,23 @@
 }
 
 
+
+..randomCellsLonLat2 <- function(r, n) {
+# only cells that are not NA
+	cells <- which(! is.na(getValues(r)) )
+# which rows are that?
+	rows <- rowFromCell(r, cells)
+# what is the latitude?
+	y <- yFromRow(r, rows)
+# what is the 'width' of a cell?
+	dx <- pointDistance(cbind(0, y), cbind(xres(r), y), 'GreatCircle')  
+
+	cells <- sample(cells, n, prob=dx)
+	return(cells)
+}
+
+
+
 randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=5, warn=2) {
 	
 	if (class(mask) != 'RasterLayer') { mask <- raster(mask, 1)	}
@@ -68,38 +85,64 @@ randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=5, 
 		mask2 <- raster(mask)
 	}
 	
-
 	nn = n * tryf
 	nn = max(nn, 250)
-	nn = min(ncell(mask2), nn)
-	
 
-	if (raster:::.couldBeLonLat(mask)) {
 	
-		cells <- .randomCellsLonLat(mask2, nn)
-		
-	} else {
-		if (nn == ncell(mask2)) {
-			cells <- 1:ncell(mask2)
+	if (canProcessInMemory(mask2)) {
+	
+		cells <- crop(mask, mask2)
+		cells <- which(! is.na(getValues(cells)) )
+		nn = min(length(cells), nn)
+
+		if (raster:::.couldBeLonLat(mask)) {
+			# which rows are that?
+			rows <- rowFromCell(mask2, cells)
+			# what is the latitude?
+			y <- yFromRow(mask2, rows)
+			# what is the 'width' of a cell?
+			dx <- pointDistance(cbind(0, y), cbind(xres(mask2), y), 'GreatCircle')  
+			cells <- sample(cells, nn, prob=dx)
+	
 		} else {
-			cells <- sampleInt(ncell(mask2), nn)
+			cells <- sample(cells, nn)
 		}
-	
 		xy <- xyFromCell(mask2, cells)
 		cells <- cellFromXY(mask, xy)
-	}
-
-	if (excludep) {	
-		pcells <- cellFromXY(mask2, p)
-		cells <- cells[!(cells%in%pcells)] 	
-	}
 	
-	vals <- cbind(cells, cellValues(mask, cells))
-	cells <- na.omit(vals)[,1]
-
-	if (length(cells) >= n) { 
-		cells <- sample(cells, n)
 	} else {
+	
+		nn = min(ncell(mask2), nn)
+		if (raster:::.couldBeLonLat(mask)) {
+	
+			cells <- .randomCellsLonLat(mask2, nn)
+			
+		} else {
+			if (nn >= ncell(mask2)) {
+				cells <- 1:ncell(mask2)
+			} else {
+				cells <- sampleInt(ncell(mask2), nn)
+			}
+		
+			xy <- xyFromCell(mask2, cells)
+			cells <- cellFromXY(mask, xy)
+		}
+
+		vals <- cbind(cells, cellValues(mask, cells))
+		cells <- na.omit(vals)[,1]
+	}
+		
+	if (excludep) {	
+		pcells <- cellFromXY(mask, p)
+		cells <- cells[ ! (cells %in% pcells) ] 	
+	}
+
+	if (length(cells) > n) { 
+		
+		cells <- sample(cells, n) 
+		
+	} else if (length(cells) < n) {
+	
 		frac <- length(cells) / n
 		if (frac < 0.1) {
 			stop("generated random points = ", frac," times requested number; Use a higher value for tryf" )
@@ -110,6 +153,7 @@ randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=5, 
 			warning("generated random points = ", frac," times requested number")
 		}
 	}
+	
 	return(xyFromCell(mask, cells))
 }
 
