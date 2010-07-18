@@ -57,7 +57,22 @@ if (!isGeneric("maxent")) {
 		standardGeneric("maxent"))
 }	
 
+.getMeVersion <- function() {
+	mxe <- .jnew("mebridge") 
+	v <- try(.jcall(mxe, "S", "meversion", "" ) )
+	if (class(v) == 'try-error') {
+		return('?.?.?')
+	} else {
+		return(v)
+	}
+}
 
+
+setMethod('maxent', signature(x='missing', p='missing'), 
+	function(x, p, ...) {
+		cat('version', .getMeVersion(), '\n' )
+	}
+)
 
 setMethod('maxent', signature(x='SpatialGridDataFrame', p='ANY'), 
 	function(x, p, a=NULL,...) {
@@ -173,6 +188,11 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 		if (!file.exists(jar)) {
 			stop('file missing:', jar, '.\nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
 		}
+
+		MEversion <- try( .getMeVersion, silent=TRUE )
+		if (class(MEversion) == 'try-error') {
+			stop('dismo needs a more recent version of Maxent (>= 3.3.3) \nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
+		}
 		
 		d <- .meTmpDir()
 		dirout <- paste(d, '/out', sep='')
@@ -222,13 +242,20 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 }
 
 
+.maxentLambdaFile <- function()  {
+	d <- .meTmpDir()
+	f <- paste(round(runif(10)*10), collapse="")
+	d <- paste(d, '/', f , sep='')
+	dir.create(d, showWarnings=TRUE, recursive=TRUE )
+	d <- paste(d, '/lambdas.csv', sep="")
+	return(d)
+}
+
+
 .maxentTmpFile <- function()  {
 	d <- .meTmpDir()
-	if (!file.exists(d)) {
-		dir.create(d, showWarnings=TRUE )
-	}
 	f <- paste(round(runif(10)*10), collapse="")
-	d <- paste(d, '/maxent_', f, '.csv', sep="")
+	d <- paste(d, '/', f, sep="")
 	return(d)
 }
 
