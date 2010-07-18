@@ -9,11 +9,17 @@ import density.*;
 public class mebridge {
 
 	public static void main(String args[]) {
+	
 	}
 	
-	
+	public String meversion (String str) {
+		Utils utils = new Utils();
+		str = Utils.getVersion();
+		return str;
+	}
 
-	public double predict (String lambda, String[] vars, double[] vals) {
+	
+	public double predict (String lambda, String[] vars, double[] vals, String[] args) {
 		Evaluate eval=null;
 		try {
 			eval = new Evaluate(lambda);
@@ -23,27 +29,17 @@ public class mebridge {
 		return( eval.evaluate() );
 	}
 
-	public double predict (String lambda, String[] vars, int[] vals) {
+
+	public double[] predict (String lambda, String[] vars, double[][] vals, String[] args) {
 		Evaluate eval=null;
 		try {
+
 			eval = new Evaluate(lambda);
+			Params params = eval.getParams();	
+			//params.readFromArgs(cmd);
+		
 		} catch (java.io.IOException e) {}
-		for (int i=0; i<vars.length; i++)
-			eval.setValue(vars[i], vals[i]);
-		return( eval.evaluate() );
-	}
-	
-	public double[] predict (String lambda, String[] vars, double[][] vals, String cmd) {
-		Evaluate eval=null;
-		try {
-			eval = new Evaluate(lambda);
-			density.Params params = eval.getParams();	
-			
-			//Params params = new Params();
-			//params = new Evaluate.getParams();
-			//density.Params object that you can use to set parameters.
-			
-		} catch (java.io.IOException e) {}
+
 		double[] p = new double[vals.length];
 		for (int i=0; i<p.length; i++) {
 			for (int j=0; j<vars.length; j++) {
@@ -57,8 +53,20 @@ public class mebridge {
 		}
 		return(p);
 	}
+	
+	public double predict (String lambda, String[] vars, int[] vals, String[] args) {
+		Evaluate eval=null;
+		try {
+			eval = new Evaluate(lambda);
+		} catch (java.io.IOException e) {}
+		for (int i=0; i<vars.length; i++)
+			eval.setValue(vars[i], vals[i]);
+		return( eval.evaluate() );
+	}
+	
 
-	public double[] predict (String lambda, String[] vars, int[][] vals) {
+
+	public double[] predict (String lambda, String[] vars, int[][] vals, String[] args) {
 		Evaluate eval=null;
 		try {
 			eval = new Evaluate(lambda);
@@ -101,7 +109,8 @@ public class mebridge {
         Runner runner = new Runner(params);
 		runner.start();
 		runner.end();
-	}	
-	
+	}
 	
 }
+
+

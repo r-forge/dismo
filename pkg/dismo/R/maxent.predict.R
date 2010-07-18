@@ -12,10 +12,10 @@ if (!isGeneric("predict")) {
 
 
 setMethod('predict', signature(object='MaxEnt'), 
-	function(object, x, ext=NULL, filename='', progress='text', ...) {
+	function(object, x, ext=NULL, filename='', progress='text', args="", ...) {
 
-	
-		lambdas <- .maxentTmpFile()
+		args <- c(args, "")
+		lambdas <- .maxentLambdaFile()
 		variables = colnames(object@presence)
 
 		write.table(object@lambdas, file=lambdas, row.names=FALSE, col.names=FALSE, quote=FALSE)
@@ -61,7 +61,7 @@ setMethod('predict', signature(object='MaxEnt'),
 				res <- rep(NA, times=nrow(rowvals))
 				rowv <- na.omit(rowvals)
 				if (length(rowv) > 0) {
-					p <- .jcall(mxe, "[D", "predict", lambdas, .jarray(colnames(rowv)), .jarray(rowv)) 
+					p <- .jcall(mxe, "[D", "predict", lambdas, .jarray(colnames(rowv)), .jarray(rowv), args) 
 					naind <- as.vector(attr(rowv, "na.action"))
 					if (!is.null(naind)) {
 						res[-naind] <- p
@@ -103,7 +103,7 @@ setMethod('predict', signature(object='MaxEnt'),
 				dim(xx) = dim(x)
 				colnames(xx) = colnames(x)
 				x = xx
-				p <- .jcall(mxe, "[D", "predict", lambdas, .jarray(colnames(x)), .jarray(x)) 
+				p <- .jcall(mxe, "[D", "predict", lambdas, .jarray(colnames(x)), .jarray(x), args) 
 				p[p == -9999] <- NA
 				naind <- as.vector(attr(x, "na.action"))
 				if (!is.null(naind)) {

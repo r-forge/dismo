@@ -2,14 +2,15 @@
 
 \alias{maxent}
 
+\alias{maxent,missing,missing-method}
 \alias{maxent,Raster,ANY-method}
 \alias{maxent,SpatialGridDataFrame,ANY-method}
 \alias{maxent,data.frame,vector-method}
 
-\title{MaxEnt}
+\title{Maxent}
 
 \description{
-The maxent (Maximum Entropy) species distribution model (see references below). The function uses presence and 'background' data for a number of locations, and the values of a number of predictors (independent variables) for those locations. The result is a predictive model that can be used to predict the suitability of other locations, for example to predict the entire range of a species, or its potential range in another region, or under changed conditions. 
+The Maxent (Maximum Entropy) species distribution model (see references below). The function uses presence and 'background' data for a number of locations, and the values of a number of predictors (independent variables) for those locations. The result is a predictive model that can be used to predict the suitability of other locations, for example to predict the entire range of a species, or its potential range in another region, or under changed conditions. 
 
 This function uses the maxent species distribution model software, which is a java program that you can download from \url{http://www.cs.princeton.edu/~schapire/maxent/}. Put the file 'maxent.jar' in the 'java' folder of this package. That is the folder returned by \code{system.file("java", package="dismo")}. Please note that this program (maxent.jar) can not be redistributed or used for commercial purposes.
 }
