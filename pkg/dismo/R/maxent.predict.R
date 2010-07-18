@@ -11,11 +11,23 @@ if (!isGeneric("predict")) {
 }	
 
 
+
+.maxentLambdaFile <- function(d)  {
+	return(d)
+}
+
+
 setMethod('predict', signature(object='MaxEnt'), 
 	function(object, x, ext=NULL, filename='', progress='text', args="", ...) {
 
 		args <- c(args, "")
-		lambdas <- .maxentLambdaFile()
+
+		if (! file.exists(object@path)) {
+			dir.create(object@path, recursive=TRUE, showWarnings=TRUE)
+		}
+		lambdas <- paste(object@path, '/lambdas.csv', sep="")
+
+
 		variables = colnames(object@presence)
 
 		write.table(object@lambdas, file=lambdas, row.names=FALSE, col.names=FALSE, quote=FALSE)
@@ -59,17 +71,20 @@ setMethod('predict', signature(object='MaxEnt'),
 				rowvals <- getValuesBlock(x, row=rr, nrows=tr$nrows[i], firstcol, ncols)
 				rowvals <- rowvals[,variables,drop=FALSE]
 				res <- rep(NA, times=nrow(rowvals))
-				rowv <- na.omit(rowvals)
-				if (length(rowv) > 0) {
-					p <- .jcall(mxe, "[D", "predict", lambdas, .jarray(colnames(rowv)), .jarray(rowv), args) 
-					naind <- as.vector(attr(rowv, "na.action"))
+				rowvals <- na.omit(rowvals)
+				if (length(rowvals) > 0) {
+					rowvals[] <- as.numeric(rowvals)
+					p <- .jcall(mxe, "[D", "predict", lambdas, .jarray(colnames(rowvals)), .jarray(rowvals), args) 
+
+					naind <- as.vector(attr(rowvals, "na.action"))
 					if (!is.null(naind)) {
 						res[-naind] <- p
 					} else {
 						res <- p
 					}
+					res[res == -9999] <- NA
 				}
-				res[res == -9999] <- NA
+				
 				if (filename != '') {
 					out <- writeValues(out, res, tr$row[i])
 				} else {
@@ -96,13 +111,12 @@ setMethod('predict', signature(object='MaxEnt'),
 			
 			
 			x <- x[,variables,drop=FALSE]
+			out <- rep(NA, times=nrow(x))
+			
 			x <- na.omit(x)
 			if (nrow(x) > 0) {
-				out <- rep(NA, times=nrow(x))
-				xx = as.numeric(as.matrix(x))
-				dim(xx) = dim(x)
-				colnames(xx) = colnames(x)
-				x = xx
+				x <- as.matrix(x)
+				x[] <- as.numeric(x)
 				p <- .jcall(mxe, "[D", "predict", lambdas, .jarray(colnames(x)), .jarray(x), args) 
 				p[p == -9999] <- NA
 				naind <- as.vector(attr(x, "na.action"))

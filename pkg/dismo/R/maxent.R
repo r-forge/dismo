@@ -7,11 +7,13 @@ setClass('MaxEnt',
 	contains = 'DistModel',
 	representation (
 		lambdas  = 'vector',
-		results = 'matrix'
+		results = 'matrix',
+		path = 'character'
 	),	
 	prototype (	
 		lambdas = as.vector(NA),
-		results = as.matrix(NA)
+		results = as.matrix(NA),
+		path = ''
 	),
 )
 
@@ -20,33 +22,33 @@ setMethod ('show' , 'MaxEnt',
 	function(object) {
 		cat('class    :' , class(object), '\n\n')
 		cat('variables:', colnames(object@presence), '\n\n')
-		cat('lambdas\n')
-		print(object@lambdas)
-		cat('\n')
+		# cat('lambdas\n')
+		# print(object@lambdas)
 		pp <- nrow(object@presence)
 		cat('\npresence points:', pp, '\n')
-		if (pp < 5) {
-			print(object@presence)
-		} else {
-			print(object@presence[1:5,])
-			cat('\n')
-			cat('  (... ...  ...)\n')
-			cat('\n')
-		}
+#		if (pp < 5) { 
+#			print(object@presence)
+#		} else {
+#			print(object@presence[1:5,])
+#			cat('  (... ...  ...)\n')
+#			cat('\n')
+#		}
 		pp <- nrow(object@absence)
 		cat('\nabsence points:', pp, '\n')
-		if (pp < 5) {
-			print(object@absence)
-		} else {
-			print(object@absence[1:5,])
-			cat('\n')
-			cat('  (... ...  ...)\n')
-			cat('\n')
-		}
+#		if (pp < 5) {
+#			print(object@absence)
+#		} else {
+#			print(object@absence[1:5,])
+#			cat('  (... ...  ...)\n')
+#			cat('\n')
+#		}
 		cat('\nmodel fit\n')
-		cat('\n')
 		print(object@results)
 		cat('\n')
+		if (file.exists(paste(object@path, "/maxent.html", sep=''))) {
+			url = paste("file:///", object@path, "/maxent.html", sep='')
+			browseURL(url, browser = getOption("browser"))
+		}
 	}
 )	
 
@@ -61,7 +63,7 @@ if (!isGeneric("maxent")) {
 	mxe <- .jnew("mebridge") 
 	v <- try(.jcall(mxe, "S", "meversion", "" ) )
 	if (class(v) == 'try-error') {
-		return('?.?.?')
+		return('unknown (< 3.3.3)')
 	} else {
 		return(v)
 	}
@@ -70,6 +72,10 @@ if (!isGeneric("maxent")) {
 
 setMethod('maxent', signature(x='missing', p='missing'), 
 	function(x, p, ...) {
+		jar <- paste(system.file(package="dismo"), "/java/maxent.jar", sep='')
+		if (!file.exists(jar)) {
+			stop('maxent program is missing:', jar, '.\nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
+		}
 		cat('version', .getMeVersion(), '\n' )
 	}
 )
@@ -109,7 +115,7 @@ setMethod('maxent', signature(x='SpatialGridDataFrame', p='ANY'),
 setMethod('maxent', signature(x='Raster', p='ANY'), 
 	function(x, p, a=NULL, factors=NULL, ...) {
 #extract values for points from stack
-		p = .getMatrix(p)
+		p <- .getMatrix(p)
 		pv1 <- data.frame(xyValues(x, p))
 
 		pv <- na.omit(pv1)
@@ -172,6 +178,15 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 setMethod('maxent', signature(x='data.frame', p='vector'), 
 	function(x, p, args=NULL, ...) {
 
+		jar <- paste(system.file(package="dismo"), "/java/maxent.jar", sep='')
+		if (!file.exists(jar)) {
+			stop('file missing:', jar, '.\nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
+		}
+		MEversion <- .getMeVersion()
+		if (substr(MEversion, 1, 3) == 'unk') {
+			stop('dismo needs a more recent version of Maxent (>= 3.3.3) \nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
+		}
+
 		x <- cbind(p, x)
 		x <- na.omit(x)
 		p <- x[,1]
@@ -184,34 +199,26 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 			}
 		}
 		
-		jar <- paste(system.file(package="dismo"), "/java/maxent.jar", sep='')
-		if (!file.exists(jar)) {
-			stop('file missing:', jar, '.\nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
-		}
-
-		MEversion <- try( .getMeVersion, silent=TRUE )
-		if (class(MEversion) == 'try-error') {
-			stop('dismo needs a more recent version of Maxent (>= 3.3.3) \nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
-		}
-		
-		d <- .meTmpDir()
-		dirout <- paste(d, '/out', sep='')
+		dirout <- .meTmpDir()
+		f <- paste(round(runif(10)*10), collapse="")
+		dirout <- paste(dirout, '/', f, sep='')
 		if (! file.exists(dirout)) {
 			dir.create(dirout, recursive=TRUE, showWarnings=TRUE)
 		}
-
+		
 		pv <- x[p==1, ,drop=FALSE]
 		av <- x[p==0, ,drop=FALSE]
 		me <- new('MaxEnt')
 		me@presence <- as.matrix(pv)
 		me@absence <- as.matrix(av)
 		me@hasabsence <- TRUE
+		me@path <- dirout
 
 		pv <- cbind(data.frame(species='species'), x=1:nrow(pv), y=1:nrow(pv), pv)
 		av <- cbind(data.frame(species='background'), x=1:nrow(av), y=1:nrow(av), av)
 		
-		pfn <- .maxentTmpFile()
-		afn <- .maxentTmpFile()
+		pfn <- paste(dirout, '/presence', sep="")
+		afn <- paste(dirout, '/absence', sep="")
 		write.table(pv, file=pfn, sep=',', row.names=FALSE)
 		write.table(av, file=afn, sep=',', row.names=FALSE)
 
@@ -230,7 +237,16 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 		rownames(dd) = rownames(d)
 		me@results <- dd
 		
-		unlink(paste(d, "/*", sep=""), recursive = TRUE)
+		f <- paste(me@path, "/species.html", sep='')
+		html <- readLines(f)
+		html[1] <- "<title>Maxent model</title>"
+		html[2] <- "<CENTER><H1>Maxent model</H1></CENTER>"
+		html[3] <- sub("model for species", "model result", html[3])
+		newtext <- paste("using 'dismo' version ", packageDescription('dismo')$Version, "& Maxent version")
+		html[3] <- sub("using Maxent version", newtext, html[3])
+		f <- paste(me@path, "/maxent.html", sep='')
+		writeLines(html, f)	
+		
 		me
 	}
 )
@@ -241,23 +257,6 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 	return( paste(dirname(tempdir()), '/R_raster_tmp/maxent', sep="") )
 }
 
-
-.maxentLambdaFile <- function()  {
-	d <- .meTmpDir()
-	f <- paste(round(runif(10)*10), collapse="")
-	d <- paste(d, '/', f , sep='')
-	dir.create(d, showWarnings=TRUE, recursive=TRUE )
-	d <- paste(d, '/lambdas.csv', sep="")
-	return(d)
-}
-
-
-.maxentTmpFile <- function()  {
-	d <- .meTmpDir()
-	f <- paste(round(runif(10)*10), collapse="")
-	d <- paste(d, '/', f, sep="")
-	return(d)
-}
 
 
 .maxentRemoveTmpFiles <- function() {
