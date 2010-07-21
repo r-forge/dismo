@@ -53,7 +53,6 @@ setMethod ('show' , 'MaxEnt',
 )	
 
 
-
 if (!isGeneric("maxent")) {
 	setGeneric("maxent", function(x, p, ...)
 		standardGeneric("maxent"))
@@ -63,7 +62,7 @@ if (!isGeneric("maxent")) {
 	mxe <- .jnew("mebridge") 
 	v <- try(.jcall(mxe, "S", "meversion", "" ) )
 	if (class(v) == 'try-error') {
-		return('unknown (< 3.3.3)')
+		stop('"dismo" needs a more recent version of Maxent (>= 3.3.3) \nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
 	} else {
 		return(v)
 	}

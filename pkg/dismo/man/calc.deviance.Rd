@@ -4,7 +4,7 @@
 
 \alias{calc.deviance}
 
-\title{gbm plot}
+\title{Calculate deviance}
 
 \description{
 Function to calculate deviance given two vectors of observed and predicted values.

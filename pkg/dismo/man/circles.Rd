@@ -20,11 +20,19 @@ circles(p, ...)
  
 \arguments{
   \item{p}{point locations (presence). Two column matrix, data.frame or SpatialPoints* object}
-  \item{...}{ Additional arguments}
+  \item{...}{ Additional arguments. See Details}
 }
 
+\details{
+The following additional arguments can be supplied to the circles function:
+\tabular{rll}{
+ \tab \code{d}  \tab The diameter of each circle. If missing the diameter is computed from the inter-point distance \cr
+ \tab \code{n}  \tab How many vertices in the circle? Default is 360 \cr
+ \tab \code{lonlat} \tab  Are these longitude/latidue data? Default = \code{FALSE} \cr
+  \tab \code{r}  \tab  Radius of the earth. Relevant for longitude/latitude data. Default is 6378137 m\cr
+} 
 
-
+}
 
 \value{
 An object of class 'Circles'

@@ -24,9 +24,12 @@ Create a density plots of presence and absence data
 }
 }
 
-
 \value{
 A density plot. Presence data are in red, and absence data (if available) are in blue.
+}
+
+\seealso{
+\code{\link[dismo]{evaluate} }
 }
 
 \author{Robert J. Hijmans}
