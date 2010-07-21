@@ -27,7 +27,7 @@ boxplot(x, ...)
 
 
 \seealso{
-\code{\link[dismo]{density}, \link[dismo]{plot}, \link[graphics]{boxplot} }
+\code{\link[dismo]{evaluate} }
 }
 
 \author{

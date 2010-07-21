@@ -9,11 +9,6 @@
 
 .avgDist <- function(xy, lonlat=TRUE, r=6378137) {
 	xy <- unique(xy)
-	if (lonlat) { 
-		dtype <- 'GreatCircle' 
-	} else { 
-		dtype <- 'Euclidean' 
-	}
 	xy <- as.matrix(xy[,1:2])
 	d <- matrix(nrow=nrow(xy), ncol=nrow(xy))
 	if (lonlat) {

@@ -2,6 +2,7 @@
 
 \alias{evaluate}
 
+
 \title{ Model testing }
 
 \description{ 
@@ -55,6 +56,8 @@ e@t[which.max(e@TPR + e@TNR)]
 
 plot(e, 'ROC')
 plot(e, 'TPR')
+boxplot(e)
+density(e)
 }
 
 \keyword{spatial}
