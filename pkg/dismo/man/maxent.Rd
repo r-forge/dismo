@@ -57,24 +57,32 @@ Steven J. Phillips, Robert P. Anderson, Robert E. Schapire, 2006. Maximum entrop
 }
 
 \examples{
-
 jar <- paste(system.file(package="dismo"), "/java/maxent.jar", sep='')
 if (file.exists(jar)) {
+
 # get predictor variables
 predictors <- stack(list.files(path=paste(system.file(package="dismo"), '/ex', sep=''), pattern='grd', full.names=TRUE ))
 plot(predictors)
+
 # file with presence points
 occurence <- paste(system.file(package="dismo"), '/ex/bradypus.csv', sep='')
 occ <- read.table(occurence, header=TRUE, sep=',')[,-1]
+
 # witholding a 20% sample for testing 
 fold <- kfold(occ, k=5)
 occtrain <- occ[fold != 1, ]
+
 # fit model, biome is a categorical variable
 me <- maxent(predictors, occ, factors='biome')
+# me2 <- maxent(predictors, occ, factors='biome', args=c("-J", "-P"))
+
 # plot showing importance of each variable
 plot(me)
+
 # predict to entire dataset
 r <- predict(me, predictors, progress='text') 
+# r <- predict(me, predictors, progress='text', args=c("outputformat=raw"))
+
 plot(r)
 points(occ)
 

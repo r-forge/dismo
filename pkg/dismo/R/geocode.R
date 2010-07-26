@@ -5,14 +5,14 @@
 # October 2008
 
 
-geocode <- function(x, boxes='', extent=NULL, progress='text') {
+geocode <- function(x, boxes='', extent=NULL) {
 
 	if (! require(XML)) stop('You need to install the XML package to be able use this function')
 
 	burl <- "http://maps.google.com/maps/api/geocode/xml?address="
 
-	if (! boxes %in% c('', 'all', 'one')) {
-		warning("boxes should be '', 'all', or 'one'")
+	if (! boxes %in% c('', 'only', 'one')) {
+		warning("boxes should be '', 'only', or 'one'")
 	}
 	
 	if (boxes != '') { boxonly <- TRUE } else { boxonly <- FALSE }
@@ -71,7 +71,7 @@ geocode <- function(x, boxes='', extent=NULL, progress='text') {
 
 	if (boxonly) {
 		res <- res[,2:5,drop=FALSE]
-		if (boxes != 'all') {
+		if (boxes == 'one') {
 			f <- apply(res, 2, range)
 			res <- cbind(f[1,1], f[2,2], f[1,3], f[2,4])
 		} else {
