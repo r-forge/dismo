@@ -27,6 +27,8 @@ voronoiHull(p, a, ...)
 A voronoiHull object
 }
 
+\seealso{\code{\link[dismo]{convexHull}}}
+
 \author{
 Robert J. Hijmans. Adapted from code by Carson Farmer: \url{http://www.carsonfarmer.com/?p=455}
 }

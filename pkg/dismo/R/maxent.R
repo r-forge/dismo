@@ -20,12 +20,12 @@ setClass('MaxEnt',
 
 setMethod ('show' , 'MaxEnt', 
 	function(object) {
-		cat('class    :' , class(object), '\n\n')
-		cat('variables:', colnames(object@presence), '\n\n')
+		cat('class    :' , class(object), '\n')
+		cat('variables:', colnames(object@presence), '\n')
 		# cat('lambdas\n')
 		# print(object@lambdas)
-		pp <- nrow(object@presence)
-		cat('\npresence points:', pp, '\n')
+#		pp <- nrow(object@presence)
+#		cat('\npresence points:', pp, '\n')
 #		if (pp < 5) { 
 #			print(object@presence)
 #		} else {
@@ -33,8 +33,8 @@ setMethod ('show' , 'MaxEnt',
 #			cat('  (... ...  ...)\n')
 #			cat('\n')
 #		}
-		pp <- nrow(object@absence)
-		cat('\nabsence points:', pp, '\n')
+#		pp <- nrow(object@absence)
+#		cat('\nabsence points:', pp, '\n')
 #		if (pp < 5) {
 #			print(object@absence)
 #		} else {
@@ -42,12 +42,14 @@ setMethod ('show' , 'MaxEnt',
 #			cat('  (... ...  ...)\n')
 #			cat('\n')
 #		}
-		cat('\nmodel fit\n')
-		print(object@results)
-		cat('\n')
+#		cat('\nmodel fit\n')
+#		print(object@results)
+#		cat('\n')
 		if (file.exists(paste(object@path, "/maxent.html", sep=''))) {
 			url = paste("file:///", object@path, "/maxent.html", sep='')
 			browseURL(url, browser = getOption("browser"))
+		} else {
+			cat('output html file no longer exists\n')
 		}
 	}
 )	
@@ -253,11 +255,9 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 )
 
 
-
 .meTmpDir <- function() {
 	return( paste(dirname(tempdir()), '/R_raster_tmp/maxent', sep="") )
 }
-
 
 
 .maxentRemoveTmpFiles <- function() {
@@ -266,8 +266,6 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 		unlink(paste(d, "/*", sep=""), recursive = TRUE)
 	}
 }
-
-
 
 setMethod("plot", signature(x='MaxEnt', y='missing'), 
 	function(x, sort=TRUE, main='Variable contribution', xlab='Percentage', ...) {
@@ -280,3 +278,4 @@ setMethod("plot", signature(x='MaxEnt', y='missing'),
 		dotchart(r, main=main, xlab=xlab, ...)
 	}
 )
+

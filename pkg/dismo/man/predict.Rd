@@ -35,6 +35,7 @@ The following additional arguments can be passed, to replace default values, whe
   \tab \code{overwrite} \tab Logical. If TRUE, "filename" will be overwritten if it exists \cr
  }
 
+For Maxent models, there is an additional argument \code{'args'} used to pass arguments (options) to the maxent software. See  \code{ \link[dismo]{maxent}} for more information.
 }}
 
 \value{

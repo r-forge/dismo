@@ -5,7 +5,7 @@
 \title{Georeferencing}
 
 \description{
-A link to the biogeomancer automatic georeferencing web-service. 
+A link to the biogeomancer georeferencing web-service. 
 See \url{http://bg.berkeley.edu/latest/} for more information and a rich visual interface.
 }
 
@@ -25,6 +25,8 @@ biogeomancer(country = "", adm1 = "", adm2 = "", locality = "", singleRecord=TRU
 \value{
 data frame with three columns: longitude, latitude, and uncertainty (see Wieczorek et al., 2004). The datum is always WGS84.
 }
+
+\seealso{\code{\link[dismo]{geocode}}}
 
 \references{ 
 Guralnick, R.P., J. Wieczorek, R. Beaman, R.J. Hijmans and the BioGeomancer Working Group, 2006. BioGeomancer:  Automated georeferencing to map the world's biodiversity data. PLoS Biology 4: 1908-1909.

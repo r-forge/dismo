@@ -44,7 +44,8 @@ Robert J. Hijmans
 }
 
 \seealso{
-\code{\link[dismo]{predict}, \link[dismo]{geoDist}, \link[dismo]{convHull},  \link[dismo]{maxent}, \link[dismo]{domain}, \link[dismo]{mahal}}
+\code{\link[dismo]{predict}, \link[dismo]{geoDist}, \link[dismo]{convHull},  \link[dismo]{maxent}, \link[dismo]{domain}, 
+\link[dismo]{mahal}, \link[dismo]{convexHull}  }
 }
 
 
