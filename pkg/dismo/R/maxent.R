@@ -115,15 +115,15 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 	function(x, p, a=NULL, factors=NULL, ...) {
 #extract values for points from stack
 		p <- .getMatrix(p)
-		pv1 <- data.frame(xyValues(x, p))
+		pv <- data.frame(xyValues(x, p))
 
-		pv <- na.omit(pv1)
-		nas <- length(as.vector(attr(pv, "na.action")))
+		pv1 <- na.omit(pv)
+		nas <- length(as.vector(attr(pv1, "na.action")))
 		if (nas > 0) {
-			if (nas >= 0.5 * nrow(pv1)) {
+			if (nas >= 0.5 * nrow(pv)) {
 				stop('more than half of the presence points have NA predictor values')
 			} else {
-				warning(100*nas/nrow(pv1), '% of the presence points have NA predictor values')
+				warning(100*nas/nrow(pv), '% of the presence points have NA predictor values')
 			}
 		} 
 		
@@ -188,6 +188,8 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 
 		x <- cbind(p, x)
 		x <- na.omit(x)
+		x[is.na(x)] <- -9999  # maxent flag for NA, unless changed with args(nodata= ), so we should check for that.
+
 		p <- x[,1]
 		x <- x[, -1 ,drop=FALSE]
 

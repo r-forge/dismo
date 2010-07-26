@@ -23,6 +23,9 @@ public class mebridge {
 		Evaluate eval=null;
 		try {
 			eval = new Evaluate(lambda);
+			Params params = eval.getParams();	
+			params.readFromArgs(args);
+			
 		} catch (java.io.IOException e) {}
 		for (int i=0; i<vars.length; i++)
 			eval.setValue(vars[i], vals[i]);
