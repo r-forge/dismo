@@ -181,7 +181,7 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 
 		jar <- paste(system.file(package="dismo"), "/java/maxent.jar", sep='')
 		if (!file.exists(jar)) {
-			stop('file missing:', jar, '.\nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
+			stop('file missing:\n', jar, '.\nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
 		}
 		MEversion <- .getMeVersion()
 		if (substr(MEversion, 1, 3) == 'unk') {
