@@ -8,7 +8,7 @@
 
 gmap <- function (x, exp=1, type='terrain', filename='', ...) {
 
-	if (! raster:::.requireRgdal() ) { stop('rgdal not available') }
+	if (! require(rgdal)) { stop('rgdal not available') }
 	
 	if (! type %in% c('roadmap', 'satellite', 'hybrid', 'terrain')) {
 		warning("type should be: roadmap, satellite, hybrid, or terrain.") 
