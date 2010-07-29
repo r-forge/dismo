@@ -1,7 +1,7 @@
 # Author: Robert Hijmans
-# cropsim package
 # November 2009
 # License GPL3
+
 # First versions were based on the rollFun function implemented by Diethelm Wuertz in the 
 # fTrading package # Version: 2100.76 # Published:	2009-09-29
 
