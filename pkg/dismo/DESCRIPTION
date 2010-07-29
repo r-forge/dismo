@@ -3,8 +3,8 @@ Type: Package
 Title: Species distribution modeling
 Version: 0.5-2
 Date: 26-July-2010
-Depends: R (>= 2.7.0), rJava (>= 0.5-0), methods, raster, sp
-Suggests: rgdal, gbm, splines, XML, ROCR, deldir, gstat, randomForest, kernlab
+Depends: R (>= 2.7.0), methods, raster, rJava (>= 0.5-0)
+Suggests: rgdal, gbm, splines, XML, ROCR, deldir, gstat, randomForest, kernlab, maptools
 Author: Robert Hijmans, Steven Phillips, John Leathwick and Jane Elith
 Maintainer: <r.hijmans@gmail.com>
 Description: Functions for species distribution modeling, that is, predicting entire geographic distributions form occurences at specific sites.
