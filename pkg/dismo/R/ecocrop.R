@@ -65,29 +65,33 @@ setMethod ('plot', signature(x='ECOCROPcrop', y='missing'),
 )
 
 
-.getECOCROPcrops <- function() {
+.getECcrops <- function() {
 	thisenvir = new.env()
-	get( data(ECOCROPcrops, thisenvir), thisenvir)
+	get( data(ECOcrops, envir=thisenvir), thisenvir)
 }
 
-.showECOCROPcrops <- function() {
-	tab <- .getECOCROPcrops() 
-	tab[,c('NAME', 'SCIENTNAME')]
-}
 
-ecocropCrop <- function(name) {
-	if (missing(name)) {
-		.showECOCROPcrops() 
+getCrop <- function(name) {
+
+	showECcrops <- function() {
+		tab <- .getECcrops() 
+		tab[,c('NAME', 'SCIENTNAME')]
 	}
-	tab <- .getECOCROPcrops() 
+
+	if (missing(name)) {
+		return( showECcrops() )
+	}
+	
+	tab <- .getECcrops() 
 	tab1 <- toupper(as.vector(tab[,'NAME']))
 	tab2 <- toupper(as.vector(tab[,'SCIENTNAME']))
 	ind1 <- which(toupper(name) == tab1)
 	ind2 <- which(toupper(name) == tab2)
 	
 	if (length(ind1) == 0 & length(ind2) == 0) {
-		stop('Unknown crop. Choose from: ', .showECOCROPcrops())
+		stop('Unknown crop. See "getCrop()" for a list')
 	} 
+	
 	r <- max(ind1, ind2)
 	r <- as.matrix(tab[r,])
 	crop <- new('ECOCROPcrop')
@@ -171,25 +175,29 @@ setMethod ('plot', signature(x='ECOCROP', y='missing'),
 	return(y)
 }
 
+# Licence GPL v3
 
-ecocrop <- function(clm, crop, rain=TRUE) {
-	if (rain) { nasum <- sum(is.na(c(clm$tmin, clm$tmp, clm$pre)))
-	} else { nasum <- sum(is.na(c(clm$tmin, clm$tmp))) }
+
+.doEcocrop <- function(crop, tmin, tavg, prec, rainfed) {
+	
+	if (rainfed) {
+		nasum <- sum(is.na(c(tmin, tavg, prec)))
+	} else { 
+		nasum <- sum(is.na(c(tmin, tavg))) 
+	}
+
 	if (nasum > 0) { return( new('ECOCROP')) }
 	
-	if (class(crop) == 'character') {
-		crop <- ecocropCrop(crop)
-	}
 	
 	duration <- round((crop@GMIN + crop@GMAX) / 60) 
 	tmp <- c(crop@TMIN, crop@TOPMN, crop@TOPMX, crop@TMAX)
-	temp <- .getY(tmp, clm$temp)
+	temp <- .getY(tmp, tavg)
 	ktmp <- c(crop@KTMP, crop@KTMP, Inf, Inf)
-	tmin <- .getY(ktmp, clm$tmin-5)
-	if (rain) {
+	tmin <- .getY(ktmp, tmin-5)
+	if (rainfed) {
 		pre <- c(crop@RMIN, crop@ROPMN, crop@ROPMX, crop@RMAX)
-		shftprec <- c(clm$prec[12], clm$prec[-12])
-		cumprec <- movingFun(clm$prec, n=duration+1, fun=sum, type='from', circular=TRUE)  + shftprec
+		shftprec <- c(prec[12], prec[-12])
+		cumprec <- movingFun(prec, n=duration+1, fun=sum, type='from', circular=TRUE)  + shftprec
 		prec <- .getY(pre, cumprec)
 		allv <- cbind(temp, tmin, prec)
 	} else {
@@ -208,3 +216,66 @@ ecocrop <- function(clm, crop, rain=TRUE) {
 	return(obj)
 }
 
+
+ecocrop <- function(crop, tmin, tavg, prec, rainfed=TRUE, ...) {
+	if (class(crop) == 'character') {
+		crop <- getCrop(crop)
+	}
+	if (missing(prec) & rainfed) {
+		stop('prec missing while rainfed=TRUE' )
+	}
+	
+	if (inherits(tmin, 'Raster')) {
+		if (nlayers(tmin) != 12) {
+			stop()
+		}
+		.ecoSpat(crop, tmin, tavg, prec, rainfed)
+	} else {
+		.doEcocrop(crop=crop, tmin=tmin, tavg=tavg, prec=prec, rainfed=rainfed, ...)
+	}
+}
+
+
+.ecoSpat <- function(crop, tmin, tavg, prec, rainfed, filename='', ...) { 
+
+	if (rainfed) { 
+		prec <- getValues(prec, r) / 10 
+	}
+
+	outr <- raster(tmin)
+	filename <- trim(filename)
+	v <- vector(length=ncol(outr))
+	if (filename=='') {
+		vv <- matrix(ncol=nrow(outr), nrow=ncol(outr))
+	}
+	for (r in 1:nrow(outr)){
+		v[] <- NA
+		tmp <- getValues(tavg, r) / 10
+        tmn <- getValues(tmin, r) / 10
+        if (rainfed) { 
+			pre <- getValues(pre, r) / 10 
+		}
+        nac <- which(!is.na(tmn[,1]))
+        for (c in nac) {
+            if(sum(is.na(tmp)) == 0) {
+				e <- .doEcocrop(crop, tmn, tmp, pre, rainfed=rainfed)
+                v[c] <- e@maxper[1]
+            }
+        }
+        if (filename=='') {
+            vv[,r] <- v
+        } else {
+            outr <- setValues(outr, v, r)
+            outr <- writeRaster(outr, filename, ...)
+        }
+    }
+    
+	if (filename=='') { 
+		outr <- setValues(outr, as.vector(vv))  
+	}
+	
+    return(outr)
+ }
+
+
+ 
