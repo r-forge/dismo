@@ -9,7 +9,7 @@
 \usepackage{hyperref}
 
 % \VignetteIndexEntry{Species distribution modeling with R}
-% \VignetteDepends{dismo, maptools, kernlab, randomForest}
+% \VignetteDepends{dismo}
 % \VignetteKeyword{spatial}
 
 % options(width=65)
@@ -110,6 +110,7 @@ The records are from Bolivia (BOL), Peru (PER) and Argentina (ARG), confirming t
 It is important to cross-check coordinates by visual and other means. One approach is to compare the country (and lower level administrative subdivisions) of the site as specified by the records, with the country implied by the coordinates (Hijmans et al., 1999). In the example below we use the 'coordinates' function from the '\verb@sp@' package to create a SpatialPointsDataFrame, and then the 'overlay' function, also from '\verb@sp@', to do a point-in-polygon query with the countries polygons.
 
 <<sdm4>>=
+library(sp)
 coordinates(acgeo) = ~lon+lat
 ov = overlay(acgeo, wrld_simpl)
 cntr = as.character(wrld_simpl@data$NAME[ov])
