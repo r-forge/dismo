@@ -46,8 +46,7 @@ setMethod ('show' , 'MaxEnt',
 #		print(object@results)
 #		cat('\n')
 		if (file.exists(paste(object@path, "/maxent.html", sep=''))) {
-			url = paste("file:///", object@path, "/maxent.html", sep='')
-			browseURL(url, browser = getOption("browser"))
+			browseURL( paste("file:///", object@path, "/maxent.html", sep='') )
 		} else {
 			cat('output html file no longer exists\n')
 		}

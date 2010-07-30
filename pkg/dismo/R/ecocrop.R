@@ -236,11 +236,7 @@ ecocrop <- function(crop, tmin, tavg, prec, rainfed=TRUE, ...) {
 }
 
 
-.ecoSpat <- function(crop, tmin, tavg, prec, rainfed, filename='', ...) { 
-
-	if (rainfed) { 
-		prec <- getValues(prec, r) / 10 
-	}
+.ecoSpat <- function(crop, tmin, tavg, prec, rainfed, div=10, filename='', ...) { 
 
 	outr <- raster(tmin)
 	filename <- trim(filename)
@@ -250,10 +246,10 @@ ecocrop <- function(crop, tmin, tavg, prec, rainfed=TRUE, ...) {
 	}
 	for (r in 1:nrow(outr)){
 		v[] <- NA
-		tmp <- getValues(tavg, r) / 10
-        tmn <- getValues(tmin, r) / 10
+		tmp <- getValues(tavg, r) / div
+        tmn <- getValues(tmin, r) / div
         if (rainfed) { 
-			pre <- getValues(pre, r) / 10 
+			pre <- getValues(prec, r)
 		}
         nac <- which(!is.na(tmn[,1]))
         for (c in nac) {
