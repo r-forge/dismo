@@ -36,12 +36,11 @@ The following additional arguments can be passed, to replace default values, whe
  }
 
 
-For Maxent models, there is an additional argument \code{'args'} used to pass arguments (options) to the maxent software. See  \code{ \link[dismo]{maxent}} for more information.
+For \link[dismo]{maxent} models, there is an additional argument \code{'args'} used to pass arguments (options) to the maxent software. See the help page for \code{ \link[dismo]{maxent}} for more information.
  
-For Bioclim models, there is an additional argument \code{'tails'} which you can use to ignore the left or right tail of the percentile distribution for a variable. If supplied, tails should be a character vector with a length equal to the number of variables used in the model. Valid values are "both" (the default), "low" and "high". For example, if you have a variable x with an observed distribution between 10 and 20 and you are predicting the bioclim value for a value 25, the default result would be zero (outside of all observed values); but if you use tail='low', the high (right) tail is ignored and the value returned will be 1.
+For \link[dismo]{bioclim} models, there is an additional argument \code{'tails'} which you can use to ignore the left or right tail of the percentile distribution for a variable. If supplied, tails should be a character vector with a length equal to the number of variables used in the model. Valid values are "both" (the default), "low" and "high". For example, if you have a variable x with an observed distribution between 10 and 20 and you are predicting the bioclim value for a value 25, the default result would be zero (outside of all observed values); but if you use tail='low', the high (right) tail is ignored and the value returned will be 1.
  
- 
-}}
+ }}
 
 \value{
 A RasterLayer or, if \code{x} is a matrix), a vector. 
