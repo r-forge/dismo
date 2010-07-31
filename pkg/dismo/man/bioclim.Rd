@@ -14,7 +14,9 @@
 
 
 \description{
-The Bioclim algorithm has been extensively used for species distribution modeling. Bioclim is the classic 'climate-envelope-model'. Although it generally does not perform as good as some other modeling methods (Elith et al. 2006, Hijmans and Graham, 2006), it is still used, among other reasons because the algorithm is easy to understand and thus useful in teaching species distribution modeling. The BIOCLIM algorithm computes the similarity of a location by comparing the values of environmental variables at any location to a percentile distribution of the values at known locations of occurence ('training sites'). The closer to the 50th percentile (the median), the more suitable the location is. The tails of the distribution are not distinguished, that is, 10 percentile is treated as equivalent to 90 percentile. In this implementation in R, the values of the upper tail values are transformed to the lower tail, and the minimum percentile score across all the environmental variables is used (i.e. BIOCLIM using an approach like Liebig's law of the minimum). This value is substracted from 1 and then mutlipled with two so that the results are between 0 and 1. The reason for scaling this way is that the results become more like that of other distributon modeling methods and are thus easier to interpret. The value 1 will rarely be observed as it would require a location that has the median value of the training data for all the variables considered. The value 0 is very common as it is assinged to all cells with a value of an environmental variable that is outside the percentile distribution (the range of the training data) for at least one of the variables.
+The Bioclim algorithm has been extensively used for species distribution modeling. Bioclim is the classic 'climate-envelope-model'. Although it generally does not perform as good as some other modeling methods (Elith et al. 2006, Hijmans and Graham, 2006), it is still used, among other reasons because the algorithm is easy to understand and thus useful in teaching species distribution modeling. The BIOCLIM algorithm computes the similarity of a location by comparing the values of environmental variables at any location to a percentile distribution of the values at known locations of occurence ('training sites'). The closer to the 50th percentile (the median), the more suitable the location is. The tails of the distribution are not distinguished, that is, 10 percentile is treated as equivalent to 90 percentile. In this implementation in R, the values of the upper tail values are transformed to the lower tail, and the minimum percentile score across all the environmental variables is used (i.e. BIOCLIM using an approach like Liebig's law of the minimum). This value is substracted from 1 and then mutlipled with two so that the results are between 0 and 1. The reason for scaling this way is that the results become more like that of other distributon modeling methods and are thus easier to interpret. The value 1 will rarely be observed as it would require a location that has the median value of the training data for all the variables considered. The value 0 is very common as it is assinged to all cells with a value of an environmental variable that is outside the percentile distribution (the range of the training data) for at least one of the variables. 
+
+In the \link[dismo]{predict} function, you can choose to ignore one of the tails of the distribution (e.g, to make low rainfall a limiting factor, but not high rainfall),
 }
 
 
@@ -70,6 +72,8 @@ bc <- bioclim(logo, pts)
 #or
 v <- xyValues(logo, pts)
 bc <- bioclim(v)
+p <- predict(logo, bc)
+p <- predict(logo, bc, tails=c('both', 'low', 'high'))
 
 #or
 sp <- SpatialPoints(pts)
