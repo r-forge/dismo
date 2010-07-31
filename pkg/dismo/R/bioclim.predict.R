@@ -92,7 +92,7 @@ function(object, x, tails=NULL, ext=NULL, filename='', progress='text', ...) {
 			k <- (apply(t(vals) >= object@min, 2, all) & apply(t(vals) <= object@max, 2, all))
 			k[is.na(k)] <- FALSE
 			for (j in 1:length(ln)) {
-				bc[k,j] <- percRank( object@presence[ ,ln[j]], vals[k, ln[j]], tails[i] )
+				bc[k,j] <- percRank( object@presence[ ,ln[j]], vals[k, ln[j]], tails[j] )
 			}
 
 			res <- apply(bc, 1, min)
