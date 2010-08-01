@@ -1,5 +1,5 @@
 
-gorilla <- function(alt, P, P50, TSD) {
+.gorilla <- function(alt, P, P50, TSD) {
 
 	groupSize <- 0
 	while (TRUE) {
@@ -39,7 +39,7 @@ gorilla <- function(alt, P, P50, TSD) {
 # P2T = plant productivity index (the number of months in the year in which rainfall [in mm] was more than twice the average monthly temperature (Le Houérou 1984))
 
 
-apes <- function(alt=1000, Tann=22.5, TmoSD=0.77, Pann=1680, P2T=10, forestcover=80, moimomx=0.5, species='gorilla') {
+.apes <- function(alt=1000, Tann=22.5, TmoSD=0.77, Pann=1680, P2T=10, forestcover=80, moimomx=0.5, species='gorilla') {
 	if (species == 'chimp') {
 		bm <- 40
 	} else if (species == 'gorilla') {

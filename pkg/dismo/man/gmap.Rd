@@ -36,7 +36,9 @@ A RasterLayer
 \note{
 If argument \code{x} is a textual locatlity description, the \code{\link[dismo]{geocode}} function is used to retrieve the extent that should be mapped.
 
-Note that the returned RasterLayer has a Mercator projection. To plot points (or lines or polygons) on top of it, these need to be transformed first.
+Change the type to 'roadmap' if the map returned says "sorry we have no imagery here"; or use a larger extent.
+
+The returned RasterLayer has a Mercator projection. To plot points (or lines or polygons) on top of it, these need to be transformed first.
 
 A matrix of lon/lat data can be transformed with the Mercator function used in the example. 'Spatial*' objects can be transformed with spTransform
 p <- spTransform(x, "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs")
@@ -61,6 +63,8 @@ points(Mercator(xy) , col='red', pch=20)
 
 # or from an Extent object
 e = extent( -121.9531 , -120.3897 , 35.36 , 36.61956 )
+# you can also get an Extent object by clicking on the map twice after using:
+# drawExtent()
 r = gmap(e)
 plot(r, interpolate=TRUE)
 
