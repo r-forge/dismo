@@ -73,7 +73,7 @@ gmap <- function (x, exp=1, type='terrain', filename='', ...) {
 	gurl <- "http://maps.google.com/staticmap?"
 		
 	if (is.character(x)) {
-		x <- geocode(x[1])[1,4:7]
+		x <- geocode(x, boxes='one')
 		if (any(is.na(x))) {
 			stop('location not found')
 		}
