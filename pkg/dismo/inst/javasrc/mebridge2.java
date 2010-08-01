@@ -6,7 +6,7 @@
 
 import density.*;
 
-public class mebridge {
+public class mebridge2 {
 
 	public static void main(String args[]) {
 	
@@ -18,6 +18,51 @@ public class mebridge {
 		return str;
 	}
 
+	public String fit(String cmd[]) {
+		Params params = new Params();
+		String str = params.readFromArgs(cmd);
+		if (str == null) {
+			params.setSelections();
+			Runner runner = new Runner(params);
+			runner.start();
+			runner.end();
+		}	
+		return(str);
+	}
+	
+	public String fit(String cmd[], String[] categorical) {
+		Params params = new Params();
+		String str = params.readFromArgs(cmd);
+		if (str == null) {
+			params.setPrefixes(false);
+			for (int i=0; i<categorical.length; i++) {
+				if (categorical[i] != "") {
+					params.parseParam("togglelayertype="+categorical[i]);
+				}
+			}
+			params.setSelections();
+			Runner runner = new Runner(params);
+			runner.start();
+			runner.end();
+		}
+		return(str);
+	}
+
+	
+	public String testPredictArgs(String lambda, String[] args) {
+		Evaluate eval=null;
+		String par=null;
+		try {
+
+			eval = new Evaluate(lambda);
+			Params params = eval.getParams();	
+			par = params.readFromArgs(args);
+			
+		} catch (java.io.IOException e) {}
+		
+		return(par);
+
+	}
 	
 	public double predict (String lambda, String[] vars, double[] vals, String[] args) {
 		Evaluate eval=null;
@@ -56,7 +101,12 @@ public class mebridge {
 		}
 		return(p);
 	}
+
 	
+	
+}
+
+
 //	public double predict (String lambda, String[] vars, int[] vals, String[] args) {
 //		Evaluate eval=null;
 //		try {
@@ -87,33 +137,4 @@ public class mebridge {
 //		}
 //		return(p);
 //	}
-
-	
-	public void fit(String cmd[]) {
-		Params params = new Params();
-		params.readFromArgs(cmd);
-        params.setSelections();
-        Runner runner = new Runner(params);
-		runner.start();
-		runner.end();
-	}
-	
-	public void fit(String cmd[], String[] categorical) {
-		Params params = new Params();
-		params.readFromArgs(cmd);
-		params.setPrefixes(false);
-		for (int i=0; i<categorical.length; i++) {
-			if (categorical[i] != "") {
-				params.parseParam("togglelayertype="+categorical[i]);
-			}
-		}
-		
-        params.setSelections();
-        Runner runner = new Runner(params);
-		runner.start();
-		runner.end();
-	}
-	
-}
-
 
