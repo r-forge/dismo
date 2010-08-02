@@ -47,6 +47,8 @@ p <- spTransform(x, "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_
 \author{Robert Hijmans, largely based on code by Markus Loecher, Sense Networks <markus at sensenetworks.com>}
 
 \examples{
+\dontrun{
+if(require(rgdal)){
 # get a map using names
 g = gmap('Australia')
 plot(g, inter=TRUE)
@@ -82,6 +84,8 @@ coordinates(pt) = ~X1 + X2
 pt@proj4string <- CRS("+proj=longlat +datum=WGS84 +ellps=WGS84")
 ptm2 <- spTransform(pt, CRS("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs"))
 points(ptm, col='red', pch='x', cex=3)
+}
+}
 }
 }
 
