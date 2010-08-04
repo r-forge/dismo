@@ -54,6 +54,10 @@ g = gmap('Australia')
 plot(g, inter=TRUE)
 gs = gmap('Sydney, New South Wales, Australia', type='satellite')
 plot(gs, inter=TRUE)
+gs = gmap('Sydney, Australia', type='satellite', exp=3)
+plot(gs, inter=TRUE)
+gs = gmap('Sydney, Australia', type='hybrid', exp=8)
+plot(gs, inter=TRUE)
 
 # from a maxtrix with lon/lat points
 x = runif(30)*10 + 40
@@ -78,13 +82,12 @@ Mercator(ptm, inverse=TRUE)
 
 # transform Spatial objects to Mercator for plotting on top of map
 # here for points, but particularly relevant for lines and polygons
-if (require(rgdal)) {
 pt <- data.frame(pt)
 coordinates(pt) = ~X1 + X2
 pt@proj4string <- CRS("+proj=longlat +datum=WGS84 +ellps=WGS84")
 ptm2 <- spTransform(pt, CRS("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs"))
 points(ptm, col='red', pch='x', cex=3)
-}
+
 }
 }
 }
