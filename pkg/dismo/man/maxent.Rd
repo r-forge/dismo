@@ -68,12 +68,12 @@ plot(predictors)
 occurence <- paste(system.file(package="dismo"), '/ex/bradypus.csv', sep='')
 occ <- read.table(occurence, header=TRUE, sep=',')[,-1]
 
-# witholding a 20% sample for testing 
-fold <- kfold(occ, k=5)
-occtrain <- occ[fold != 1, ]
-
 # fit model, biome is a categorical variable
 me <- maxent(predictors, occ, factors='biome')
+# see the maxent results in a browser:
+# me
+
+# use "args"
 # me2 <- maxent(predictors, occ, factors='biome', args=c("-J", "-P"))
 
 # plot showing importance of each variable
