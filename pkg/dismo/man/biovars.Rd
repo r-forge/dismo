@@ -31,41 +31,41 @@ Input data is normaly monthly. I.e. there should be 12 values (layers) for each 
 \value{
 Depending on the class of the input data, an object of class 'vector', 'matrix' or 'RasterBrick' with 19 variables (columns, layers)
 
-BIO1 = Mean annual temperature
+bio1 = Mean annual temperature
 
-BIO2 = Mean diurnal range (mean of max temp - min temp)
+bio2 = Mean diurnal range (mean of max temp - min temp)
 
-BIO3 = Isothermality (BIO2/BIO7) (* 100)
+bio3 = Isothermality (bio2/bio7) (* 100)
 
-BIO4 = Temperature seasonality (standard deviation *100)
+bio4 = Temperature seasonality (standard deviation *100)
 
-BIO5 = Max temperature of warmest month
+bio5 = Max temperature of warmest month
 
-BIO6 = Min temperature of coldest month
+bio6 = Min temperature of coldest month
 
-BIO7 = Temperature annual range (BIO5-BIO6)
+bio7 = Temperature annual range (bio5-bio6)
 
-BIO8 = Mean temperature of the wettest quarter
+bio8 = Mean temperature of the wettest quarter
 
-BIO9 = Mean temperature of driest quarter 
+bio9 = Mean temperature of driest quarter 
 
-BIO10 = Mean temperature of warmest quarter
+bio10 = Mean temperature of warmest quarter
 
-BIO11 = Mean temperature of coldest quarter
+bio11 = Mean temperature of coldest quarter
 
-BIO12 = Total (annual) precipitation
+bio12 = Total (annual) precipitation
 
-BIO13 = Precipitation of wettest month
+bio13 = Precipitation of wettest month
 
-BIO14 = Precipitation of driest month
+bio14 = Precipitation of driest month
 
-BIO15 = Precipitation seasonality (coefficient of variation)
+bio15 = Precipitation seasonality (coefficient of variation)
 
-BIO16 = Precipitation of wettest quarter
+bio16 = Precipitation of wettest quarter
 
-BIO17 = Precipitation of driest quarter
+bio17 = Precipitation of driest quarter
 
-BIO18 = Precipitation of warmest quarter
+bio18 = Precipitation of warmest quarter
 }
 
 \author{
