@@ -110,7 +110,19 @@ setMethod('biovars', signature(prec='matrix', tmin='matrix', tmax='matrix'),
 		if (nrow(prec) != nrow(tmin) | nrow(tmin) != nrow(tmax) ) {
 			stop('prec, tmin and tmax should have same length')
 		}
-	
+		
+		if (ncol(prec) != ncol(tmin) | ncol(tmin) != ncol(tmax) ) {
+			stop('prec, tmin and tmax should have same number of columns')
+		}
+		
+		# can't have missing values in a row
+		nas <- apply(prec, 1, function(x){ any(is.na(x)) } )
+		prec[nas,] <- NA
+		nas <- apply(tmin, 1, function(x){ any(is.na(x)) } )
+		tmin[nas,] <- NA
+		nas <- apply(tmax, 1, function(x){ any(is.na(x)) } )
+		tmax[nas,] <- NA
+		
 		window <- function(x)  { 
 			lng <- length(x)
 			x <- c(x,  x[1:3])
@@ -155,27 +167,35 @@ setMethod('biovars', signature(prec='matrix', tmin='matrix', tmax='matrix'),
 		p[,17] <- apply(wet, 1, min)
 		tmp <- t(apply(tavg, 1, window)) / 3
 		
+		if (all(is.na(wet))) {
+			p[,8] <- NA		
+			p[,9] <- NA		
+		} else {
 # P8. Mean Temperature of Wettest Quarter 
-		wetqrt <- cbind(1:nrow(p), apply(wet, 1, which.max))
-		p[,8] <- tmp[wetqrt]
-
+			wetqrt <- cbind(1:nrow(p), as.integer(apply(wet, 1, which.max)))
+			p[,8] <- tmp[wetqrt]
 # P9. Mean Temperature of Driest Quarter 
-		dryqrt <- cbind(1:nrow(p), apply(wet, 1, which.min))
-		p[,9] <- tmp[dryqrt]
-
+			dryqrt <- cbind(1:nrow(p), as.integer(apply(wet, 1, which.min)))
+			p[,9] <- tmp[dryqrt]
+		}
 # P10 Mean Temperature of Warmest Quarter 
 		p[,10] <- apply(tmp, 1, max)
 
 # P11 Mean Temperature of Coldest Quarter
 		p[,11] <- apply(tmp, 1, min) 
 
+		if (all(is.na(tmp))) {
+			p[,18] <- NA		
+			p[,19] <- NA
+		} else {
 # P18. Precipitation of Warmest Quarter 
-		hot <- cbind(1:nrow(p),apply(tmp, 1, which.max))
-		p[,18] <- wet[hot]
-
+			hot <- cbind(1:nrow(p), as.integer(apply(tmp, 1, which.max)))
+			p[,18] <- wet[hot]
 # P19. Precipitation of Coldest Quarter 
-		cold <- cbind(1:nrow(p), apply(tmp, 1, which.min))
-		p[,19] <- wet[cold]
+			cold <- cbind(1:nrow(p), as.integer(apply(tmp, 1, which.min)))
+			p[,19] <- wet[cold]
+		}
+		
 		return(p)	
 	}
 )

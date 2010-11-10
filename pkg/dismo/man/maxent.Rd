@@ -36,11 +36,9 @@ Additional arguments:
 \cr
 
 
-if you want to give maxent (the Java virtual machine that runs it) more memory, you do that by running something like this (for 4 GB)
+if you want to give maxent (the Java virtual machine that runs it) more memory, you do that by running something like this (for 1 GB) \bold{before} you load the dismo library.
 
-\code{options(java.parameters = "-Xmx4g" )} 
-
-_before_ you load the dismo library.
+\code{options(java.parameters = "-Xmx1g" )} 
 }
 }
 
@@ -121,7 +119,6 @@ testa <- predict(me, avtest)
 e3 = evaluate(p=testp, a=testa)
 e3
 plot(e3, 'ROC')
-
 }
 }
 
