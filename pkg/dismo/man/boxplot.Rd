@@ -22,7 +22,6 @@ Arguments:
 }
 
 
-
 \seealso{
 \code{\link[dismo]{evaluate} }
 }
