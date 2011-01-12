@@ -56,7 +56,7 @@ setMethod('biovars', signature(prec='vector', tmin='vector', tmax='vector'),
 
 
 setMethod('biovars', signature(prec='Raster', tmin='Raster', tmax='Raster'), 
-	function(prec, tmin, tmax, filename='', ...) {
+	function(prec, tmin, tmax, filename='', progress='', ...) {
 
 	if (nlayers(prec) != 12) stop('nlayers(prec) is not 12')
 	if (nlayers(tmin) != 12) stop('nlayers(tmin) is not 12')
@@ -65,9 +65,10 @@ setMethod('biovars', signature(prec='Raster', tmin='Raster', tmax='Raster'),
 	compare(prec, tmin, tmax)
 
 	out <- brick(prec, values=FALSE)
+	out@layernames <- paste('bio', 1:19, sep="")
 	
 	filename <- trim(filename)
-	if (!.canProcessInMemory(out, 18)) {
+	if (!canProcessInMemory(out, 18)) {
 		if (filename == '') { 
 			filename <- rasterTmpFile()
 		}
@@ -91,6 +92,7 @@ setMethod('biovars', signature(prec='Raster', tmin='Raster', tmax='Raster'),
 			v[tr$row[i]:(tr$row[i]+tr$nrows[i]-1),] <- p
 		}
 	}
+	
 	if (filename == "") {
 		out <- setValues(out, v)
 	} else {
