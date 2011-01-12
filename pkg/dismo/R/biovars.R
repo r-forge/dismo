@@ -64,8 +64,7 @@ setMethod('biovars', signature(prec='Raster', tmin='Raster', tmax='Raster'),
 	
 	compare(prec, tmin, tmax)
 
-	out <- brick(raster(prec))
-	out@data@nlayers  <- 19
+	out <- brick(prec, values=FALSE)
 	
 	filename <- trim(filename)
 	if (!.canProcessInMemory(out, 18)) {
