@@ -63,8 +63,11 @@ if (!isGeneric("maxent")) {
 	mxe <- .jnew("mebridge1") 
 	v <- try(.jcall(mxe, "S", "meversion") )
 	if (class(v) == 'try-error') {
-		stop('"dismo" needs a more recent version of Maxent (>= 3.3.3) \nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
+		stop('"dismo" needs a more recent version of Maxent (3.3.3b or later) \nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
 	} else {
+		if (v == '3.3.3' | v == '3.3.3a') { 
+			stop("please update your maxent program to version 3.3.3b or later. This version is no longer supported. \nYou can download it here: http://www.cs.princeton.edu/~schapire/maxent/'")
+		}
 		return(v)
 	}
 }
