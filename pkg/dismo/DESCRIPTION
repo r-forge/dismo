@@ -1,8 +1,8 @@
 Package: dismo
 Type: Package
 Title: Species distribution modeling
-Version: 0.5-16
-Date: 3-February-2011
+Version: 0.5-17
+Date: 4-February-2011
 Depends: R (>= 2.10.0), methods, raster (>= 1.7-0), rJava (>= 0.5-0)
 Suggests: rgdal, gbm, splines, XML, ROCR, deldir, gstat, randomForest, kernlab, maptools
 Author: Robert J. Hijmans, Steven Phillips, John Leathwick and Jane Elith
