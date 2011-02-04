@@ -77,7 +77,9 @@ setMethod('maxent', signature(x='missing', p='missing'),
 		if (!file.exists(jar)) {
 			stop('maxent program is missing:', jar, '.\nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
 		}
-		cat('version', .getMeVersion(), '\n' )
+		v <- .getMeVersion()
+		cat('This is MaxEnt version', v, '\n' )
+		return(invisible(v))
 	}
 )
 
