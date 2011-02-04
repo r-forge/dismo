@@ -6,7 +6,7 @@
 
 import density.*;
 
-public class mebridge2 {
+public class mebridge {
 
 	public static void main(String args[]) {
 	
