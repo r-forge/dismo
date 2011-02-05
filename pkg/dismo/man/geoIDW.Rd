@@ -1,10 +1,10 @@
 \name{InvDistW}
 \Rdversion{1.1}
 
-\alias{idwModel}
-\alias{idwModel,SpatialPoints,SpatialPoints-method}
-\alias{idwModel,matrix,matrix-method}
-\alias{idwModel,data.frame,data.frame-method}
+\alias{geoIDW}
+\alias{geoIDW,SpatialPoints,SpatialPoints-method}
+\alias{geoIDW,matrix,matrix-method}
+\alias{geoIDW,data.frame,data.frame-method}
 
 
 \title{Inverse-distance weighted model}
@@ -14,7 +14,7 @@ Inverse-distance weighted predictions for presence/absence data. Computed with t
 }
 
 \usage{
-idwModel(p, a, ...)
+geoIDW(p, a, ...)
 }
 
 \arguments{
