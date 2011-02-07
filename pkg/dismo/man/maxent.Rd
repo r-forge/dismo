@@ -34,10 +34,21 @@ Additional arguments:
 \tab \code{factors} \tab Which (if any) variables should be considered as categorical? Either by (layer)name or by index. Only used when argument \code{x} is a Raster* object because it is not needed in other cases as you can set the appropriate class to the variables in the data.frame \cr 
 \tab \code{args} \tab Additional argument that can be passed to Maxent. See the Maxent help. For this function, only the arguments relevant to model fitting are used. (e.g. there is no point in using args='outputformat=raw' when *fitting* the model; but you can use these in the \code{predict} functions. Some others (e.g. outputfiletype) do not apply at all to the R implementation (the "predict" function has its own arguments for that) \cr
 }
+}
 
+
+\note{
 if you want to give maxent (the Java virtual machine that runs it) more memory, you do that by running something like this (for 1 GB) \bold{before} you load the dismo library.
 
 \code{options(java.parameters = "-Xmx1g" )} 
+
+
+Some people have reported problems when using this function on a Mac (Apple) computer. Specifically, the following error message occurs:
+
+Error in .jcall(mxe, "S", "fit", c("autorun", "-e", afn, "-o", dirout, : java.lang.InternalError: Can't start the AWT because
+Java was started on the first thread. Make sure StartOnFirstThread is not specified in your application's Info.plist or on the command line.
+
+This is a known problem with certain Java applications on Macs. The only work around that we are aware of, is to run the maxent function from the JGR interface (a Java based R GUI), instead of from, e.g., Rgui. You can install JGR from here: \url{http://www.rforge.net/JGR/}
 }
 
 
