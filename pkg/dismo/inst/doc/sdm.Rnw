@@ -41,11 +41,6 @@ SDM have been implemented in \R in many different ways. Here we focus on the fun
 \verb@install.packages(c('rJava', 'XML', 'sp', 'raster', 'dismo', 'rgdal'))@
 
 
-\includegraphics{sdm.png}
-
-Figure (source:   )
-
-
 
 \part{Data preparation}
 
