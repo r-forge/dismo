@@ -219,8 +219,10 @@ Here we make a list of files that are installed with the dismo package and then 
 
 <<sdm9, fig=TRUE>>=
 files <- list.files(path=paste(system.file(package="dismo"), 
-				'/ex', sep=''), pattern='grd', full.names=TRUE )
-#this (above) finds all the files with extension "grd" in the examples ("ex") directory for the dismo package.
+			'/ex', sep=''), pattern='grd', full.names=TRUE )
+# The above finds all the files with extension "grd" in the examples
+# ("ex") directory of the dismo package. You do not need such a complex
+# statement to get your own files
 files
 predictors <- stack(files)
 predictors
