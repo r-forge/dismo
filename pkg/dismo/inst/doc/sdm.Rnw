@@ -246,12 +246,12 @@ The example above uses data representing 'bioclimatic variables' from the WorldC
 
 \section{Extracting values from rasters}
 
-We now have a set of predictor variables (rasters) and occurrence points. The next step is to extract the values of the predictors at the locations of the points. (This step can be skipped for the modeling methods that are implemented in the dismo package). This is very straightfoward thing to do using the xyValues function from the raster package. In the example below we use that function first for the \textit{Bradypus} occurrence points, then for 500 random background points. We combine these into a single \texttt{data.frame} in which the first column (variable 'pb') indicates whether this is a presence or a background point. 'biome' is categorical variable (called a 'factor' in \R) and it is important to explicitly define it that way (so that it won't be treated like any other numerical variable).
+We now have a set of predictor variables (rasters) and occurrence points. The next step is to extract the values of the predictors at the locations of the points. (This step can be skipped for the modeling methods that are implemented in the dismo package). This is very straightfoward thing to do using the 'extract' function from the raster package. In the example below we use that function first for the \textit{Bradypus} occurrence points, then for 500 random background points. We combine these into a single \texttt{data.frame} in which the first column (variable 'pb') indicates whether this is a presence or a background point. 'biome' is categorical variable (called a 'factor' in \R) and it is important to explicitly define it that way (so that it won't be treated like any other numerical variable).
 
 <<sdm12, fig=TRUE>>=
-presvals <- xyValues(predictors, bradypus)
+presvals <- extract(predictors, bradypus)
 backgr <- randomPoints(predictors, 500)
-absvals <- xyValues(predictors, backgr)
+absvals <- extract(predictors, backgr)
 pb <- c(rep(1, nrow(presvals)), rep(0, nrow(absvals)))
 sdmdata <- data.frame(cbind(pb, rbind(presvals, absvals)))
 sdmdata[,'biome'] = as.factor(sdmdata[,'biome'])
@@ -554,13 +554,13 @@ The remaining models need to be fit presence textif{and} absence (background) da
 <<sdm40>>=
 train <- rbind(pres_train, backg_train)
 pb_train <- c(rep(1, nrow(pres_train)), rep(0, nrow(backg_train)))
-envtrain <- xyValues(predictors, train)
+envtrain <- extract(predictors, train)
 envtrain <- data.frame( cbind(pa=pb_train, envtrain) )
 envtrain[,'biome'] = factor(envtrain[,'biome'], levels=1:14)
 head(envtrain)
 
-testpres <- data.frame( xyValues(predictors, pres_test) )
-testbackg <- data.frame( xyValues(predictors, backg_test) )
+testpres <- data.frame( extract(predictors, pres_test) )
+testbackg <- data.frame( extract(predictors, backg_test) )
 testpres[ ,'biome'] = factor(testpres[ ,'biome'], levels=1:14)
 testbackg[ ,'biome'] = factor(testbackg[ ,'biome'], levels=1:14)
 @
