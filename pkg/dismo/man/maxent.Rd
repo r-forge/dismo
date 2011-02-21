@@ -118,8 +118,8 @@ e1 = evaluate(me, p=occtest, a=bg, x=predictors)
 
 # alternative 1
 # extract values
-pvtest <- data.frame(xyValues(predictors, occtest))
-avtest <- data.frame(xyValues(predictors, bg))
+pvtest <- data.frame(extract(predictors, occtest))
+avtest <- data.frame(extract(predictors, bg))
 
 e2 = evaluate(me, p=pvtest, a=avtest)
 

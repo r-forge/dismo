@@ -119,7 +119,7 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 	function(x, p, a=NULL, factors=NULL, ...) {
 #extract values for points from stack
 		p <- .getMatrix(p)
-		pv <- data.frame(xyValues(x, p))
+		pv <- data.frame(extract(x, p))
 
 		pv1 <- na.omit(pv)
 		nas <- length(as.vector(attr(pv1, "na.action")))
@@ -133,7 +133,7 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 		
 		if (! is.null(a) ) {
 			a = .getMatrix(a)
-			av <- data.frame(xyValues(x, a))
+			av <- data.frame(extract(x, a))
 			avr = nrow(av)
 			av <- na.omit(av)
 			nas <- length(as.vector(attr(av, "na.action")))
@@ -147,7 +147,7 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 		} else { 
 		# random absence
 			xy <- randomPoints( raster(x,1), 10000, p, warn=0 )
-			av <- data.frame(xyValues(x, xy))
+			av <- data.frame(extract(x, xy))
 			av <- na.omit(av)
 			if (nrow(av) == 0) {
 				stop('could not get valid background point values; is there a layer with only NA values?')
