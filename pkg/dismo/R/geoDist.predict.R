@@ -8,7 +8,7 @@
 setMethod('predict', signature(object='GeographicDistance'), 
 	function(object, x, ext=NULL, filename='', mask=FALSE, progress='text', ...) {
 	
-		inverse = function(x) { x[x>0] <- 1/x[x>0]; return(x) }
+		inverse <- function(x) { x[x>0] <- 1/x[x>0]; x[x<=0] <- 1; return(x) }
 
 		if ( extends(class(x), 'Raster'))  {
 			if (! mask) {
@@ -28,11 +28,13 @@ setMethod('predict', signature(object='GeographicDistance'),
 			
 		} else {
 		
-			if ( inherits(x, 'SpatialPoints') )  { x = coordinates(x) }
+			if ( inherits(x, 'SpatialPoints') )  { 
+				x = coordinates(x) 
+			}
 			
 			res <- vector(length=nrow(x))
 			for (i in 1:nrow(x)) {
-				res[i] <- min( pointDistance(x[i,], object@presence) )
+				res[i] <- min( pointDistance(x[i,], object@presence, longlat=object@lonlat) )
 			}	
 			return(inverse(res))
 		}
