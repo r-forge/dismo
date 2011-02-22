@@ -6,9 +6,19 @@
 
 
 setMethod('predict', signature(object='GeographicDistance'), 
-	function(object, x, ext=NULL, filename='', mask=FALSE, progress='text', ...) {
+	function(object, x, ext=NULL, filename='', mask=FALSE, progress='text', fun=NULL, ...) {
 	
-		inverse <- function(x) { x[x>0] <- 1/x[x>0]; x[x<=0] <- 1; return(x) }
+		if (is.null(fun)) {
+			inverse <- function(x) {
+				x[x < 1] <- 1
+				1/x
+			}
+		} else {
+			inverse <- function(x) {
+				x[x < 1] <- 1
+				fun(1/x)
+			}
+		}
 
 		if ( extends(class(x), 'Raster'))  {
 			if (! mask) {
