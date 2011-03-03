@@ -146,7 +146,7 @@ setMethod('biovars', signature(prec='matrix', tmin='matrix', tmax='matrix'),
 # P2. Mean Diurnal Range(Mean(period max-min)) 
 		p[,2] <- apply(tmax-tmin, 1, mean)
 # P4. Temperature Seasonality (standard deviation) 
-		p[,4] <- apply(tavg, 1, sd)
+		p[,4] <- 100 * apply(tavg, 1, sd)
 # P5. Max Temperature of Warmest Period 
 		p[,5] <- apply(tmax,1, max)
 # P6. Min Temperature of Coldest Period 
@@ -154,7 +154,7 @@ setMethod('biovars', signature(prec='matrix', tmin='matrix', tmax='matrix'),
 # P7. Temperature Annual Range (P5-P6) 
 		p[,7] <- p[,5] - p[,6]
 # P3. Isothermality (P2 / P7) 
-		p[,3] <- p[,2] / p[,7]
+		p[,3] <- 100 * p[,2] / p[,7]
 # P12. Annual Precipitation 
 		p[,12] <- apply(prec, 1, sum)
 # P13. Precipitation of Wettest Period 
