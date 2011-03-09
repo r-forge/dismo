@@ -4,8 +4,8 @@
 # Version 0.1
 # October 2008
 
-
-geocode <- function(x, boxes='', extent=NULL) {
+# this function has been made invisible because it appearst to be in conflict with the Google terms of use
+.geocode <- function(x, boxes='', extent=NULL) {
 
 	if (! require(XML)) stop('You need to install the XML package to be able use this function')
 
