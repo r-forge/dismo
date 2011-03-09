@@ -6,7 +6,10 @@
 # Based on functions in R package 'RgoogleMaps' 
 # by Markus Loecher, Sense Networks <markus at sensenetworks.com>
 
-gmap <- function (x, exp=1, type='terrain', filename='', ...) {
+
+
+# this function has been made invisible because it appearst to be in conflict with the Google terms of use
+.gmap <- function (x, exp=1, type='terrain', filename='', ...) {
 
 	if (! require(rgdal)) { stop('rgdal not available') }
 	
@@ -73,7 +76,7 @@ gmap <- function (x, exp=1, type='terrain', filename='', ...) {
 	gurl <- "http://maps.google.com/staticmap?"
 		
 	if (is.character(x)) {
-		x <- geocode(x, boxes='one')
+		x <- .geocode(x, boxes='one')
 		if (any(is.na(x))) {
 			stop('location not found')
 		}
@@ -163,7 +166,8 @@ gmap <- function (x, exp=1, type='terrain', filename='', ...) {
 #plot(r)
 
 
-Mercator <- function (p, inverse = FALSE) {
+# not relevant without gmap
+.Mercator <- function (p, inverse = FALSE) {
 #author: RH
 	r = 6378137
     toRad <- pi/180
