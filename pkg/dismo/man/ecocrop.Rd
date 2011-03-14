@@ -4,7 +4,7 @@
 \alias{getCrop}
 \alias{ECOcrops}
 \alias{ECOCROP-class}
-\alias{ECOCROP-ECOCROPcrop}
+\alias{ECOCROPcrop-class}
 
 
 \title{Ecocrop model}

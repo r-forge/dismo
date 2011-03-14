@@ -6,7 +6,7 @@
 \alias{maxent,Raster,ANY-method}
 \alias{maxent,SpatialGridDataFrame,ANY-method}
 \alias{maxent,data.frame,vector-method}
-\alias{Maxent-class}
+\alias{MaxEnt-class}
 
 \title{Maxent}
 

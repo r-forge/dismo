@@ -8,8 +8,7 @@
 
 
 
-# this function has been made invisible because it appearst to be in conflict with the Google terms of use
-.gmap <- function (x, exp=1, type='terrain', filename='', ...) {
+gmap <- function (x, exp=1, type='terrain', filename='', ...) {
 
 	if (! require(rgdal)) { stop('rgdal not available') }
 	
@@ -76,7 +75,7 @@
 	gurl <- "http://maps.google.com/staticmap?"
 		
 	if (is.character(x)) {
-		x <- .geocode(x, boxes='one')
+		x <- geocode(x, boxes='one')
 		if (any(is.na(x))) {
 			stop('location not found')
 		}
@@ -167,7 +166,7 @@
 
 
 # not relevant without gmap
-.Mercator <- function (p, inverse = FALSE) {
+Mercator <- function (p, inverse = FALSE) {
 #author: RH
 	r = 6378137
     toRad <- pi/180
