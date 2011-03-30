@@ -1,3 +1,7 @@
+--- 30-Mar-2011, version 0.6-5
+New function 'partial' to show partial plots (single variable response curves)
+DistModel object has changed. presence and absence data are now stored as data.frames, not matrices.
+
 --- 13-Mar-2011, version 0.6-1
 Documentation changes to pass 'check' in R 2.13.0 (exported classes now all documented)
 
