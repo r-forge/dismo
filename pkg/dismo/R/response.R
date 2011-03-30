@@ -1,13 +1,13 @@
 
-if (!isGeneric("partial")) {
-	setGeneric("partial", function(x,...)
-		standardGeneric("partial"))
+if (!isGeneric("response")) {
+	setGeneric("response", function(x,...)
+		standardGeneric("response"))
 }	
 
 
-setMethod("partial", signature(x='DistModel'), 
+setMethod("response", signature(x='DistModel'), 
 
-function(x, var=NULL, at=median, ylim=c(0,1), col='red', lwd=2, ... ) {
+function(x, var=NULL, at=median, rug=TRUE, ylim=c(0,1), col='red', lwd=2, ... ) {
 	
 	d <- x@presence
 	cn <- colnames(d)
@@ -53,6 +53,11 @@ function(x, var=NULL, at=median, ylim=c(0,1), col='red', lwd=2, ... ) {
 		colnames(a)[1] <- vr
 		p <- predict(x, a)
 		plot(a[,1], p, type='l', xlab=vr, ylab='predicted value', col=col, lwd=lwd, ylim=ylim, ...)
+		if (rug) {
+			if (!is.factor(d[,i])) {
+				rug(quantile(d[,i], probs = seq(0, 1, 0.1)), col='blue')
+			}
+		}
 	}
 	
 	if (length(var) == 1) {

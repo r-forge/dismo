@@ -1,19 +1,19 @@
-\name{partial}
+\name{response}
 
-\alias{partial}
-\alias{partial,DistModel-method}
+\alias{response}
+\alias{response,DistModel-method}
 
 
-\title{Partial plots}
+\title{response plots}
 
 
 \description{
-Generate 'partial plots', i.e. single variable response curves for a model
+Generate 'response plots', i.e. single variable response curves for a model
 }
 
 
 \usage{
-partial(x, ...) 
+response(x, ...) 
 }
 
 
@@ -27,6 +27,7 @@ partial(x, ...)
 \tabular{rll}{  
 \tab \code{var} \tab Variable to be plotted (if NULL, all variables will be plotted) \cr
 \tab \code{at}  \tab Function to indicate at what level the other variables should be. E.g. median (the default), mean, min, max. Note that currently the function fails when 'mean' is used and one of the variables is a factor. Instead of a function you can also supply a single-row matrix with values for each of the variables \cr
+\tab \code{rug} \tab Logical. If \code{TRUE} (the default) a 'rug' of deciles is plotted on the horizontal axes) \cr
 \tab \code{...}  \tab Additional graphical parameters  \cr
 }
 }
