@@ -1,22 +1,41 @@
 \name{partial}
 
 \alias{partial}
+\alias{partial,DistModel-method}
+
 
 \title{Partial plots}
+
 
 \description{
 Generate 'partial plots', i.e. single variable response curves for a model
 }
 
+
 \usage{
-partial(model, var=NULL, at=median) 
+partial(x, ...) 
 }
 
+
 \arguments{
-  \item{model}{ Model object that inherits from 'DistModel', e.g. 'MaxEnt'}
-  \item{var}{ Variable to be plotted (if NULL, all variables will be plotted) }
-  \item{at}{ Function to indicate at what level the other variables should be. E.g. median, mean, min, max. Note that mean fails when one of the variables is a factor. Or a matrix or named vector with values for each of the variables (except for variabls var) }
+  \item{x}{ Model object that inherits from 'DistModel', e.g. 'MaxEnt' }
+  \item{...}{ Additional arguments. See Details }  
 }
+
+
+\details{  
+\tabular{rll}{  
+\tab \code{var} \tab Variable to be plotted (if NULL, all variables will be plotted) \cr
+\tab \code{at}  \tab Function to indicate at what level the other variables should be. E.g. median (the default), mean, min, max. Note that currently the function fails when 'mean' is used and one of the variables is a factor. Instead of a function you can also supply a single-row matrix with values for each of the variables \cr
+\tab \code{...}  \tab Additional graphical parameters  \cr
+}
+}
+
+
+\seealso{
+\code{\link[dismo]{density}, \link[dismo]{plot}, \link[dismo]{pairs}}
+}
+
 
 \value{
 Used for the side-effect of a plot

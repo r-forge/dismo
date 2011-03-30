@@ -1,24 +1,36 @@
 
+if (!isGeneric("partial")) {
+	setGeneric("partial", function(x,...)
+		standardGeneric("partial"))
+}	
 
-partial <- function(model, var=NULL, at=median) {
+
+setMethod("partial", signature(x='DistModel'), 
+
+function(x, var=NULL, at=median, ylim=c(0,1), col='red', lwd=2, ... ) {
 	
-	d <- model@presence
+	d <- x@presence
+	cn <- colnames(d)
 	if (is.null(var)) {
-		var <- colnames(d)
+		var <- cn
 	}
 	
-	var <- var[var %in% colnames(d)]
+	if (is.numeric(var)) {
+		var <- cn[var]
+	}
+	var <- var[var %in% cn]
 	if (length(var) == 0) { stop('var not found')	}
 	
 	if (length(var) > 1) {
-		on.exit(par(par(no.readonly = TRUE) ))
-		x <- floor(sqrt(length(var)))
-		y <- ceiling(length(var) / x)
-		par(mfrow=c(x,y))
+		old.par <- par(no.readonly = TRUE) 
+		on.exit(par(old.par))
+		xs <- floor(sqrt(length(var)))
+		ys <- ceiling(length(var) / xs)
+		par(mfrow=c(xs, ys))
 	}
 	
 	for (vr in var) {
-		i <- which(colnames(d)==vr)
+		i <- which(cn==vr)
 		v <- d[,i]
 		if (is.factor(v)) {
 			v <- levels(v)
@@ -29,25 +41,23 @@ partial <- function(model, var=NULL, at=median) {
 		if (is.function(at)) {
 			m <- as.numeric(apply(d[,-i], 2, at))
 			m <- data.frame(matrix(rep(m, each=length(v)), nrow=length(v)))
-			colnames(m) <- colnames(d)[-i]
+			colnames(m) <- cn[-i]
 		} else {
+			at <- at[cn[-i]]
 			m <- as.vector(at)
-			if (length(m) != ncol(d)-1) {
-				stop('length of "at" is not correct')
-			}
 			m <- data.frame(matrix(rep(m, each=length(v)), nrow=length(v)))
 			colnames(m) <- names(at)
 		}
 
 		a <- cbind(v, m)
 		colnames(a)[1] <- vr
-		p <- predict(model, a)
-		plot(a[,1], p, type='l', xlab=vr, ylab='predicted value', col='red', lwd=2)
+		p <- predict(x, a)
+		plot(a[,1], p, type='l', xlab=vr, ylab='predicted value', col=col, lwd=lwd, ylim=ylim, ...)
 	}
 	
 	if (length(var) == 1) {
 		return(invisible(cbind(a[,1], p)))
 	}
 }
-
+)
 
