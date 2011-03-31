@@ -1,5 +1,5 @@
 --- 30-Mar-2011, version 0.6-5
-New function 'partial' to show partial plots (single variable response curves)
+New function 'response' to show single variable response curves (with the other variables at e.g. their median values)
 DistModel object has changed. presence and absence data are now stored as data.frames, not matrices.
 
 --- 13-Mar-2011, version 0.6-1

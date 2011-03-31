@@ -7,7 +7,7 @@ if (!isGeneric("response")) {
 
 setMethod("response", signature(x='DistModel'), 
 
-function(x, var=NULL, at=median, rug=TRUE, ylim=c(0,1), col='red', lwd=2, ... ) {
+function(x, var=NULL, at=median, rug=TRUE, ylim=c(0,1), col='red', lwd=2, add=FALSE, ... ) {
 	
 	d <- x@presence
 	cn <- colnames(d)
@@ -52,10 +52,14 @@ function(x, var=NULL, at=median, rug=TRUE, ylim=c(0,1), col='red', lwd=2, ... ) 
 		a <- cbind(v, m)
 		colnames(a)[1] <- vr
 		p <- predict(x, a)
-		plot(a[,1], p, type='l', xlab=vr, ylab='predicted value', col=col, lwd=lwd, ylim=ylim, ...)
-		if (rug) {
-			if (!is.factor(d[,i])) {
-				rug(quantile(d[,i], probs = seq(0, 1, 0.1)), col='blue')
+		if (add) {
+			points(a[,1], p, type='l', col=col, lwd=lwd, ...)
+		} else {
+			plot(a[,1], p, type='l', xlab=vr, ylab='predicted value', col=col, lwd=lwd, ylim=ylim, ...)
+			if (rug) {
+				if (!is.factor(d[,i])) {
+					rug(quantile(d[,i], probs = seq(0, 1, 0.1)), col='blue')
+				}
 			}
 		}
 	}

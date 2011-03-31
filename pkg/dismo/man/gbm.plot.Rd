@@ -11,7 +11,7 @@ Function to plot gbm response variables, with the option of adding a smooth repr
 }
 
 \usage{
-gbm.plot(gbm.object, variable.no = 0, smooth = FALSE, rug = T, n.plots = length(pred.names), common.scale = T, write.title = T, y.label = "fitted function", x.label = NULL, show.contrib = T, plot.layout = c(3, 4), ...)
+gbm.plot(gbm.object, variable.no=0, smooth=FALSE, rug=TRUE, n.plots=length(pred.names), common.scale=TRUE, write.title=TRUE, y.label="fitted function", x.label=NULL, show.contrib=TRUE, plot.layout=c(3, 4), ...)
 }
 
 \arguments{
