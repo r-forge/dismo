@@ -19,7 +19,7 @@ Class to store results of model cross-validation with presence/absence (0/1) dat
     \item{\code{np}:}{number of presence points}
     \item{\code{na}:}{number of absence points}
     \item{\code{auc}:}{Area under the receiver operator (ROC) curve}
-    \item{\code{pauc}:}{ p-value for the AUC (for the W statistic}
+    \item{\code{pauc}:}{ p-value for the AUC (for the Wilcoxon test W statistic}
     \item{\code{cor}:}{ Correlation coefficient}
     \item{\code{pcor}:}{p-value for correlation coefficient }
     \item{\code{t}:}{ vector of thresholds used to compute confusion matrices }
@@ -46,6 +46,8 @@ Class to store results of model cross-validation with presence/absence (0/1) dat
 
 \references{
 Fielding, A. H. & J.F. Bell, 1997. A review of methods for the assessment of prediction errors in conservation presence/absence models. Environmental Conservation 24: 38-49
+
+Liu, C., M. White, M. & G. Newell, G., 2011. Measuring and comparing the accuracy of species distribution models with presence-absence data. Ecography 34: 232-243.
 }
 
 \author{
