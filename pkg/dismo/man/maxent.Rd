@@ -104,8 +104,8 @@ me <- maxent(predictors, occtrain, factors='biome')
 # plot showing importance of each variable
 plot(me)
 
-# partial plots
-# partial(me)
+# response curves
+# response(me)
 
 # predict to entire dataset
 r <- predict(me, predictors, progress='text') 

@@ -36,9 +36,12 @@ gbif <- function(genus, species='', geo=TRUE, sp=FALSE, removeZeros=TRUE, downlo
 	}
 
 
+	species <- trim(species)
+	species <- gsub(" ", "%20", species)
+	
 	if (sp) geo <- TRUE
 
-    spec <- paste('scientificname=', trim(genus),'+', trim(species), sep='')
+    spec <- paste('scientificname=', trim(genus),'+', species, sep='')
 	if (geo) { cds <- '&coordinatestatus=true' 
 	} else { cds <- '' }
     base <- 'http://data.gbif.org/ws/rest/occurrence/'
