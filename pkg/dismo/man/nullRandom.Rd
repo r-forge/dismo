@@ -24,7 +24,7 @@ nullRandom(x, model, n=25, rep=25, pa=FALSE)
 
 
 \value{
-List with \code{n} object of class \code{\link{ModelEvaluation}}
+List with \code{n} object of class \code{\link{ModelEvaluation-class}}
 }
 
 
