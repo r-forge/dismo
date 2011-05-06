@@ -4,7 +4,7 @@
 
 \docType{class}
 
-\alias{ModelEvaluation}
+\alias{ModelEvaluation-class}
 
 \title{Class "ModelEvaluation"}
 
@@ -47,7 +47,7 @@ Class to store results of model cross-validation with presence/absence (0/1) dat
 \references{
 Fielding, A. H. & J.F. Bell, 1997. A review of methods for the assessment of prediction errors in conservation presence/absence models. Environmental Conservation 24: 38-49
 
-Liu, C., M. White, M. & G. Newell, G., 2011. Measuring and comparing the accuracy of species distribution models with presence-absence data. Ecography 34: 232-243.
+Liu, C., M. White & G. Newell, 2011. Measuring and comparing the accuracy of species distribution models with presence-absence data. Ecography 34: 232-243.
 }
 
 \author{
