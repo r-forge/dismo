@@ -21,7 +21,7 @@ geocode <- function(x, boxes='', extent=NULL, progress='') {
 		res <- res[,4:7]
 	}
 	
-	pb <- raster:::.progress(progress)
+	pb <- pbCreate(length(x), type=progress)
 	for (z in 1:length(x)) {
 		r <- x[z]
 		r <- gsub(', ', ',', r)
