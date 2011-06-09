@@ -28,9 +28,11 @@ matrix
 \author{Robert J. Hijmans}
 
 \examples{
-# geocode(c('1600 Pennsylvania Ave NW, Washington DC', 'Luca, Italy', 'Kampala'))
-# geocode(c('San Jose', 'San Jose, Mexico'))
-# geocode(c('San Jose', 'San Jose, Mexico'), boxes='one')
+\dontrun{
+geocode(c('1600 Pennsylvania Ave NW, Washington DC', 'Luca, Italy', 'Kampala'))
+geocode(c('San Jose', 'San Jose, Mexico'))
+geocode(c('San Jose', 'San Jose, Mexico'), oneRecord=TRUE)
+}
 }
 
 \keyword{ spatial }
