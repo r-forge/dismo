@@ -109,7 +109,7 @@ plot(me)
 # response(me)
 
 # predict to entire dataset
-r <- predict(me, predictors, progress='text') 
+r <- predict(me, predictors, progress='window') 
 
 # with options:
 # r <- predict(me, predictors, progress='text', args=c("outputformat=raw"))
