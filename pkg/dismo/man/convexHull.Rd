@@ -60,9 +60,8 @@ plot(ch@hull, border='red', lwd=2, add=TRUE)
 points(train, col='red', pch=20, cex=2)
 points(test, col='black', pch=20, cex=2)
 
-pr = predict(ch, r, progress='')
-plot(r, legend=FALSE)
-plot(pr, add=TRUE, col='blue')
+pr <- predict(ch, r, progress='')
+plot(pr)
 points(test, col='black', pch=20, cex=2)
 points(train, col='red', pch=20, cex=2)
 }
