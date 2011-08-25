@@ -1,6 +1,6 @@
 
 
-selectByDistance <- function(from, to, target, tr=0.1, lonlat=TRUE) {
+pwdSample <- function(fixed, sample, reference, tr=0.33, lonlat=TRUE) {
 
 	distHaversine <- function (p1, p2) {
 		r <- 6378137
@@ -20,7 +20,7 @@ selectByDistance <- function(from, to, target, tr=0.1, lonlat=TRUE) {
 		m <- nrow(y)
 		dm <- matrix(ncol = m, nrow = n)
 		for (i in 1:n) {
-			dm[i, ] <- distHaversine(x[i, ], y)
+			dm[i, ] <- distHaversine(x[i, ,drop=FALSE], y)
 		}
 		return(dm)
 	}
@@ -34,7 +34,7 @@ selectByDistance <- function(from, to, target, tr=0.1, lonlat=TRUE) {
 		m = nrow(y)
 		dm = matrix(ncol = m, nrow = n)
 		for (i in 1:n) {
-			dm[i, ] = dfun(x[i, ], y)
+			dm[i, ] = dfun(x[i, ,drop=FALSE], y)
 		}
 		return(dm)
 	}
@@ -45,17 +45,25 @@ selectByDistance <- function(from, to, target, tr=0.1, lonlat=TRUE) {
 		distfun <- distPlane
 	}
 	
+	if (inherits(fixed, 'SpatialPoints')) fixed <- coordinates(fixed)
+	if (inherits(sample, 'SpatialPoints')) sample <- coordinates(sample)
+	if (inherits(reference, 'SpatialPoints')) reference <- coordinates(reference)
+	fixed     <- as.matrix(fixed)[,1:2]
+	sample    <- as.matrix(sample)[,1:2]
+	reference <- as.matrix(reference)[,1:2]
+
 	ngb <- NULL
-	fromd <- apply(distfun(from, target), 1, min)
-	tod <- distfun(to, target)
-	for (i in 1:nrow(from)) {
-		d <- apply(tod, 1, min) 
+	fromd <- apply(distfun(fixed, reference), 1, min)
+	tod <- distfun(sample, reference)
+	d <- apply(tod, 1, min) 
+	for (i in 1:nrow(fixed)) {
 		d <- abs(d - fromd[i])
 		mn <- min(d)
-		if (mn < (1+tr) * fromd[i]) {
+		if (mn < (tr) * fromd[i]) {
 			x <- which.min(d)
 			ngb <- c(ngb, x)
 			tod[x, ] <- Inf
+			d <- apply(tod, 1, min) 
 		} else {
 			ngb <- c(ngb, NA)
 		}
