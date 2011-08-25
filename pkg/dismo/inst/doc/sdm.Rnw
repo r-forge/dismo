@@ -369,10 +369,15 @@ predict(bc, pd)
 \chapter{Model evaluation}
 
 Many model types have measures that help you to assess model fit. It is worth becoming familiar with these and understanding their role, because they help you to assess whether there is anything substantially wrong with your model. Most statistics or machine learning texts will provide some details. For instance, for a GLM one can look at how much deviance is explained, whether there are patterns in the residuals, whether there are points with high leverage and so on. However, since many models are to be used for prediction, much evaluation is focused on how well the model predicts to points not used in model training (see following section on data partitioning).  Before we start to give some examples of statistics used for this evaluation, it is worth considering what else can be done to evaluate a model. Useful questions include:
+
 • does the model seem sensible, ecologically?
+
 • do the fitted functions (the shapes of the modeled relationships) make sense?
+
 • do the predictions seem reasonable? (map them, and think about them)
+
 • are there any spatial patterns in model residuals? (see Leathwick and Whitehead 2001 for an interesting example)
+
 
 Most modelers rely on cross-validation. This consists of creating a model with one 'training' data set, and testing it with another data set of known occurrences. Typically, training and testing data are created through random sampling (without replacement) from a single data set. Only in a few cases, e.g. Elith \textit{et al}., 2006, training and test data are from different sources and pre-defined.
 Different measures can be used to evaluate the quality of a prediction (Fielding and Bell, 1997, Liu et al., 2011; and Potts and Elith (2006) for abundance data), perhaps depending on the goal of the study. Many measures for evaluating models based on presence-absence or presence-only data are 'threshold dependent'. That means that a threshold must be set first (e.g., 0.5, though 0.5 is rarely a sensible choice – e.g. see Lui et al. 2005). Predicted values above that threshold indicate a prediction of 'presence', and values below the threshold indicate 'absence'. Some measures emphasize the weight of false absences; others give more weight to false presences. Cohen's \textit{kappa} is an example of a threshold dependent model evaluation statistic.
@@ -648,7 +653,7 @@ gm2 <- glm(pa ~ bio1 + bio5 + bio6 + bio7 + bio8 + bio12 + bio16 + bio17,
 			family = gaussian(link = "identity"), data=envtrain)
 			
 evaluate(testpres, testbackg, gm1)
-evaluate(testpres, testbackg, gm2)
+e2 <- evaluate(testpres, testbackg, gm2)
 @
 
 

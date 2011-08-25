@@ -92,7 +92,9 @@ randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=5, 
 	if (canProcessInMemory(mask2)) {
 	
 		cells <- crop(mask, mask2)
-		cells <- which(! is.na(getValues(cells)) )
+		if (hasValues(cells)) {
+			cells <- which(! is.na(getValues(cells)) )
+		}
 		nn = min(length(cells), nn)
 
 		if (raster:::.couldBeLonLat(mask)) {
@@ -128,8 +130,10 @@ randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=5, 
 			cells <- cellFromXY(mask, xy)
 		}
 
-		vals <- cbind(cells, extract(mask, cells))
-		cells <- na.omit(vals)[,1]
+		if (hasValues(mask)) {
+			vals <- cbind(cells, extract(mask, cells))
+			cells <- na.omit(vals)[,1]
+		}
 	}
 		
 	if (excludep) {	
