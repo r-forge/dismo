@@ -54,16 +54,15 @@ pwdSample <- function(fixed, sample, reference, tr=0.33, lonlat=TRUE) {
 
 	ngb <- NULL
 	fromd <- apply(distfun(fixed, reference), 1, min)
-	tod <- distfun(sample, reference)
-	d <- apply(tod, 1, min) 
+	tod <- apply(distfun(sample, reference), 1, min)
 	for (i in 1:nrow(fixed)) {
-		d <- abs(d - fromd[i])
-		mn <- min(d)
-		if (mn < (tr) * fromd[i]) {
+		d <- abs(tod - fromd[i])
+		if (min(d) < (tr * fromd[i])) {
 			x <- which.min(d)
+			# or 
+			# x <- sample(which(d < (tr * fromd[i]))) ?
 			ngb <- c(ngb, x)
-			tod[x, ] <- Inf
-			d <- apply(tod, 1, min) 
+			tod[x] <- Inf
 		} else {
 			ngb <- c(ngb, NA)
 		}
