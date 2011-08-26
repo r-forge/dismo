@@ -4,7 +4,7 @@
 # Licence GPL v3
 
 
-pwdSample <- function(fixed, sample, reference, tr=0.33, lonlat=TRUE) {
+pwdSample <- function(fixed, sample, reference, tr=0.33, n=1, lonlat=TRUE) {
 
 	distHaversine <- function (p1, p2) {
 		r <- 6378137
@@ -49,6 +49,9 @@ pwdSample <- function(fixed, sample, reference, tr=0.33, lonlat=TRUE) {
 		distfun <- distPlane
 	}
 	
+	n <- round(n)
+	stopifnot(n >= 1)
+	
 	if (inherits(fixed, 'SpatialPoints')) fixed <- coordinates(fixed)
 	if (inherits(sample, 'SpatialPoints')) sample <- coordinates(sample)
 	if (inherits(reference, 'SpatialPoints')) reference <- coordinates(reference)
@@ -56,19 +59,20 @@ pwdSample <- function(fixed, sample, reference, tr=0.33, lonlat=TRUE) {
 	sample    <- as.matrix(sample)[,1:2]
 	reference <- as.matrix(reference)[,1:2]
 
-	ngb <- NULL
 	fromd <- apply(distfun(fixed, reference), 1, min)
 	tod <- apply(distfun(sample, reference), 1, min)
-	for (i in 1:nrow(fixed)) {
-		d <- abs(tod - fromd[i])
-		if (min(d) < (tr * fromd[i])) {
-			x <- which.min(d)
-			# or 
-			# x <- sample(which(d < (tr * fromd[i]))) ?
-			ngb <- c(ngb, x)
-			tod[x] <- Inf
-		} else {
-			ngb <- c(ngb, NA)
+
+	ngb <- matrix(NA, nrow=length(fromd), ncol=n)
+
+	for (j in 1:n) {
+		for (i in 1:nrow(fixed)) {
+			d <- abs(tod - fromd[i])
+			if (min(d) < (tr * fromd[i])) {
+				x <- which.min(d)
+				ngb[i, j] <- x
+			# or  x <- sample(which(d < (tr * fromd[i]))) ?
+				tod[x] <- Inf
+			} 
 		}
 	}
 	return(ngb)

@@ -13,19 +13,20 @@ Hijmans (2011) proposes this sampling approach to remove 'spatial sorting bias' 
 }
 
 \usage{
-pwdSample(fixed, sample, reference, tr=0.33, lonlat=TRUE) 
+pwdSample(fixed, sample, reference, tr=0.33, n=1, lonlat=TRUE) 
 }
  
 \arguments{
   \item{fixed}{two column matrix (x, y) or (longitude/latitude) or SpatialPoints object, for point locations for which a pair should be found in \code{sample} }
   \item{sample}{as above for point locations from which to sample to make a pair with a point from \code{fixed}}
   \item{reference}{as above for reference point locations to which distances are computed}
+  \item{n}{How many pairs do you want for each point in \code{fixed}}
   \item{tr}{ the threshold distance for a pair of points (one of \code{fixed} and one of \code{sample}) to their respective nearest point in \code{reference}. The absolute difference in distance between the candidate point pairs in \code{fixed} and \code{reference} (dfr) and the distance between candidate point pairs in \code{sample} and \code{reference} (dsr) must be smaller than \code{tr} * dfr. I.e. if the dfr = 100 km, and tr = 0.1, dsr must be between >90 and <110 km to be considered a valid pair.}
   \item{lonlat}{ Logical. Use \code{TRUE} if the coordinates are spherical (in degrees), and use \code{FALSE} if they are planar }
 }
 
 \value{
-A vector of length nrow(fixed) that indicates, for each point (row) in \code{fixed} which row in \code{sample} it is paired to; or \code{NA} if the row was dropped.
+A matrix of nrow(fixed) and ncol(n), that indicates, for each point (row) in \code{fixed} which point(s) in \code{sample} it is paired to; or \code{NA} if no suitable pair was available.
 }
 
 \references{
@@ -63,6 +64,9 @@ plot(sam, pch='x', cex=0)
 points(ssam, pch='x')
 points(ref, col='red', pch=18, cex=2)
 points(sfix, col='blue', pch=20, cex=2)
+
+# try to get 3 pairs for each point in 'fixed'
+pwdSample(fix, sam, ref, lonlat=TRUE, n=3)
 }
 
 \keyword{spatial}

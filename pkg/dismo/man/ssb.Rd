@@ -20,7 +20,8 @@ ssb(p, a, reference, lonlat=TRUE)
 }
 
 \value{
-a matrix with two values. 'dp': the average distance from a point in \code{p} to the nearest point in \code{reference} and 'da': the average distance from a point in \code{a} to the nearest point in \code{reference}
+matrix with two values. 'dp': the average distance from a point in \code{p} to the nearest point in \code{reference} and 'da': the average distance from a point in \code{a} to the nearest point in \code{reference}.
+Distance is in meters if \code{lonlat=TRUE}, and in mapunits (typically also meters) if \code{lonlat=FALSE}
 }
 
 \references{
@@ -41,7 +42,13 @@ extent(r) <- c(-110, 110, -45, 45)
 r[] <- 1
 set.seed(0)
 a <- randomPoints(r, n=50)
-ssb(p, a, ref)
+b <- ssb(p, a, ref)
+
+# distances in km
+b / 1000
+
+# an index of spatial sorting bias (1 is no bias, near 0 is extreme bias)
+b[1] / b[2]
 }
 
 \keyword{spatial}
