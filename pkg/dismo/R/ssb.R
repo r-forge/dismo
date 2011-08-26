@@ -1,10 +1,10 @@
 # Author: Robert J. Hijmans, r.hijmans@gmail.com
-# Date : April 2011
+# Date : August 2011
 # Version  1.0
 # Licence GPL v3
 
 
-pwdSample <- function(fixed, sample, reference, tr=0.33, lonlat=TRUE) {
+ssb <- function(p, a, reference, lonlat=TRUE) {
 
 	distHaversine <- function (p1, p2) {
 		r <- 6378137
@@ -49,29 +49,23 @@ pwdSample <- function(fixed, sample, reference, tr=0.33, lonlat=TRUE) {
 		distfun <- distPlane
 	}
 	
-	if (inherits(fixed, 'SpatialPoints')) fixed <- coordinates(fixed)
-	if (inherits(sample, 'SpatialPoints')) sample <- coordinates(sample)
+	if (inherits(p, 'SpatialPoints')) p <- coordinates(p)
+	if (inherits(a, 'SpatialPoints')) a <- coordinates(a)
 	if (inherits(reference, 'SpatialPoints')) reference <- coordinates(reference)
-	fixed     <- as.matrix(fixed)[,1:2]
-	sample    <- as.matrix(sample)[,1:2]
+	p <- as.matrix(p)[,1:2]
+	a <- as.matrix(a)[,1:2]
 	reference <- as.matrix(reference)[,1:2]
-
-	ngb <- NULL
-	fromd <- apply(distfun(fixed, reference), 1, min)
-	tod <- apply(distfun(sample, reference), 1, min)
-	for (i in 1:nrow(fixed)) {
-		d <- abs(tod - fromd[i])
-		if (min(d) < (tr * fromd[i])) {
-			x <- which.min(d)
-			# or 
-			# x <- sample(which(d < (tr * fromd[i]))) ?
-			ngb <- c(ngb, x)
-			tod[x] <- Inf
-		} else {
-			ngb <- c(ngb, NA)
-		}
-	}
-	return(ngb)
+		
+	pdist <- distfun(p, reference)
+	adist <- distfun(a, reference)
+	pd <- mean(apply(pdist, 1, min))
+	ad <- mean(apply(adist, 1, min))
+	
+	cbind(pd, ad)
 }
 
 
+
+
+ 
+ 
