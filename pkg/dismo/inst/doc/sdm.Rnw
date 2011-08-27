@@ -899,6 +899,8 @@ talk about how to target the "important" uncertainties (will vary with the appli
 
 \noindent Hijmans, R.J., S.E. Cameron, J.L. Parra, P.G. Jones and A. Jarvis, 2005. Very high resolution interpolated climate surfaces for global land areas. International Journal of Climatology 25: 1965-1978. \url{http://dx.doi.org/10.1002/joc.1276}
 
+\noindent Jiménez-Valverde, A. 2011. Insights into the area under the receiver operating characteristic curve (AUC) as a discrimination measure in species distribution modelling. Global Ecology and Biogeography (on-line early): DOI: 10.1111/j.1466-8238.2011.00683.
+
 \noindent Karatzoglou, A., D. Meyer and K. Hornik, 2006. Support Vector Machines in \R. Journal of statistical software 15(9). \url{http://www.jstatsoft.org/v15/i09/}
 
 \noindent Kéry M., Gardner B., Monnerat C. (2010) Predicting species distributions from checklist data using site-occupancy models. J. Biogeogr. 37:1851–1862
@@ -909,9 +911,11 @@ talk about how to target the "important" uncertainties (will vary with the appli
 
 \noindent Liu C., White M., Newell G. (2011) Measuring and comparing the accuracy of species distribution models with presence–absence data. Ecography 34:232-243. 
 
-
 \noindent Liu C., Berry P.M., Dawson T.P., Pearson R.G. (2005) Selecting thresholds of occurrence in the prediction of species distributions. Ecography 28:385-393.
 
+\noindent Lobo, J.M. 2008. More complex distribution models or more representative data? Biodiversity Informatics 5: 14-19.
+
+\noindent Lobo, J.M., A. Jiménez-Valverde and R. Real. 2007. AUC: a misleading measure of the performance of predictive distribution models. Global Ecology and Biogeography 17: 145-151.
 
 \noindent Mahalanobis, P.C., 1936. On the generalised distance in statistics. Proceedings of the National Institute of Sciences of India 2: 49-55.
 
