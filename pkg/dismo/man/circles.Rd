@@ -60,7 +60,7 @@ cc <- circles(train, lonlat=FALSE)
 predict(cc, test)
 
 plot(r)
-plot(cc@circles, border='red', lwd=2, add=TRUE)
+plot(cc@polygons, border='red', lwd=2, add=TRUE)
 points(train, col='red', pch=20, cex=2)
 points(test, col='black', pch=20, cex=2)
 

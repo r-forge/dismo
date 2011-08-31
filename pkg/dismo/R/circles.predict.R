@@ -15,11 +15,11 @@ setMethod('predict', signature(object='CirclesRange'),
 			if (! is.null(ext)) { 
 				x = crop(x, ext) 
 			}
-			xx <- rasterize(object@circles, raster(x), field=-1, fun='sum', mask=FALSE, update=FALSE, updateValue="NA", getCover=FALSE, silent=TRUE, progress=progress)
+			xx <- rasterize(object@polygons, raster(x), field=-1, fun='sum', mask=FALSE, update=FALSE, updateValue="NA", getCover=FALSE, silent=TRUE, progress=progress)
 			if (mask) {
 				xx <- mask(xx, x)
 			}
-			#nc <- length(object@circles@polygons) 
+			#nc <- length(object@polygons@polygons) 
 			#fun <- function(x){x / nc }
 			#xx <- calc(xx, fun=fun, filename=filename, progress=progress, ...)
 			return(xx)
@@ -29,8 +29,8 @@ setMethod('predict', signature(object='CirclesRange'),
 				colnames(x) = c('x', 'y')
 				coordinates(x) = ~ x + y
 			}
-			#v <- .pointsInPolygons(x, object@circles, sum) / length(object@circles@polygons) 
-			v <- .pointsInPolygons(x, object@circles, sum) 
+			#v <- .pointsInPolygons(x, object@polygons, sum) / length(object@polygons@polygons) 
+			v <- .pointsInPolygons(x, object@polygons, sum) 
 			return(v)
 		}
 	}

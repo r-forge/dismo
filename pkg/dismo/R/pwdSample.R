@@ -59,6 +59,10 @@ pwdSample <- function(fixed, sample, reference, tr=0.33, n=1, lonlat=TRUE) {
 	sample    <- as.matrix(sample)[,1:2]
 	reference <- as.matrix(reference)[,1:2]
 
+	if (nrow(sample) < nrow(fixed)) {
+		warning("nrow(sample) < nrow(fixed)")
+	}
+	
 	fromd <- apply(distfun(fixed, reference), 1, min)
 	tod <- apply(distfun(sample, reference), 1, min)
 
