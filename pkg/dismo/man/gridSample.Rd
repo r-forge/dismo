@@ -6,7 +6,7 @@
 
 
 \description{
-Sample points from xy, using a grid (raster) as stratification. Up to n points are sampled from each stratum (cell). For "chessboard" sampling (i.e. sampling from half the cells", use the argument \code{chess='black'}, or \code{chess='white'}.
+Sample points from xy, using a grid (raster) as stratification. Up to n points are sampled from each stratum (cell). For "chessboard" sampling (i.e. sampling from half the cells), use the argument \code{chess='black'}, or \code{chess='white'}.
 }
 
 \usage{

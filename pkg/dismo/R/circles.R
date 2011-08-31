@@ -27,10 +27,11 @@
 .generateCircles <- function(xy, d, n=360, lonlat, r=6378137 ) {
 	if (length(d)==1) {
 		d <- rep(d, nrow(xy))
-	} else {
-		if (length(d) != nrow(xy)) {
-			stop('length of d should be 1 or match the number of points')
-		}
+	} else if (length(d) != nrow(xy)) {
+		# recycling
+		dd <- vector(length=nrow(xy))
+		dd[] <- d
+		d <- dd
 	}
 	
 	xy <- as.matrix(xy[,1:2])
@@ -38,7 +39,9 @@
 	toRad <- pi/180
 	brng <- 1:n * 360/n
 	brng <- brng * toRad
-	if (lonlat) { xy = xy * toRad }
+	if (lonlat) { 
+		xy = xy * toRad 
+	}
 	pols <- list()
 	for (i in 1:nrow(xy)) {
 		p <- xy[i, ]
@@ -61,7 +64,12 @@
 		res <- rbind(res, res[1,])
 		pols <- c(pols, Polygons(list(Polygon( res )), i))		
 	}
-	return( SpatialPolygons( pols ) )
+
+	pols <- SpatialPolygons(pols)
+	if (lonlat) {
+		projection(pols) <- CRS('+proj=longlat')
+	}
+	return( pols )
 }
 
 
@@ -114,4 +122,12 @@ setMethod('circles', signature(p='SpatialPoints'),
 		circles(p, d=d, lonlat=lonlat, ...)
 	}
 )
+
+
+setMethod("plot", signature(x='CirclesRange', y='missing'), 
+	function(x, ...) {
+		plot(x@circles, ...)
+	}
+)
+
 
