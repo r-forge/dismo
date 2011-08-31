@@ -47,7 +47,7 @@
 
 
 
-randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=5, warn=2) {
+randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, cellnumbers=FALSE, tryf=5, warn=2) {
 	
 	if (nlayers(mask) > 1) { mask <- raster(mask, 1)	}
 	
@@ -95,7 +95,7 @@ randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=5, 
 		if (hasValues(cells)) {
 			cells <- which(! is.na(getValues(cells)) )
 		}
-		nn = min(length(cells), nn)
+		nn <- min(length(cells), nn)
 
 		if (raster:::.couldBeLonLat(mask)) {
 			# which rows are that?
@@ -114,7 +114,7 @@ randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=5, 
 	
 	} else {
 	
-		nn = min(ncell(mask2), nn)
+		nn <- min(ncell(mask2), nn)
 		if (raster:::.couldBeLonLat(mask)) {
 	
 			cells <- .randomCellsLonLat(mask2, nn)
@@ -158,7 +158,11 @@ randomPoints <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, tryf=5, 
 		}
 	}
 	
-	return(xyFromCell(mask, cells))
+	if (cellnumbers) {
+		return(cells)
+	} else {
+		return(xyFromCell(mask, cells))
+	}
 }
 
 
