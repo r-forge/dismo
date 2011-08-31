@@ -287,6 +287,7 @@ Survey-absence data has value. In conjunction with presence records, it establis
 
 \texttt{dismo} has a function to sample random points (background data) from a study area. You can use a 'mask' to exclude area with no data \texttt{NA}, e.g. areas not on land. You can use an 'extent' to further restrict the area from which random locations are drawn.  
 In the example below, we first get the list of filenames with the predictor raster data (discussed in detail in the next chapter). We use a raster as a 'mask' in the \texttt{randomPoints} function such that the background points are from the same geographic area, and only for places where there are values (land, in our case). 
+
 Note that if the mask has the longitude/latitute coordinate reference system, function \texttt{randomPoints} selects cells according to cell area, which varies by latitude (as in Elith et al., 2011)
 
 
@@ -319,11 +320,11 @@ pts <- acg[, c('lon', 'lat')]
 # circles with a radius of 50 km
 x <- circles(pts, d=50000, lonlat=T, col='light gray')
 
-plot(x@circles, axes=T)
+plot(x@polygons, axes=T)
 points(pts, pch='x')
 
 # sample randomly from all circles
-samp1 <- spsample(x@circles, 250, type='random', iter=25)
+samp1 <- spsample(x@polygons, 250, type='random', iter=25)
 points(samp1, cex=0.5, col='red')
 
 # get unique cells
@@ -338,7 +339,7 @@ points(xy, cex=0.75, pch=20, col='blue')
 Note that the blue points are not all within the circles, as they now reprsenst the centers of the selected cells from mask. We could choose to select only those cells that have theirs centers within the circles, using the overlay function.
 
 <<sdm21c>>=
-o <- overlay(x@circles, SpatialPoints(xy))
+o <- overlay(x@polygons, SpatialPoints(xy))
 xyInside <- xy[!is.na(o), ]
 @
 
@@ -346,7 +347,7 @@ Similar results could also be achieved via the raster functions \texttt{rasteriz
 
 <<sdm21d, fig=TRUE, width=9, height=6>>=
 # extract cell numbers for the circles
-v <- extract(mask, x@circles, cellnumbers=T)
+v <- extract(mask, x@polygons, cellnumbers=T)
 # use rbind to combine the elements in list v
 v <- do.call(rbind, v)
 
@@ -358,8 +359,8 @@ v
 m <- mask
 m[] <- NA
 m[v] <- 1
-plot(m, ext=extent(x@circles)+1)
-plot(x@circles, add=T)
+plot(m, ext=extent(x@polygons)+1)
+plot(x@polygons, add=T)
 @
 
 
@@ -648,7 +649,7 @@ evaluate(bc, p=pres_test_pwd, a=back_test_pwd, x=predictors)
 \chapter{Types of algorithms \& data used in examples}
 
 
-A large number of algorithms has been used in species distribution modeling. They can be classified as 'profile', 'regression', and 'machine learning' methods. Profile methods only consider 'presence' data, not absence or background data. Regression and machine learning methods use both presence and absence or background data. The distinction between regression and machine learning methods is not sharp, but it is perhaps still useful as way to classify models. Another distinction that one can make is between presence-only and presence-absence models. Profile methods are always presence-only, other methods can be either, depending if they are used with survey-absence or with pseudo-absence/backround data. An entirey different class of models consists of models that only, or primarily, use the geographic location of known occurences, and do not rely on the values of predictor variables at these locations. We refer to these models as 'spatial-only models'. Below we discuss examples of these different types of models.
+A large number of algorithms has been used in species distribution modeling. They can be classified as 'profile', 'regression', and 'machine learning' methods. Profile methods only consider 'presence' data, not absence or background data. Regression and machine learning methods use both presence and absence or background data. The distinction between regression and machine learning methods is not sharp, but it is perhaps still useful as way to classify models. Another distinction that one can make is between presence-only and presence-absence models. Profile methods are always presence-only, other methods can be either, depending if they are used with survey-absence or with pseudo-absence/backround data. An entirely different class of models consists of models that only, or primarily, use the geographic location of known occurences, and do not rely on the values of predictor variables at these locations. We refer to these models as 'geographic models'. Below we discuss examples of these different types of models.
 
 We will use the same data to illustrate all models, except that some models cannot use categorical variables. So for those models we drop the categorical variables from the predictors stack.
 
@@ -959,17 +960,21 @@ points(backg_train, pch='-', cex=0.25)
 @
 
 
-\chapter{Spatial-only models}
+\chapter{Geographic models}
 
-The 'spatial-only models' described here are not commonly used in species distribution modeling. They are an attempt to formalize methods to draw 'expert range maps'. We are exploring their use in comparing and contrasting them with the other approaches (Bahn and McGill, 2007); in model evaluation as as null-models (Hijmans 2011); to sample background points; and generally to help think about the duality between geographic and environmental space (Colwel and Rangel, 2009). 
+The 'geograhic models' described here are not commonly used in species distribution modeling. They use the geographic location of known occurences, and do not rely on the values of predictor variables at these locations. We are exploring their use in comparing and contrasting them with the other approaches (Bahn and McGill, 2007); in model evaluation as as null-models (Hijmans 2011); to sample background points; and generally to help think about the duality between geographic and environmental space (Colwel and Rangel, 2009). Below we show examples of these different types of models.
 
 \section{Geographic Distance}
 
 Simple model based on the assumption that the closer to a know presence point, the more likely it is to find the species. 
 
 <<sdm100, fig=TRUE, width=9, height=6>>=
+# first create a mask to predict to, and to use as a mask 
+# to only predict to land areas
+seamask <- crop(predictors[[1]], ext)
+
 distm <- geoDist(pres_train, lonlat=TRUE)
-ds <- predict(predictors, distm, ext=ext)
+ds <- predict(seamask, distm, mask=TRUE)
 
 e <- evaluate(distm, p=pres_test, a=backg_test, tr=quantile(ds, c(1:50/50)))
 e
@@ -988,33 +993,29 @@ points(backg_train, pch='-', cex=0.25)
 
 \section{Convex hulls}
 
+This model draws a convex hull around all 'presence' points.
 
 <<sdm102, fig=TRUE, width=9, height=6>>=
 hull <- convHull(pres_train, lonlat=TRUE)
 e <- evaluate(hull, p=pres_test, a=backg_test)
 e
 
-h <- predict(predictors, hull, ext=ext)
+h <- predict(seamask, hull, mask=TRUE)
 
-par(mfrow=c(1,2))
 plot(h, main='Convex Hull')
 plot(wrld_simpl, add=TRUE, border='dark grey')
 points(pres_train, pch='+')
 points(backg_train, pch='-', cex=0.25)
-
-h <- mask(h, crop(predictors[[1]], ext))
-plot(h, main='Water masked')
-plot(wrld_simpl, add=TRUE, border='dark grey')
-
 @
 
 
 \section{Circles}
 
+This model draws circles around all 'presence' points. 
 
 <<sdm104, fig=TRUE, width=9, height=6>>=
 circ <- circles(pres_train, lonlat=TRUE)
-pc <- predict(predictors, circ, ext=ext)
+pc <- predict(seamask, circ, mask=TRUE)
 
 e <- evaluate(circ, p=pres_test, a=backg_test, tr=quantile(ds, c(1:50/50)))
 e
@@ -1033,7 +1034,42 @@ points(backg_train, pch='-', cex=0.25)
 
 \section{Presence/absence}
 
-Spatial-only models for presence/absence data are also available. See functions \texttt{geoIDW}, \texttt{voronoi}, and general geostatistical methods such as indicator kriging (available in the gstat pacakge).
+Spatial-only models for presence/background (or absence) data are also available through functions \texttt{geoIDW}, \texttt{voronoiHull}, and general geostatistical methods such as indicator kriging (available in the gstat pacakge).
+
+<<sdm106, fig=TRUE, width=9, height=6>>=
+idwm <- geoIDW(p=pres_train, a=data.frame(back_train))
+
+e <- evaluate(idwm, p=pres_test, a=backg_test, tr=quantile(ds, c(1:50/50)))
+e
+
+iw <- predict(seamask, idwm, mask=TRUE)
+
+par(mfrow=c(1,2))
+
+plot(iw, main='Inv. Dist. Weighted')
+plot(wrld_simpl, add=TRUE, border='dark grey')
+threshold <- e@t[which.max(e@TPR + e@TNR)]
+pa <- mask(iw > threshold, seamask)
+plot(pa, main='presence/absence')
+plot(wrld_simpl, add=TRUE, border='dark grey')
+points(pres_train, pch='+')
+points(backg_train, pch='-', cex=0.25)
+@
+
+
+<<sdm108, fig=TRUE, width=9, height=6>>=
+vorm <- voronoiHull(p=pres_train, a=data.frame(back_train[sample(nrow(back_train), 100), ]))
+
+e <- evaluate(vorm, p=pres_test, a=backg_test, tr=quantile(ds, c(1:50/50)))
+e
+
+vo <- predict(seamask, vorm, mask=T)
+
+plot(vo, main='Voronoi Hull')
+plot(wrld_simpl, add=TRUE, border='dark grey')
+points(pres_train, pch='+')
+points(backg_train, pch='-', cex=0.25)
+@
 
 
 
@@ -1047,6 +1083,8 @@ Spatial-only models for presence/absence data are also available. See functions 
 
 
 \chapter{To do list}
+
+You can ignore this chapter, it is the authors' to-do list. 
 
 There are many sophistications that are required by the realities that (a) there are multiple end uses of models, and (b) there are numerous issues with ecological data that mean that the assumptions of the standard methods don't hold.  Could include:
 
@@ -1064,9 +1102,9 @@ There are many sophistications that are required by the realities that (a) there
 
 • link to phylogeography
 
-• advanced topics on predictors including remote sensing variables, thinking about extremes
+• additional predictors including remote sensing variables, thinking about extremes
 
-• species that don't "mix" with grids – freshwater systems etc.. 
+• species that don't "mix" with grids – freshwater systems etc.
 
 • quantile regression
 
@@ -1081,8 +1119,7 @@ There are many sophistications that are required by the realities that (a) there
 • See the BIOMOD for on multi-model inference.
 
 • Dealing with uncertainty 
-
-how to target the "important" uncertainties (will vary with the application), an example of partial plots with standard errors, and predicting the upper and lower bounds; the idea of testing sensitivity to decisions made in the modeling process (including dropping out points etc etc). 
+using uncertainty field in georeferences. How to target the "important" uncertainties (will vary with the application), an example of partial plots with standard errors, and predicting the upper and lower bounds; the idea of testing sensitivity to decisions made in the modeling process (including dropping out points etc etc). 
 
 
 \part{References}

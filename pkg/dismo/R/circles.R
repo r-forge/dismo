@@ -76,7 +76,7 @@
 setClass('CirclesRange',
 	contains = 'DistModel',
 	representation (
-		circles='SpatialPolygons'
+		polygons='SpatialPolygons'
 	),	
 	prototype (	
 	),
@@ -102,7 +102,7 @@ setMethod('circles', signature(p='data.frame'),
 		if (missing(d)) {
 			d <- .avgDist(p, lonlat=lonlat, r=r) / 2
 		}
-		ci@circles <- .generateCircles(p, d=d, lonlat=lonlat)
+		ci@polygons <- .generateCircles(p, d=d, lonlat=lonlat)
 		return(ci)
 	}
 )
@@ -126,7 +126,7 @@ setMethod('circles', signature(p='SpatialPoints'),
 
 setMethod("plot", signature(x='CirclesRange', y='missing'), 
 	function(x, ...) {
-		plot(x@circles, ...)
+		plot(x@polygons, ...)
 	}
 )
 
