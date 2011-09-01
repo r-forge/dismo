@@ -4,7 +4,7 @@
 # Licence GPL v3
 
 
-pwdSample <- function(fixed, sample, reference, tr=0.33, n=1, lonlat=TRUE) {
+pwdSample <- function(fixed, sample, reference, tr=0.33, n=1, lonlat=TRUE, warn=TRUE) {
 
 	distHaversine <- function (p1, p2) {
 		r <- 6378137
@@ -59,8 +59,10 @@ pwdSample <- function(fixed, sample, reference, tr=0.33, n=1, lonlat=TRUE) {
 	sample    <- as.matrix(sample)[,1:2]
 	reference <- as.matrix(reference)[,1:2]
 
-	if (nrow(sample) < nrow(fixed)) {
-		warning("nrow(sample) < nrow(fixed)")
+	if (warn) {
+		if (nrow(sample) < nrow(fixed)) {
+			warning("nrow(sample) < nrow(fixed)")
+		}
 	}
 	
 	fromd <- apply(distfun(fixed, reference), 1, min)
@@ -68,8 +70,10 @@ pwdSample <- function(fixed, sample, reference, tr=0.33, n=1, lonlat=TRUE) {
 
 	ngb <- matrix(NA, nrow=length(fromd), ncol=n)
 
+	iter <- sample(1:nrow(fixed)) # random order
+	
 	for (j in 1:n) {
-		for (i in 1:nrow(fixed)) {
+		for (i in iter) {
 			d <- abs(tod - fromd[i])
 			if (min(d) < (tr * fromd[i])) {
 				x <- which.min(d)

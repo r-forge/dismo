@@ -4,7 +4,7 @@
 # Licence GPL v3
 
 
-ssb <- function(p, a, reference, lonlat=TRUE) {
+ssb <- function(p, a, reference, lonlat=TRUE, avg=TRUE) {
 
 	distHaversine <- function (p1, p2) {
 		r <- 6378137
@@ -58,10 +58,15 @@ ssb <- function(p, a, reference, lonlat=TRUE) {
 		
 	pdist <- distfun(p, reference)
 	adist <- distfun(a, reference)
-	pd <- mean(apply(pdist, 1, min))
-	ad <- mean(apply(adist, 1, min))
+
+	pd <- apply(pdist, 1, min)
+	ad <- apply(adist, 1, min)
 	
-	cbind(pd, ad)
+	if (avg) {
+		return( cbind(mean(pd), mean(ad)) )
+	} else {
+		return( list(pd, ad) )
+	}
 }
 
 

@@ -9,7 +9,7 @@ Determine "spatial sorting bias", or the difference between two point data sets 
 }
 
 \usage{
-ssb(p, a, reference, lonlat=TRUE)
+ssb(p, a, reference, lonlat=TRUE, avg=TRUE)
 }
  
 \arguments{
@@ -17,6 +17,7 @@ ssb(p, a, reference, lonlat=TRUE)
   \item{a}{two column matrix (x, y) or (longitude/latitude) or SpatialPoints object, for point locations}
   \item{reference}{as above for reference point locations to which distances are computed}
   \item{lonlat}{ Logical. Use \code{TRUE} if the coordinates are spherical (in degrees), and use \code{FALSE} if they are planar }
+  \item{avg}{ Logical. If \code{TRUE} the distances are averaged }
 }
 
 \value{
