@@ -13,7 +13,7 @@ Hijmans (2011) proposes this sampling approach to remove 'spatial sorting bias' 
 }
 
 \usage{
-pwdSample(fixed, sample, reference, tr=0.33, n=1, lonlat=TRUE) 
+pwdSample(fixed, sample, reference, tr=0.33, n=1, lonlat=TRUE, warn=TRUE) 
 }
  
 \arguments{
@@ -23,6 +23,7 @@ pwdSample(fixed, sample, reference, tr=0.33, n=1, lonlat=TRUE)
   \item{n}{How many pairs do you want for each point in \code{fixed}}
   \item{tr}{ the threshold distance for a pair of points (one of \code{fixed} and one of \code{sample}) to their respective nearest point in \code{reference}. The absolute difference in distance between the candidate point pairs in \code{fixed} and \code{reference} (dfr) and the distance between candidate point pairs in \code{sample} and \code{reference} (dsr) must be smaller than \code{tr} * dfr. I.e. if the dfr = 100 km, and tr = 0.1, dsr must be between >90 and <110 km to be considered a valid pair.}
   \item{lonlat}{ Logical. Use \code{TRUE} if the coordinates are spherical (in degrees), and use \code{FALSE} if they are planar }
+  \item{warn}{ Logical. If \code{TRUE} a warning is given if \code{nrow(fixed) < nrow(sample)} }
 }
 
 \value{
