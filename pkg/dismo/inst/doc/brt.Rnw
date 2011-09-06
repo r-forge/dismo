@@ -16,9 +16,12 @@
 
 \SweaveOpts{keep.source=TRUE}
 \SweaveOpts{png=TRUE}
-\SweaveOpts{pdf=FALSE}
 \SweaveOpts{resolution=100}
 
+<<foo,include=FALSE,echo=FALSE>>=
+options(width = 65)
+set.seed(0)
+@
 
 \begin{document}
 
@@ -57,8 +60,6 @@ Two sets of presence/absence data for Anguilla australis (Angaus) are available.
 
 <<dismo-1>>=
 library(dismo)
-options(width=65)
-set.seed(0)
 data(Anguilla_train)
 head(Anguilla_train)
 @
