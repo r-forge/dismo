@@ -19,7 +19,7 @@
 \newcommand{\R}{{\normalfont\textsf{R }}{}}
 
 \SweaveOpts{png=TRUE}
-\SweaveOpts{resolution=100}
+% \SweaveOpts{resolution=100}
 \SweaveOpts{keep.source=TRUE}
 
 <<foo,include=FALSE,echo=FALSE>>=
