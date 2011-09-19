@@ -54,9 +54,11 @@ evaluate <- function(p, a, model, x, tr, ...) {
 		if (length(a) > 1000) {
 			a <- as.vector(quantile(a, 0:1000/1000))
 		}
-		tr <- sort(unique( round(c(-1, 0, a, p, 1, 2), 8 )))
+		tr <- sort(unique( round(c(a, p), 8 )))
+		tr <- c( tr - 0.0001, tr[length(tr)] + c(0, 0.0001))
+		
 	} else {
-		tr <- sort(tr)
+		tr <- sort(as.vector(tr))
 	}
 	
 	N <- na + np
