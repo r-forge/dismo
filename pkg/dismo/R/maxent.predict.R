@@ -35,7 +35,8 @@ setMethod('predict', signature(object='MaxEnt'),
 		args <- c(args, "")
 
 		if (! file.exists(object@path)) {
-			dir.create(object@path, recursive=TRUE, showWarnings=TRUE)
+			object@path <- .meTmpDir()
+			# dir.create(object@path, recursive=TRUE, showWarnings=TRUE)
 		}
 		lambdas <- paste(object@path, '/lambdas.csv', sep="")
 
