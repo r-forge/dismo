@@ -8,7 +8,9 @@
 .pointsInPolygons <- function(xy, polygons, fun=NULL) {
 # based on similar function in sp (overlay) by Pebesma and Bivand
 # and calling a C function from the SP package
-	polygons <- polygons@polygons
+# the difference is that this functions considers that a point can be inside
+# multiple polygons
+	polygons <- geometry(polygons)
 	xy <- coordinates(xy)
 	xy[] <- as.numeric(xy)
 	res <- vector(length=nrow(xy))

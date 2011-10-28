@@ -638,7 +638,7 @@ sb2 <- ssb(pres_test_pwd, back_test_pwd, pres_train)
 sb2[1]/ sb2[2]
 @
 
-Spatial sorting bias is much reduced now. The AUC drops from almost around 0.8 to 0.5!
+Spatial sorting bias is much reduced now; notice how the AUC dropped!
 
 <<sdm45d, echo=TRUE>>=
 bc <- bioclim(predictors, pres_train)
