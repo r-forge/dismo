@@ -10,7 +10,7 @@
 # and calling a C function from the SP package
 # the difference is that this functions considers that a point can be inside
 # multiple polygons
-	polygons <- geometry(polygons)
+	polygons <- polygons@polygons
 	xy <- coordinates(xy)
 	xy[] <- as.numeric(xy)
 	res <- vector(length=nrow(xy))
