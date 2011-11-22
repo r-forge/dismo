@@ -105,7 +105,7 @@ function(object, x, tails=NULL, ext=NULL, filename='', ...) {
 			res <- apply(bc, 1, min)
 			if (inmem) {
 				res <- matrix(res, nrow=ncols)
-				cols = tr$row[i]:(tr$row[i]+dim(res)[2]-1)
+				cols <- tr$row[i]:(tr$row[i]+dim(res)[2]-1)
 				v[ , cols] <- res
 			} else {
 				out <- writeValues(out, res, tr$row[i])
