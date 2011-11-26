@@ -111,12 +111,12 @@ function(x, var=NULL, at=median, range='pa', expand=10, rug=TRUE, ylim=c(0,1), c
 		if (sum(f) > 0) {
 			m[f] <- as.numeric(apply(d[,f,drop=FALSE], 2, modal))
 		}
-		m <- data.frame(m)
+		m <- matrix(m, nrow=1)
 		colnames(m) <- cn
 	} else {
 		at <- at[cn]
 		m <- as.vector(at)
-		m <- data.frame(m)
+		m <- matrix(m, nrow=1)
 		colnames(m) <- names(at)
 	}
 	
@@ -134,8 +134,8 @@ function(x, var=NULL, at=median, range='pa', expand=10, rug=TRUE, ylim=c(0,1), c
 		mm <- matrix(rep(m[,-i], length(v)), nrow=length(v), byrow=T)
 		colnames(mm) <- colnames(m)[-i]
 		a <- cbind(v, mm)
-		
 		colnames(a)[1] <- vr
+		
 		p <- predict(x, a)
 		if (add) {
 			points(a[,1], p, type='l', col=col, lwd=lwd, ...)
