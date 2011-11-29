@@ -37,7 +37,8 @@ gbif <- function(genus, species='', ext=NULL, geo=TRUE, sp=FALSE, removeZeros=TR
 
 	
 	if (!is.null(ext)) { 
-		ex <- paste('&minlatitude=',max(-90, ext@ymin),'&maxlatitude=',min(90, ext@ymax),'&minlongitude=',max(-180, ext@xmin),'&maxlongitude=',min(180, ext@xmax), sep='')
+		ex <- round(extent(ext), 5)
+		ex <- paste('&minlatitude=',max(-90, ex@ymin),'&maxlatitude=',min(90, ex@ymax),'&minlongitude=',max(-180, ex@xmin),'&maxlongitude=',min(180, ex@xmax), sep='')
 	} else {
 		ex <- NULL
 	}
@@ -150,6 +151,7 @@ gbif <- function(genus, species='', ext=NULL, geo=TRUE, sp=FALSE, removeZeros=TR
 		}
 	}
 
+#	if (inherits(ext, 'SpatialPolygons')) { overlay	}
 	return(z)
 }
 
