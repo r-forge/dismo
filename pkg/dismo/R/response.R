@@ -124,7 +124,7 @@ function(x, var=NULL, at=median, range='pa', expand=10, rug=TRUE, ylim=c(0,1), c
 		i <- which(cn==vr)
 		v <- d[,i]
 		if (is.factor(v)) {
-			v <- levels(v)
+			v <- as.numeric(levels(v))
 		} else {
 			v <- range(v)
 			expand <- round(abs(expand))
