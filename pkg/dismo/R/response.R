@@ -125,7 +125,9 @@ function(x, var=NULL, at=median, range='pa', expand=10, rug=TRUE, ylim=c(0,1), c
 		v <- d[,i]
 		if (is.factor(v)) {
 			v <- as.numeric(levels(v))
+			fact <- TRUE
 		} else {
+			fact <- FALSE
 			v <- range(v)
 			expand <- round(abs(expand))
 			v <- v[1] + (-expand):(100+expand) * (v[2]-v[1])/100
@@ -138,9 +140,17 @@ function(x, var=NULL, at=median, range='pa', expand=10, rug=TRUE, ylim=c(0,1), c
 		
 		p <- predict(x, a)
 		if (add) {
-			points(a[,1], p, type='l', col=col, lwd=lwd, ...)
+			if (fact) {
+				points(a[,1], p, col=col, lwd=lwd, ...)
+			} else {
+				points(a[,1], p, col=col, lwd=lwd, type='l', ...)			
+			}
 		} else {
-			plot(a[,1], p, type='l', xlab=vr, ylab='predicted value', col=col, lwd=lwd, ylim=ylim, ...)
+			if (fact) {
+				plot(a[,1], p, xlab=vr, ylab='predicted value', col=col, lwd=lwd, ylim=ylim, ...)
+			} else {
+				plot(a[,1], p, xlab=vr, ylab='predicted value', col=col, lwd=lwd, ylim=ylim, type='l', ...)
+			}
 			if (rug) {
 				if (!is.factor(d[,i])) {
 					rug(quantile(d[,i], probs = seq(0, 1, 0.1)), col='blue')

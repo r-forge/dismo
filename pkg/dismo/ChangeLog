@@ -1,3 +1,8 @@
+--- 30-November-2011, version 0.7-13
+New 'ext' argument to gbif function to allow for querying for a geographic region
+imrovements to 'response'
+Fixed bug in 'evaluate' when using > 1000 evaluation points, discovered by Diego Nieto Lugilde
+
 --- 18-October-2011, version 0.7-12
 Fixed a problem with maxent that could occur when predicting from a an object fitted on another machine. Reported by Adam Smith: https://r-forge.r-project.org/forum/message.php?msg_id=5060 
 Fixed bug in biogeomancer function

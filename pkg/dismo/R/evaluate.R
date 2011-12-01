@@ -48,9 +48,17 @@ evaluate <- function(p, a, model, x, tr, ...) {
 	}
 
 	if (missing(tr)) {
-		tp <- as.vector(quantile(p, 0:1000/1000))
-		ta <- as.vector(quantile(a, 0:1000/1000))
-		tr <- sort(unique( round(c(ta, tp), 8)))
+		if (length(p) > 1000) {
+			tr <- as.vector(quantile(p, 0:1000/1000))
+		} else {
+			tr <- p
+		}
+		if (length(a) > 1000) {
+			tr <- c(tr, as.vector(quantile(a, 0:1000/1000)))
+		} else {
+			tr <- c(tr, a)
+		}
+		tr <- sort(unique( round(tr, 8)))
 		tr <- c( tr - 0.0001, tr[length(tr)] + c(0, 0.0001))
 	} else {
 		tr <- sort(as.vector(tr))
