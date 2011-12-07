@@ -134,12 +134,16 @@ setMethod('maxent', signature(x='missing', p='missing'),
 setMethod('maxent', signature(x='SpatialGridDataFrame', p='ANY'), 
 	function(x, p, a=NULL,...) {
 		factors = NULL
-		for (i in 1:colnames(x@data)) {
-			if (is.factor(x[,i])) { factors = c(factors, colnames(x@data)[i]) }
+		for (i in 1:ncol(x@data)) {
+			if (is.factor(x@data[,i])) { 
+				factors = c(factors, colnames(x@data)[i]) 
+			}
 		}
 		x <- brick(x)
 		p <- .getMatrix(p)
-		if (! is.null(a) ) { a <- .getMatrix(a) }
+		if (! is.null(a) ) { 
+			a <- .getMatrix(a) 
+		}
 		# Signature = raster, ANY
 		maxent(x, p, a, factors=factors, ...)
 	}
