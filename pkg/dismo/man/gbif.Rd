@@ -12,7 +12,7 @@ This function downloads species occurence records from the Global Biodiversity I
 
 
 \usage{
-gbif(genus, species="", ext=NULL, geo=TRUE, sp=FALSE, removeZeros=TRUE, download=TRUE, getAlt=TRUE, ntries=5, feedback=3)
+gbif(genus, species="", ext=NULL, geo=TRUE, sp=FALSE, removeZeros=TRUE, download=TRUE, getAlt=TRUE, ntries=5, nrecs=1000, start=1, end=NULL, feedback=3)
 }
  
 \arguments{
@@ -25,6 +25,9 @@ gbif(genus, species="", ext=NULL, geo=TRUE, sp=FALSE, removeZeros=TRUE, download
   \item{download}{Logical. If \code{TRUE}, records will be downloaded, else only the number of records will be shown}
   \item{getAlt}{Logical. If \code{TRUE}, elevation data (4 character variables) will be processed into a single new numerical variable}
   \item{ntries}{Integer. How many times should the function attempt to download the data, if an invalid response is returned (perhaps because the GBIF server is very busy)}
+  \item{nrecs}{Integer. How many records to download in a single request (max is 1000)?}
+  \item{start}{Integer. Record number from which to start requesting data}
+  \item{end}{Integer. Last record to request}
   \item{feedback}{Integer. Lower values give less feedback (0-no messages; 3-all messages)}
 }
 

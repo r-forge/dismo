@@ -8,7 +8,7 @@
 # implemented trycatch to deal with poor response from GBIF server
 # suggestion and changed code provided by John Baumgartner
 
-gbif <- function(genus, species='', ext=NULL, geo=TRUE, sp=FALSE, removeZeros=TRUE, download=TRUE, getAlt=TRUE, ntries=5, feedback=3) {
+gbif <- function(genus, species='', ext=NULL, geo=TRUE, sp=FALSE, removeZeros=TRUE, download=TRUE, getAlt=TRUE, ntries=5, nrecs=1000, start=1, end=NULL, feedback=3) {
 	
 	if (! require(XML)) { stop('You need to install the XML package to use this function') }
 
@@ -76,9 +76,6 @@ gbif <- function(genus, species='', ext=NULL, geo=TRUE, sp=FALSE, removeZeros=TR
         return(n)
     }
 	
-	ntries <- min(max(ntries, 1), 100)
-	if (! download) { return(n) }
-	
     if (n==0) {
 		cat(gensp, ': no occurrences found\n')
         return(invisible(NULL))
@@ -89,15 +86,25 @@ gbif <- function(genus, species='', ext=NULL, geo=TRUE, sp=FALSE, removeZeros=TR
 		}
 	}
 
-    iter <- n %/% 1000
+	ntries <- min(max(ntries, 1), 100)
+	if (! download) { return(n) }
+	nrecs <- min(max(nrecs, 1), 1000)
+	
+    iter <- n %/% nrecs
 	first <- TRUE
-    for (group in 0:iter) {
-        start <- group * 1000
+	breakout <- FALSE
+	if (start > 1) {
+		ss <- floor(start/nrecs)
+	} else {
+		ss <- 0
+	}
+    for (group in ss:iter) {
+        start <- group * nrecs
 		if (feedback > 1) {
-			if (group == iter) { end <- n-1 } else { end <- start + 999 }
-			if (group == 0) { cat('1-', end+1, sep='')  
+			if (group == iter) { end <- n-1 } else { end <- start + nrecs - 1 }
+			if (group == ss) { cat(ss, '-', end+1, sep='')  
 			} else { cat('-', end+1, sep='')  }
-			if ((group != 0 & group %% 20 == 0)  |  group == iter ) { cat('\n') }
+			if ((group > ss & group %% 20 == 0)  |  group == iter ) { cat('\n') }
 			flush.console()
 		}
 		
@@ -109,21 +116,26 @@ gbif <- function(genus, species='', ext=NULL, geo=TRUE, sp=FALSE, removeZeros=TR
         while (!exists('zz')) {
 			if (tries > 1) {
 				if (tries > ntries) {
-					stop('GBIF did not return the data in ', ntries, ' tries')
+					warning('GBIF did not return the data in ', ntries, ' tries\nreturning incomplete data')
+					breakout <- TRUE
+					break
 				} else {
-					cat('(try: ',tries,')')
+					cat('(try:',tries,')')
 				}
 			}
 			tries <- tries + 1
 	    	tryCatch( zz <- gbifxmlToDataFrame(aurl), error = function(e) cat('failed.\n') )
 	    }
         #======================================================================#
-
+		
 		if (first) {
 			z <- zz
 			first <- FALSE
 		} else {
 			z <- rbind(z, zz)
+		}
+		if (breakout) {
+			break
 		}
 	}
 
