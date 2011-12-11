@@ -168,7 +168,7 @@ setMethod('maxent', signature(x='SpatialGridDataFrame', p='ANY'),
 
 
 setMethod('maxent', signature(x='Raster', p='ANY'), 
-	function(x, p, a=NULL, factors=NULL, removeDuplicates=TRUE, ...) {
+	function(x, p, a=NULL, factors=NULL, removeDuplicates=TRUE, nbg=10000, ...) {
 
 		p <- .getMatrix(p)
 		if (removeDuplicates) {
@@ -178,13 +178,14 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 			pv <- data.frame(extract(x, p))
 		}
 
-		pv1 <- na.omit(pv)
-		nas <- length(as.vector(attr(pv1, "na.action")))
+		lpv <- nrow(pv)
+		pv <- na.omit(pv)
+		nas <- lpv - nrow(pv)
 		if (nas > 0) {
-			if (nas >= 0.5 * nrow(pv)) {
+			if (nas >= 0.5 * lpv) {
 				stop('more than half of the presence points have NA predictor values')
 			} else {
-				warning(100*nas/nrow(pv), '% of the presence points have NA predictor values')
+				warning(round(100*nas/lpv,6), '% of the presence points have NA predictor values')
 			}
 		} 
 		
@@ -203,17 +204,17 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 			}
 		} else { 
 		# random absence
-			bg <- list(...)$ngb
-			if (is.null(bg)) { bg <- 10000 
+			if (is.null(nbg)) {
+				nbg <- 10000 
 			} else {
-				if (bg < 100) {
+				if (nbg < 100) {
 					stop('number of background points is very low')
-				} else if (bg < 1000) {
+				} else if (nbg < 1000) {
 					warning('number of background points is very low')
 				}
 			}
 
-			xy <- randomPoints( raster(x,1), bg, p, warn=0 )
+			xy <- randomPoints( raster(x,1), nbg, p, warn=0 )
 			av <- data.frame(extract(x, xy))
 			av <- na.omit(av)
 			if (nrow(av) == 0) {

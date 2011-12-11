@@ -66,7 +66,6 @@ gbif <- function(genus, species='', ext=NULL, geo=TRUE, sp=FALSE, removeZeros=TR
 		if (tries == 5) { # if you cannot do this in 5 tries, you might as well stop
 			stop('GBIF server does not return a valid answer')
 		}
-    	cat(sprintf('Trying to get number of records for %s... ', gensp))
     	tryCatch(x <- readLines(url, warn = FALSE), error = function(e) cat('failed.\n'))
 		tries <- tries + 1
     }
