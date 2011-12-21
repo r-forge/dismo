@@ -199,7 +199,7 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 				if (nas >= 0.5 * avr) {
 					stop('more than half of the absence points have NA predictor values')
 				} else {
-					warning(100*nas/nrow(avr), '% of the presence points have NA predictor values')
+					warning(100*nas/avr, '% of the presence points have NA predictor values')
 				}
 			}
 		} else { 
