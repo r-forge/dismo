@@ -11,7 +11,7 @@ shapefile <- function(filename) {
 	}
 	fn <- basename(filename) 
 	extension(fn) <- ''
-	vec <- readOGR(dirname(filename), fn) 
+	vec <- readOGR(dirname(filename), fn, stringsAsFactors=FALSE) 
 	return(vec)
 }
 
