@@ -1,3 +1,9 @@
+--- 15-January-2012, version 0.7-15
+New argument to pwdSample, "nearest", suggested by Kumar Mainali 
+
+--- January-2012, version 0.7-14
+function gbif now attempts to download the data n times if downloads are interrupted (likely because of high traffic loads at the gbif server). Suggestion and changed code provided by John Baumgartner.
+
 --- 30-November-2011, version 0.7-13
 New 'ext' argument to gbif function to allow for querying for a geographic region
 imrovements to 'response'
