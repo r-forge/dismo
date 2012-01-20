@@ -22,7 +22,7 @@ pwdSample(fixed, sample, reference, tr=0.33, nearest=TRUE, n=1, lonlat=TRUE, war
   \item{reference}{as above for reference point locations to which distances are computed}
   \item{n}{How many pairs do you want for each point in \code{fixed}}
   \item{tr}{Numeric, normally below 1. The threshold distance for a pair of points (one of \code{fixed} and one of \code{sample}) to their respective nearest points in \code{reference} to be considered a valid pair. The absolute difference in distance between the candidate point pairs in \code{fixed} and \code{reference} (dfr) and the distance between candidate point pairs in \code{sample} and \code{reference} (dsr) must be smaller than \code{tr} * dfr. I.e. if the dfr = 100 km, and tr = 0.1, dsr must be between >90 and <110 km to be considered a valid pair.}
-  \item{nearest}{Logical. If \code{TRUE}, the pair with the smallest difference in distance to their nearest \code{reference} point is selected. If \code{FALSE}, a random point from the valid pairs (with a difference in distance below the threshold defined by \code{tr}) is selected}
+  \item{nearest}{Logical. If \code{TRUE}, the pair with the smallest difference in distance to their nearest \code{reference} point is selected. If \code{FALSE}, a random point from the valid pairs (with a difference in distance below the threshold defined by \code{tr}) is selected (generally leading to higher \code{\link{ssb})}
   \item{lonlat}{ Logical. Use \code{TRUE} if the coordinates are spherical (in degrees), and use \code{FALSE} if they are planar }
   \item{warn}{ Logical. If \code{TRUE} a warning is given if \code{nrow(fixed) < nrow(sample)} }
 }
