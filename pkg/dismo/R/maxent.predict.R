@@ -35,13 +35,13 @@ setMethod('predict', signature(object='MaxEnt'),
 		args <- c(args, "")
 
 		if (! file.exists(object@path)) {
-			object@path <- .meTmpDir()
-			# dir.create(object@path, recursive=TRUE, showWarnings=TRUE)
+			object@path <- paste(.meTmpDir(), '/', paste(round(runif(10) * 10), collapse = ""), sep='')
+			if (! file.exists(object@path)) {
+				dir.create(object@path, recursive=TRUE, showWarnings=TRUE)
+			}
 		}
 		lambdas <- paste(object@path, '/lambdas.csv', sep="")
-
-
-		variables = colnames(object@presence)
+		variables <- colnames(object@presence)
 		write.table(object@lambdas, file=lambdas, row.names=FALSE, col.names=FALSE, quote=FALSE)
 		
 		MEversion <- dismo:::.getMeVersion()
