@@ -1,4 +1,4 @@
---- 31-January-2012, version 0.7-17
+--- 6-February-2012, version 0.7-17
 New argument to pwdSample, "nearest", suggested by Kumar Mainali 
 maxent no longer needs to write a parameters file to disk to make a prediction (this led in some cases to problems when using a cluster; reported by Rafael Wüest). 
 

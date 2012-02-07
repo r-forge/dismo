@@ -85,7 +85,7 @@ setMethod('predict', signature(object='MaxEnt'),
 				inMemory <- FALSE
 			}
 
-			if (.doCluster()) {
+			if (raster:::.doCluster()) {
 				cl <- getCluster()
 				on.exit( returnCluster() )
 				nodes <- min(ceiling(out@nrows/10), length(cl)) # at least 10 rows per node
