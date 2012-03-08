@@ -12,7 +12,8 @@ This function downloads species occurence records from the Global Biodiversity I
 
 
 \usage{
-gbif(genus, species="", ext=NULL, geo=TRUE, sp=FALSE, removeZeros=TRUE, download=TRUE, getAlt=TRUE, ntries=5, nrecs=1000, start=1, end=NULL, feedback=3)
+gbif(genus, species="", ext=NULL, geo=TRUE, sp=FALSE, removeZeros=TRUE, download=TRUE,
+     getAlt=TRUE, ntries=5, nrecs=1000, start=1, end=NULL, feedback=3)
 }
  
 \arguments{
