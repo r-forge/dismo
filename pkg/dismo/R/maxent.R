@@ -400,7 +400,7 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 
 
 .meTmpDir <- function() {
-	return( paste(dirname(tempdir()), '/R_raster_tmp/maxent', sep="") )
+	return( paste(raster:::.tmpdir(), 'maxent', sep="") )
 }
 
 
@@ -414,11 +414,13 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 setMethod("plot", signature(x='MaxEnt', y='missing'), 
 	function(x, sort=TRUE, main='Variable contribution', xlab='Percentage', ...) {
 		r <- x@results
-		rnames = rownames(r)
+		rnames <- rownames(r)
 		i <- grep('.contribution', rnames)
 		r <- r[i, ]
 		names(r) <- gsub('.contribution', '', names(r))
-		if (sort) r = sort(r)
+		if (sort) {
+			r <- sort(r)
+		}
 		dotchart(r, main=main, xlab=xlab, ...)
 	}
 )
