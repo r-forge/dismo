@@ -30,6 +30,7 @@ setMethod('predict', signature(object='MaxEntReplicates'),
 setMethod('predict', signature(object='MaxEnt'), 
 	function(object, x, ext=NULL, args="", filename='', ...) {
 
+		.rJava()
 		args <- c(args, "")
 
 		#if (! file.exists(object@path)) {
