@@ -6,13 +6,15 @@ if (!isGeneric("response")) {
 
 
 setMethod("response", signature(x='DistModel'), 
-function(x, var=NULL, at=median, range='pa', expand=10, rug=TRUE, ylim=c(0,1), col='red', lwd=2, add=FALSE, ... ) {
+function(x, var=NULL, at=median, range='pa', expand=10, rug=TRUE, ylim=c(0,1), col='red', lwd=2, add=FALSE, data=NULL, ... ) {
 	stopifnot(range %in% c('p', 'pa'))
-	d <- x@presence
-	if (range == 'pa' & x@hasabsence) {
-		d <- rbind(d, x@absence)
+	if (is.null(data)) {
+		data <- x@presence
+		if (range == 'pa' & x@hasabsence) {
+			data <- rbind(data, x@absence)
+		}
 	}
-	cn <- colnames(d)
+	cn <- colnames(data)
 	if (is.null(var)) {
 		var <- cn
 	}
@@ -23,9 +25,11 @@ function(x, var=NULL, at=median, range='pa', expand=10, rug=TRUE, ylim=c(0,1), c
 		# ?
 	}
 	var <- var[var %in% cn]
-	if (length(var) == 0) { stop('var not found')	}
+	if (length(var) == 0) { 
+		stop('var not found')	
+	}
 
-	.doResponse(x, var, at, d, cn, expand, rug, ylim, col, lwd, add, ... )
+	.doResponse(x, var, at, data, cn, expand, rug, ylim, col, lwd, add, ... )
 
 }
 )
@@ -38,11 +42,13 @@ function(x, var=NULL, at=median, range='pa', expand=10, rug=TRUE, ylim=c(0,1), c
 		if (i > 1) {
 			add = TRUE
 		}
-		d <- x[[i]]@presence
-		if (range == 'pa' & x@hasabsence) {
-			d <- rbind(d, x@absence)
+		if (is.null(data)) {
+			data <- x@presence
+			if (range == 'pa' & x@hasabsence) {
+				data <- rbind(data, x@absence)
+			}
 		}
-		cn <- colnames(d)
+		cn <- colnames(data)
 		if (is.null(var)) {
 			var <- cn
 		}
@@ -55,7 +61,7 @@ function(x, var=NULL, at=median, range='pa', expand=10, rug=TRUE, ylim=c(0,1), c
 		var <- var[var %in% cn]
 		if (length(var) == 0) { stop('var not found')	}
 
-		.doResponse(x[[i]], var, at, d, cn, expand, rug, ylim, col, lwd, add, ... )
+		.doResponse(x[[i]], var, at, data, cn, expand, rug, ylim, col, lwd, add, ... )
 	}
 }
 )
@@ -66,14 +72,13 @@ function(x, var=NULL, at=median, range='pa', expand=10, rug=TRUE, ylim=c(0,1), c
 	stopifnot(range %in% c('p', 'pa'))
 
 	cn <- names(attr(x$terms, "dataClasses")[-1])
-	d <- x$model
-	if (is.null(d)) {
-		d <- x$data
+	if (is.null(data)) {
+		data <- x$model
 	}
-	if (is.null(d)) {
-		d <- data
+	if (is.null(data)) {
+		data <- x$data
 	}
-	if (is.null(d)) {
+	if (is.null(data)) {
 		stop('The model object does not seem to have the data used to fit it. Provide these with a "data= " argument')
 	}
 	
@@ -93,8 +98,8 @@ function(x, var=NULL, at=median, range='pa', expand=10, rug=TRUE, ylim=c(0,1), c
 #	var <- var[var %in% cn]
 	if (length(var) == 0) { stop('var not found')	}
 
-	d <- d[, var]
-	.doResponse(x, var, at, d, cn, expand, rug, ylim, col, lwd, add, ... )
+	data <- data[, var]
+	.doResponse(x, var, at, data, cn, expand, rug, ylim, col, lwd, add, ... )
 
 }
 )
