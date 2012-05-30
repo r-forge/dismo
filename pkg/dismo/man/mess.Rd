@@ -24,12 +24,11 @@ Either a RasterStack object with n layers corresponding to the values for each i
 }
 
 \references{
-Elith J., Kearney M., Phillips S. 2010. The art of modelling range-shifting species. Methods in Ecology and Evolution 1:330-342.
+Elith J., M. Kearney M., and S. Phillips, 2010. The art of modelling range-shifting species. \href{http://onlinelibrary.wiley.com/doi/10.1111/j.2041-210X.2010.00036.x/abstract}{Methods in Ecology and Evolution 1:330-342}.
 }
 
-}
 \author{
-Jean-Pierre Rossi, <jean-pierre.rossi@supagro.inra.fr>
+Jean-Pierre Rossi <jean-pierre.rossi@supagro.inra.fr>
 }
 
 
