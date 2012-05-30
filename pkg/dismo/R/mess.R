@@ -1,0 +1,28 @@
+mess<-function(X,V,full=TRUE)
+{
+messi<-function(p,v){
+    niinf<-length(which(v<=p))
+    f<-100 * niinf / length(v)
+    if(f==0) simi<-100*(p-min(v))/(max(v)-min(v))
+    if(0<f & f<=50) simi<-2*f
+    if(50<=f & f<100) simi<-2*(100-f)
+    if(f==100) simi<-100*(max(v)-p)/(max(v)-min(v))
+    return(simi)
+    }
+E<-extract(x=X,y=1:ncell(X))
+r_mess<-X
+for (i in 1:(dim(E)[2])) {
+    e<-data.frame(E[,i]) ; v<-V[,i]
+    r_mess[[i]][]<-apply(X=e, MARGIN=1, FUN=messi, v=v)
+    }
+rmess<-r_mess[[1]]
+E<-extract(x=r_mess,y=1:ncell(r_mess[[1]]))
+rmess[]<-apply(X=E, MARGIN=1, FUN=min)
+
+if(full==TRUE) {
+    out <- addLayer(r_mess,rmess)
+    layerNames(out)<-c(layerNames(X),"mess")
+}
+if(full==FALSE) out <- rmess
+return(out)
+}
