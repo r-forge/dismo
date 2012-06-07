@@ -5,7 +5,7 @@
 
 \description{Compute multivariate environmental similarity surfaces (MESS), as described by Elith et al., 2010}
 
-\usage{mess(X, v, full=TRUE)}
+\usage{mess(x, v, full=TRUE)}
 
 \arguments{
   \item{x}{A Raster* object}
