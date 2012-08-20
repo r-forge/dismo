@@ -119,15 +119,18 @@ if (!isGeneric("maxent")) {
 
 
 setMethod('maxent', signature(x='missing', p='missing'), 
-	function(x, p, ...) {
+	function(x, p, silent=FALSE, ...) {
 		.rJava()
 		jar <- paste(system.file(package="dismo"), "/java/maxent.jar", sep='')
 		if (!file.exists(jar)) {
-			stop('maxent program is missing: ', jar, '\nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
+			warning('maxent program is missing: ', jar, '\nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
+			return(FALSE)
 		}
 		v <- .getMeVersion()
-		cat('This is MaxEnt version', v, '\n' )
-		return(invisible(v))
+		if (!silent) {
+			cat('This is MaxEnt version', v, '\n' )
+		}
+		return(TRUE)
 	}
 )
 
@@ -135,7 +138,7 @@ setMethod('maxent', signature(x='SpatialGridDataFrame', p='ANY'),
 	function(x, p, a=NULL,...) {
 		factors = NULL
 		for (i in 1:ncol(x@data)) {
-			if (is.factor(x@data[,i])) { 
+			if (is.factor(x@data[,i]) | is.character(x@data[,i])) { 
 				factors = c(factors, colnames(x@data)[i]) 
 			}
 		}

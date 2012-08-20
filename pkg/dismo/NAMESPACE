@@ -1,4 +1,5 @@
 import("raster")
 importFrom("graphics", plot, points)
+exportMethods("predict")
 exportPattern("^[^\\.]")
 exportClasses(DistModel,MaxEnt)
