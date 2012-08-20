@@ -7,8 +7,12 @@
 \alias{predict,Domain-method}
 \alias{predict,Mahalanobis-method}
 \alias{predict,MaxEnt-method}
+\alias{predict,MaxEntReplicates-method}
 \alias{predict,ConvexHull-method}
-\alias{predict,geoDist-method}
+\alias{predict,CirclesRange-method}
+\alias{predict,GeographicDistance-method}
+\alias{predict,InvDistWeightModel-method}
+\alias{predict,VoronoiHull-method}
 
 \title{Distribution model predictions}
 
