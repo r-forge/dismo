@@ -29,12 +29,11 @@ setMethod('predict', signature(object='VoronoiHull'),
 		
 			if (! inherits(x, 'SpatialPoints') )  {
 				x <- data.frame(x[,1:2])
-				colnames(x) = c('x', 'y')
-				coordinates(x) = ~ x + y
+				colnames(x) <- c('x', 'y')
+				coordinates(x) <- ~ x + y
 			}
 			
-			v <- .pointsInPolygons(x, object@polygons) 			
-			return(v)
+			return( .pointsInPolygons(x, object@polygons, sum) )
 		}
 	}
 )
