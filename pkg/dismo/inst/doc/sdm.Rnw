@@ -242,16 +242,16 @@ Among the first records is an old acquaintance. The record, with catalog number 
 
 We recommend using a tool like BioGeomancer: \url{http://bg.berkeley.edu/latest} (Guralnick \textit{et al}., 2006) to georeference textual locality descriptions. An important feature of BioGeomancer is that it attempts to capture the uncertainty associated with each georeference (Wieczorek \textit{et al}., 2004). The dismo package has a function \texttt{biogeomancer} that you can use for this, and that we demonstrate below, but its use is generally not recommended because you really need a detailed map interface for accurate georeferencing. 
 
-Here is an example for one of the records with longitude = 0. We put the biogeomancer function into a 'try' function, to assure elegant error handling if the computer is not connected to the Internet.
+Here is an example for one of the records with longitude = 0, using Google's geocoding service. We put the function into a 'try' function, to assure elegant error handling if the computer is not connected to the Internet.
 
 <<sdm9>>=
 args(biogeomancer)
 # the first locality:
-lonzero$locality[1]
-b <- try( biogeomancer('Peru', locality=lonzero$locality[1], progress=''))
+loc <- paste(lonzero$locality[1], ", Peru")
+loc
+b <- try(  geocode(loc, oneRecord=T) )
 b
 @
-
 
 
 \section{Sampling bias}
