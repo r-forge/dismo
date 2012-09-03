@@ -26,7 +26,7 @@ mess <- function(x, v, full=TRUE) {
 
 	if(full==TRUE) {
 		out <- addLayer(r_mess,rmess)
-		layerNames(out)<-c(layerNames(x),"mess")
+		names(out)<-c(names(x),"mess")
 	}
 	
 	if(full==FALSE) out <- rmess

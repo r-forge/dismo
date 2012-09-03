@@ -61,7 +61,7 @@ setMethod('predict', signature(object='MaxEnt'),
 		
 		if (inherits(x, "Raster")) {
 			
-			if (! all(colnames(object@presence)  %in%  layerNames(x) )) {
+			if (! all(colnames(object@presence)  %in%  names(x) )) {
 				stop('missing layers (or wrong names)')
 			}
 			
