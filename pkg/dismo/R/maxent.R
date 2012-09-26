@@ -96,6 +96,8 @@ if (!isGeneric("maxent")) {
 
 .rJava <- function() {
 	if (is.null(getOption('dismo_rJavaLoaded'))) {
+		# to avoid trouble on macs
+		Sys.setenv(NOAWT=TRUE)
 		if ( require(rJava) ) {
 			.jpackage('dismo')
 			options(dismo_rJavaLoaded=TRUE)
