@@ -52,7 +52,10 @@ Some people have reported problems when using this function on a Mac (Apple) com
 \code{Error in .jcall(mxe, "S", "fit", c("autorun", "-e", afn, "-o", dirout, : java.lang.InternalError: Can't start the AWT because
 Java was started on the first thread. Make sure StartOnFirstThread is not specified in your application's Info.plist or on the command line.}
 
-This is a known problem with certain Java applications on Macs. The only work around that we are aware of, is to run the maxent function from the JGR interface (a Java based R GUI), instead of from, e.g., Rgui. You can install JGR from here: \url{http://www.rforge.net/JGR/}
+This is a known problem with certain Java applications on Macs. There are two work arounds that we are aware of:
+1) run \code{Sys.setenv(NOAWT=TRUE)} before running \code{library rJava} (this is what dismo does if rJava is not loaded).
+
+2) use the JGR interface (a Java based R GUI). You can install JGR from here: \url{http://www.rforge.net/JGR/}
 }
 
 
