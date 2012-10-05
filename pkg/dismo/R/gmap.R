@@ -1,4 +1,4 @@
-# Author: Robert J. Hijmans, r.hijmans@gmail.com
+# Author: Robert J. Hijmans
 # Date :  July 2010
 # Version 1.0
 # Licence GPL v3
@@ -6,6 +6,7 @@
 # Based on functions in R package 'RgoogleMaps' 
 # by Markus Loecher, Sense Networks <markus at sensenetworks.com>
 
+# with contributions by Sébastien Rochette
 
 gmap <- function(x, exp=1, type='terrain', filename='', style=NULL, size=c(640, 640), scale=1, RGB=FALSE, lonlat=FALSE, ...) {
 
