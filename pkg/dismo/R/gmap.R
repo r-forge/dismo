@@ -170,7 +170,7 @@ gmap <- function(x, exp=1, type='terrain', filename='', style=NULL, size=c(640, 
 		r@legend@colortable <- ct
 	}
 	
-    if(rgb){
+    if(RGB){
 		d <- t( col2rgb(r@legend@colortable) )
 		d <- data.frame(id=0:255, d)
 		r <- subs(r, d, which=2:4)
