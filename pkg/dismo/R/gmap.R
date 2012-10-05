@@ -8,15 +8,15 @@
 
 # with contributions by Sébastien Rochette
 
-gmap <- function(x, exp=1, type='terrain', filename='', style=NULL, size=c(640, 640), scale=1, RGB=FALSE, lonlat=FALSE, ...) {
+gmap <- function(x, exp=1, type='terrain', filename='', style=NULL, scale=1, zoom=NULL, rgb=FALSE, lonlat=FALSE, size=c(640, 640), ...) {
 
 	if (! require(rgdal) ) { 
 		stop('rgdal not available') 
 	}
 	
 	if (! type %in% c('roadmap', 'satellite', 'hybrid', 'terrain')) {
-		warning("type should be: roadmap, satellite, hybrid, or terrain.") 
-		type <- 'roadmap'
+		warning("type should be: roadmap, satellite, hybrid, or terrain: Terrain chosen by default") 
+		type <- 'terrain'
 	}
 	
 	mxzoom <- function(latrange, lonrange, size=size) {
@@ -117,8 +117,10 @@ gmap <- function(x, exp=1, type='terrain', filename='', style=NULL, size=c(640, 
 		lonR <- c(e@xmin, e@xmax)
 		latR <- c(e@ymin, e@ymax)
 
-		size <- c(640, 640)
-		zoom <- min(mxzoom(latR, lonR, size))
+# 		size <- c(640, 640)
+		if(is.null(zoom)){
+		  zoom <- min(mxzoom(latR, lonR, size))
+		}
 		center <- c(mean(latR), mean(lonR))
  	
 		ll <- ll2XY(latR[1], lonR[1], zoom)
@@ -170,7 +172,7 @@ gmap <- function(x, exp=1, type='terrain', filename='', style=NULL, size=c(640, 
 		r@legend@colortable <- ct
 	}
 	
-    if(RGB){
+    if(rgb){
 		d <- t( col2rgb(r@legend@colortable) )
 		d <- data.frame(id=0:255, d)
 		r <- subs(r, d, which=2:4)
@@ -182,26 +184,3 @@ gmap <- function(x, exp=1, type='terrain', filename='', style=NULL, size=c(640, 
 #e = extent( -121.9531 , -120.3897 , 35.36 , 36.61956 )
 #r = gmap(e)
 #plot(r)
-
-
-# not relevant without gmap
-Mercator <- function (p, inverse = FALSE) {
-#author: RH
-	r = 6378137
-    toRad <- pi/180
-    if (inverse) {
-        p <- .pointsToMatrix(p, checkLonLat = FALSE)
-        p[, 2] <- pi/2 - 2 * atan(exp(-p[, 2]/r))
-        p[, 1] <- p[, 1]/r
-        colnames(p) <- c("lon", "lat")
-        return(p/toRad)
-    }
-    else {
-        p <- .pointsToMatrix(p) * toRad
-        p[, 2] <- log(tan(p[, 2]) + (1/cos(p[, 2])))
-        p <- p * r
-        colnames(p) <- c("x", "y")
-        return(p)
-    }
-}
-
