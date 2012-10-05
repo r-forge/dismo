@@ -17,25 +17,31 @@ The purpose of using this function should be to display the map in a browser. Yo
 }
 
 \usage{
-gmap(x, exp=1, type='terrain', filename='', style, ...) 
-Mercator(p, inverse = FALSE) 
+gmap(x, exp=1, type='terrain', filename='', style=NULL, scale=1, zoom=NULL, rgb=FALSE, lonlat=FALSE, size=c(640, 640), ...)
+
+Mercator(p, inverse = FALSE)
 }
 
 \arguments{
-  \item{x}{A textual locality description, or an Extent object or an object that can be coerced to one (e.g. a Raster* or Spatial* object)}
-  \item{exp}{An expansion factor to enlarge (by multiplication) the extent specified by \code{x} }
-  \item{type}{Character. Choose from 'roadmap', 'satellite', 'hybrid', 'terrain' }
-  \item{filename}{Character. Filename (optional). You can open the resulting file in a GIS program }
-  \item{style}{Character. Additional style arguments. See \url{http://code.google.com/apis/maps/documentation/staticmaps/#StyledMapFeatures}.
+  \item{x}{a textual locality description, or an Extent object or an object that can be coerced to one (e.g. a Raster* or Spatial* object)}
+  \item{exp}{numeric. An expansion factor to enlarge (by multiplication) the extent specified by \code{x} }
+  \item{type}{character. Choose from 'roadmap', 'satellite', 'hybrid', 'terrain' }
+  \item{filename}{character. Filename (optional). You can open the resulting file in a GIS program }
+  \item{style}{character. Additional style arguments. See \url{http://code.google.com/apis/maps/documentation/staticmaps/#StyledMapFeatures}.
   Note that certain style features do not work in combination with (the default) \code{type='terrain'} }
-  \item{...}{Graphical parameters }
+  \item{scale}{logical}
+  \item{zoom}{integer > 0}
+  \item{rgb}{logical. If \code{TRUE}, a RasterBrick is returned with three layers (red, green, blue). This can be plotted with \code{\link{plotRGB}}}
+  \item{lonlat}{logical. If \code{TRUE} the RasterLayer is transformed to a longitude/latitude CRS}
+  \item{size}{tbd}
+  \item{...}{additional parameters }
   
   \item{p}{Points. A two-column matrix, or a SpatialPoints object}
   \item{inverse}{ Should the inverse projection be done (i.e. from Mercator to longitude/latitude }  
 }
 
 \value{
-A RasterLayer
+RasterLayer
 }
 
 
@@ -50,7 +56,7 @@ A matrix of lon/lat data can be transformed with the Mercator function used in t
 p <- spTransform(x, "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs")
 }
 
-\author{Robert Hijmans, based on code by Markus Loecher, Sense Networks <markus at sensenetworks.com> in the RgoogleMaps package}
+\author{Robert Hijmans and Sebastien Rochette, based on code by Markus Loecher, Sense Networks <markus at sensenetworks.com> in the RgoogleMaps package}
 
 \examples{
 \dontrun{
