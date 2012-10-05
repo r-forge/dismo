@@ -7,8 +7,7 @@
 # by Markus Loecher, Sense Networks <markus at sensenetworks.com>
 
 
-
-gmap <- function (x, exp=1, type='terrain', filename='', style=NULL, ...) {
+gmap <- function(x, exp=1, type='terrain', filename='', style=NULL, size=c(640, 640), scale=1, RGB=FALSE, lonlat=FALSE, ...) {
 
 	if (! require(rgdal) ) { 
 		stop('rgdal not available') 
@@ -18,17 +17,15 @@ gmap <- function (x, exp=1, type='terrain', filename='', style=NULL, ...) {
 		warning("type should be: roadmap, satellite, hybrid, or terrain.") 
 		type <- 'roadmap'
 	}
-
-	mxzoom <- function (latrange, lonrange, size = c(640, 640)) {
-	# function from in R package 'RgoogleMaps' 
-	# by Markus Loecher, Sense Networks <markus at sensenetworks.com>
-		SinPhi = sin(latrange * pi/180)
-		normX = lonrange / 180
-		normY = (0.5 * log(abs((1 + SinPhi)/(1 - SinPhi))))/pi
-		MaxZoom.lon <- floor(1 + log2(abs(size[1]/256/diff(normX))))
-		MaxZoom.lat <- floor(1 + log2(abs(size[2]/256/diff(normY))))
-		return(c(MaxZoom.lat = MaxZoom.lat, MaxZoom.lon = MaxZoom.lon))
-	}
+	
+	mxzoom <- function(latrange, lonrange, size=size) {
+        SinPhi = sin(latrange * pi/180)
+        normX = lonrange/180
+        normY = (0.5 * log(abs((1 + SinPhi)/(1 - SinPhi))))/pi
+        MaxZoom.lon <- floor(1 + log2(abs(size[1]/256/diff(normX))))
+        MaxZoom.lat <- floor(1 + log2(abs(size[2]/256/diff(normY))))
+        return(c(MaxZoom.lat = MaxZoom.lat, MaxZoom.lon = MaxZoom.lon))
+    }	
 
 	ll2XY <- function (lat, lon, zoom) {
 	# function from in R package 'RgoogleMaps' 
@@ -139,7 +136,7 @@ gmap <- function (x, exp=1, type='terrain', filename='', style=NULL, ...) {
 
 		ctr <- paste(center, collapse = ",")
 	
-		gurl <- paste(gurl, "center=", ctr, "&zoom=", zoom, "&size=", s, "&maptype=", type, "&format=gif", "&sensor=false", sep = "")
+		gurl <- paste(gurl, "center=", ctr, "&zoom=", zoom, "&size=", s, "&maptype=", type, "&format=gif&sensor=false&scale=", scale, sep = "")
 		if (!is.null(style)) {
 			style <- gsub("\\|", "%7C", style)
 			style <- gsub(" ", "", style)
@@ -165,6 +162,19 @@ gmap <- function (x, exp=1, type='terrain', filename='', style=NULL, ...) {
 	try( hdr(r, format='worldfile', extension='.gfw') )
 	extension(filename) <- 'prj'
 	showWKT(projection(r), file=filename, morphToESRI=TRUE)
+	
+	if (lonlat) {
+		ct <- r@legend@colortable 
+		r <- projectRaster(r, crs="+proj=longlat +datum=WGS84", method='ngb')
+		r@legend@colortable <- ct
+	}
+	
+    if(rgb){
+		d <- t( col2rgb(r@legend@colortable) )
+		d <- data.frame(id=0:255, d)
+		r <- subs(r, d, which=2:4)
+    }
+	
     return(r)
 }
 
