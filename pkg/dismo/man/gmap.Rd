@@ -10,14 +10,15 @@ Retrieve a 'Google Map' that can be used as a background for plotting points and
 
 You should check the terms of service before you use these maps: \url{http://code.google.com/apis/maps/terms.html}
 
-The projection of the returned maps is "Mercator" and your data may need to be transformed before you can plot on top of these maps. You can use the \code{Mercator} function for that, and to transform map coordinates back to longitude/latitude.
+The projection of the returned Raster object is "Mercator" (unless you use \code{lonlat=TRUE}, and other spatial data may need to be transformed before it can be plotted on top of the Google map. You can use the \code{Mercator} function to transform map coordinates and points between Mercator and longitude/latitude. For Spatial* objects, use \code{spTransform} in the \code{rgdal} package.
 
 This function uses the Google static maps web-service, and is based on functions by Markus Loecher for the \code{RgoogleMaps} package. 
+
 The purpose of using this function should be to display the map in a browser. You should check the Google terms of use \url{http://code.google.com/apis/maps/terms.html} to see if your usage of this function (and the underlying Google API) is permitted.
 }
 
 \usage{
-gmap(x, exp=1, type='terrain', filename='', style=NULL, scale=1, zoom=NULL, size=c(640, 640), rgb=FALSE, lonlat=FALSE, , ...)
+gmap(x, exp=1, type='terrain', filename='', style=NULL, scale=1, zoom=NULL, size=c(640, 640), rgb=FALSE, lonlat=FALSE, ...)
 
 Mercator(p, inverse = FALSE)
 }
@@ -33,7 +34,7 @@ Mercator(p, inverse = FALSE)
   \item{zoom}{integer between 0 (the whole world) to 21 (very small area), centered on the center of the extent}
   \item{size}{vector of two integers indicating the number of columns and rows that is requested (what is returned depends on other factors as well). Maximum values are \code{c(640, 640)}, so you can only select a smaller area than the default. Note that the number of pixels returned can be doubled by using \code{scale=2}}
   \item{rgb}{logical. If \code{TRUE}, a RasterBrick is returned with three layers (red, green, blue). This can be plotted with \code{\link{plotRGB}}}
-  \item{lonlat}{logical. If \code{TRUE} the RasterLayer is transformed to a longitude/latitude CRS}
+  \item{lonlat}{logical. If \code{TRUE} the Raster object returned has a longitude/latitude CRS instead of Mercator}
   \item{...}{additional parameters }
   
   \item{p}{Points. A two-column matrix, or a SpatialPoints object}
@@ -60,7 +61,8 @@ p <- spTransform(x, "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_
 
 \examples{
 \dontrun{
-if(require(rgdal)){
+library(rgdal)
+
 # get a map using names
 g = gmap('Australia')
 plot(g, inter=TRUE)
@@ -101,10 +103,7 @@ ptm2 <- spTransform(pt, CRS("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0
 points(ptm, col='red', pch='x', cex=3)
 
 # styles:
-\dontrun{
 d = gmap("Brooklyn", type='roadmap',  style="feature:road.local|element:geometry|hue:0x00ff00|saturation:100&style=feature:landscape|element:geometry|lightness:-100")
-}
-}
 }
 }
 
