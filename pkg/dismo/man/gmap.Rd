@@ -17,7 +17,7 @@ The purpose of using this function should be to display the map in a browser. Yo
 }
 
 \usage{
-gmap(x, exp=1, type='terrain', filename='', style=NULL, scale=1, zoom=NULL, rgb=FALSE, lonlat=FALSE, size=c(640, 640), ...)
+gmap(x, exp=1, type='terrain', filename='', style=NULL, scale=1, zoom=NULL, size=c(640, 640), rgb=FALSE, lonlat=FALSE, , ...)
 
 Mercator(p, inverse = FALSE)
 }
@@ -29,11 +29,11 @@ Mercator(p, inverse = FALSE)
   \item{filename}{character. Filename (optional). You can open the resulting file in a GIS program }
   \item{style}{character. Additional style arguments. See \url{http://code.google.com/apis/maps/documentation/staticmaps/#StyledMapFeatures}.
   Note that certain style features do not work in combination with (the default) \code{type='terrain'} }
-  \item{scale}{logical}
-  \item{zoom}{integer > 0}
+  \item{scale}{1 or 2. Using 2 doubles the number of pixels returned (and thus gives you better image quality if you need a large image)}
+  \item{zoom}{integer between 0 (the whole world) to 21 (very small area), centered on the center of the extent}
+  \item{size}{vector of two integers indicating the number of columns and rows that is requested (what is returned depends on other factors as well). Maximum values are \code{c(640, 640)}, so you can only select a smaller area than the default. Note that the number of pixels returned can be doubled by using \code{scale=2}}
   \item{rgb}{logical. If \code{TRUE}, a RasterBrick is returned with three layers (red, green, blue). This can be plotted with \code{\link{plotRGB}}}
   \item{lonlat}{logical. If \code{TRUE} the RasterLayer is transformed to a longitude/latitude CRS}
-  \item{size}{tbd}
   \item{...}{additional parameters }
   
   \item{p}{Points. A two-column matrix, or a SpatialPoints object}
@@ -68,7 +68,7 @@ gs = gmap('Sydney, New South Wales, Australia', type='satellite')
 plot(gs, inter=TRUE)
 gs = gmap('Sydney, Australia', type='satellite', exp=3)
 plot(gs, inter=TRUE)
-gs = gmap('Sydney, Australia', type='hybrid', exp=8)
+gs = gmap('Sydney, Australia', type='hybrid', zoom=10, scale=2)
 plot(gs, inter=TRUE)
 
 # from a maxtrix with lon/lat points

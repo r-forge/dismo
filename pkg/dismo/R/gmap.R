@@ -6,9 +6,10 @@
 # Based on functions in R package 'RgoogleMaps' 
 # by Markus Loecher, Sense Networks <markus at sensenetworks.com>
 
-# with contributions by Sébastien Rochette
+# October 2012
+# Updated with contributions by Sébastien Rochette
 
-gmap <- function(x, exp=1, type='terrain', filename='', style=NULL, scale=1, zoom=NULL, rgb=FALSE, lonlat=FALSE, size=c(640, 640), ...) {
+gmap <- function(x, exp=1, type='terrain', filename='', style=NULL, scale=1, zoom=NULL, size=c(640, 640), rgb=FALSE, lonlat=FALSE, ...) {
 
 	if (! require(rgdal) ) { 
 		stop('rgdal not available') 
@@ -147,12 +148,15 @@ gmap <- function(x, exp=1, type='terrain', filename='', style=NULL, scale=1, zoo
 		}
 #		cat(gurl, "\n")
 	
-	if (trim(filename) == '') filename <- rasterTmpFile()
+	filename <- trim(filename)
+	if (filename == '') {
+		filename <- rasterTmpFile()
+	}
 	extension(filename) <- 'gif'
-	download.file(gurl, filename, mode = "wb", quiet = TRUE)
+	download.file(gurl, filename, mode="wb", quiet=TRUE)
     
 	MyMap <- list(lat.center = center[1], lon.center = center[2], zoom = zoom)
-	bb <- list(ll = xy2ll(MyMap, X = -size[1]/2 + 0.5, Y = -size[2]/2 - 0.5), ur = xy2ll(MyMap, X = size[1]/2 +  0.5, Y = size[2]/2 - 0.5))
+	bb <- list(ll = xy2ll(MyMap, X=-size[1]/2 + 0.5, Y=-size[2]/2 - 0.5), ur=xy2ll(MyMap, X=size[1]/2 + 0.5, Y=size[2]/2 - 0.5))
 
 	r <- raster(filename, warn=FALSE)
 	ext <- extent(bb$ll[2], bb$ur[2], bb$ll[1], bb$ur[1])
@@ -172,7 +176,7 @@ gmap <- function(x, exp=1, type='terrain', filename='', style=NULL, scale=1, zoo
 		r@legend@colortable <- ct
 	}
 	
-    if(rgb){
+    if (rgb) {
 		d <- t( col2rgb(r@legend@colortable) )
 		d <- data.frame(id=0:255, d)
 		r <- subs(r, d, which=2:4)
