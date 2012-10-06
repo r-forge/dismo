@@ -6,7 +6,6 @@
 # for use with gmap
 
 Mercator <- function (p, inverse = FALSE) {
-#author: RH
 	r = 6378137
     toRad <- pi/180
     if (inverse) {
