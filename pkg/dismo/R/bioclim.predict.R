@@ -9,13 +9,12 @@ if (!isGeneric("predict")) {
 }	
 
 setMethod('predict', signature(object='Bioclim'), 
-function(object, x, tails=NULL, ext=NULL, filename='', useC=FALSE, ...) {
+function(object, x, tails=NULL, ext=NULL, filename='', useC=TRUE, ...) {
 
 	percRank <- function(x, y, tail) {
 		b <- apply(y, 1, FUN=function(z)sum(x<z))
 		t <- apply(y, 1, FUN=function(z)sum(x==z))
 		r <- (b + 0.5 * t)/length(x)
-		
 		
 		if (tail=='both') {
 			i <- which(r > 0.5)

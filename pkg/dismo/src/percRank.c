@@ -1,13 +1,9 @@
-/* Robert Hijmans, October 2011 */
+/* Robert Hijmans, October 2012 */
 
 #include <R.h>
 #include <Rinternals.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-#include "Rdefines.h"
-#include "R_ext/Rdynload.h"
-#include "Rmath.h"
 
 
 
@@ -35,7 +31,7 @@ SEXP percRank(SEXP x, SEXP y, SEXP tail) {
 		b = 0;
 		t = 0;
 		for (j=0; j<m; j++) {
-			if (py[i] < px[j]) {
+			if (py[i] > px[j]) {
 				b++;
 			} else if (py[i] == px[j]) {
 				t++;
