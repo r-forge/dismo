@@ -1,5 +1,4 @@
 # Author: Robert J. Hijmans
-# contact: r.hijmans@gmail.com
 # Date : December 2009
 # Version 0.1
 # Licence GPL v3
@@ -10,22 +9,22 @@ if (!isGeneric("predict")) {
 }	
 
 setMethod('predict', signature(object='Bioclim'), 
-function(object, x, tails=NULL, ext=NULL, filename='', ...) {
+function(object, x, tails=NULL, ext=NULL, filename='', useC=FALSE, ...) {
 
 	percRank <- function(x, y, tail) {
-		x <- sort(as.vector(na.omit(x)))
-		y <- data.frame(y)
 		b <- apply(y, 1, FUN=function(z)sum(x<z))
 		t <- apply(y, 1, FUN=function(z)sum(x==z))
 		r <- (b + 0.5 * t)/length(x)
-		i <- which(r > 0.5)
+		
+		
 		if (tail=='both') {
+			i <- which(r > 0.5)
 			r[i] <- 1-r[i]
 		} else if (tail == 'high') {
-			r[which(r < 0.5)] <- 0.5
-			r[i] <- 1-r[i]			
+			r[ r < 0.5 ] <- 0.5
+			r <- 1-r
 		} else { # if tail == low
-			r[i] <- 0.5
+			r[ r > 0.5 ] <- 0.5
 		}
 		r * 2
 	}
@@ -35,11 +34,13 @@ function(object, x, tails=NULL, ext=NULL, filename='', ...) {
 	if (is.null(tails) ) {
 		tails <- rep('both', times=length(ln))
 	} else {
-		if (length(tails) != length(ln)) {
-			stop('length of "tails" is: ', length(tails), '.\nThis does not match the number of variables in the model which is: ', length(ln))
-		}
 		test <- all(tails %in% c('low', 'high', 'both'))
 		if (!test) stop('"tails" should be a character vector with values "low", "high", and/or "both"')
+		if (length(tails) == 1) {
+			tails <- rep(tails, times=length(ln))
+		} else if (length(tails) != length(ln)) {
+			stop('length of "tails" is: ', length(tails), '.\nThis does not match the number of variables in the model which is: ', length(ln))
+		}
 	}
 	 
 	
@@ -50,7 +51,7 @@ function(object, x, tails=NULL, ext=NULL, filename='', ...) {
 		bc <- matrix(ncol=length(ln), nrow=nrow(x))
 		
 		for (i in 1:ncol(bc)) {
-			bc[,i] <- percRank(object@presence[,ln[i]], x[,ln[i]], tails[i])
+			bc[,i] <- percRank(object@presence[,ln[i]], x[,ln[i], drop=FALSE], tails[i])
 		}
 		return( apply(bc, 1, min) )
 
@@ -66,8 +67,13 @@ function(object, x, tails=NULL, ext=NULL, filename='', ...) {
 		}
 		ncols <- ncol(out)
 		
-		if (! all(colnames(object@presence) %in% names(x)) ) {
+		
+		rasternames <- names(x)
+		if (! all(ln %in% rasternames )) {
 			stop('missing variables in Raster object')
+		}
+		if ( inherits(x, 'RasterStack') & (length(ln) < length(rasternames))) {
+			x <- x[[ln]]
 		}
 		
 		if (canProcessInMemory(out, 2)) {
@@ -77,7 +83,6 @@ function(object, x, tails=NULL, ext=NULL, filename='', ...) {
 			inmem <- FALSE
 			if  (filename == '') {
 				filename <- rasterTmpFile()
-				if (getOption('verbose')) { cat('writing raster to:', filename)	}		
 				out <- writeStart(out, filename, ...)
 			}
 		}
@@ -90,18 +95,28 @@ function(object, x, tails=NULL, ext=NULL, filename='', ...) {
 		maxcomp <- object@max
 		maxcomp[tails=='low'] <- Inf
 		
+		pres <- na.omit(object@presence)
 		for (i in 1:tr$n) {
 			rr <- firstrow + tr$row[i] - 1
-			vals <- getValuesBlock(x, row=rr, nrows=tr$nrows[i], firstcol, ncols)
+			vals <- getValuesBlock(x, row=rr, nrows=tr$nrows[i], firstcol, ncols)[, ln, drop=FALSE]
 			bc <- matrix(0, ncol=ncol(vals), nrow=nrow(vals))
-			na <- as.vector(attr(na.omit(vals), 'na.action'))
+			na <- as.vector( attr(na.omit(vals), 'na.action') )
 			bc[na] <- NA
 			k <- (apply(t(vals) >= mincomp, 2, all) & apply(t(vals) <= maxcomp, 2, all))
 			k[is.na(k)] <- FALSE
-			for (j in 1:length(ln)) {
-				bc[k,j] <- percRank( object@presence[ ,ln[j]], vals[k, ln[j]], tails[j] )
+			
+			if (useC) {
+				tailopt <- match(tails, c('both', 'high', 'low'))
+				for (j in 1:length(ln)) {
+					bc[k,j] <- .Call('percRank', as.double(pres[ ,ln[j]]), as.double(vals[k, ln[j]]), as.integer(tailopt[j]), PACKAGE='dismo' )
+				}
+			
+			} else {
+				for (j in 1:length(ln)) {
+					bc[k,j] <- percRank( pres[ ,ln[j]], vals[k, ln[j], drop=FALSE], tails[j] )
+				}
 			}
-
+			
 			res <- apply(bc, 1, min)
 			if (inmem) {
 				res <- matrix(res, nrow=ncols)
