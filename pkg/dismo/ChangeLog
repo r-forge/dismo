@@ -1,3 +1,7 @@
+to do:
+make location of maxent.jar a setting
+
+--- development version
 Running Sys.setenv(NOAWT=TRUE) before calling rJava, to solve maxent/mac issues. Suggested by Pascal Title.
 New function "mess" by Jean-Pierre Rossi
 
