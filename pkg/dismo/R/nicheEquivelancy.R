@@ -69,15 +69,14 @@ nicheEquivalency <- function (sp1, sp2, predictors, n=99, model=maxent, verbose=
 
 
 
-library(dismo)
-predictors <- stack(list.files(path=paste(system.file(package="dismo"), '/ex', sep=''), pattern='grd', full.names=TRUE ))  
-p = sampleRegular(predictors, 10000, asRaster=TRUE)
-occurence <- paste(system.file(package="dismo"), '/ex/bradypus.csv', sep='')
-occ <- read.table(occurence, header=TRUE, sep=',')[,-1]
-spa <- occ[1:50, ]
-spb <- occ[51:116, ]
-
-ne <- nicheEquivalency(spa, spb, p, n=5, factors='biome')
+#library(dismo)
+#predictors <- stack(list.files(path=paste(system.file(package="dismo"), '/ex', sep=''), pattern='grd', full.names=TRUE ))  
+#p = sampleRegular(predictors, 10000, asRaster=TRUE)
+#occurence <- paste(system.file(package="dismo"), '/ex/bradypus.csv', sep='')
+#occ <- read.table(occurence, header=TRUE, sep=',')[,-1]
+#spa <- occ[1:50, ]
+#spb <- occ[51:116, ]
+#ne <- nicheEquivalency(spa, spb, p, n=5, factors='biome')
 
 
 
