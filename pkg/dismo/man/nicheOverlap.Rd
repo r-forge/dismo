@@ -8,7 +8,7 @@
 Compute niche overlap from predictions of species distributions with the I similarity statistic of Warren et al. (2009). The statistic ranges from 0 (no overlap) to 1 (the distributions are identical).
 }
 
-\usage{ nicheOverlap(x,y, mask=TRUE, checkNegatives=TRUE) ) }
+\usage{ nicheOverlap(x,y, mask=TRUE, checkNegatives=TRUE) }
 
 \arguments{
 \item{x}{RasterLayer with non-negative values (predictions of the probability that a site is suitable for a species)}
