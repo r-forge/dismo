@@ -89,73 +89,6 @@ setMethod('predict', signature(object='MaxEnt'),
 				inMemory <- FALSE
 			}
 
-			if (raster:::.doCluster()) {
-				cl <- getCluster()
-				on.exit( returnCluster() )
-				nodes <- min(ceiling(out@nrows/10), length(cl)) # at least 10 rows per node
-				cat('Using cluster with', nodes, 'nodes\n')
-				flush.console()
-
-				tr <- blockSize(out, minblocks=nodes)
-				pb <- pbCreate(tr$n, ...)
-
-				clFun <- function(i) {
-					rr <- firstrow + tr$row[i] - 1
-					rowvals <- getValuesBlock(x, row=rr, nrows=tr$nrows[i], firstcol, ncols)
-					rowvals <- rowvals[,variables,drop=FALSE]
-					res <- rep(NA, times=nrow(rowvals))
-					rowvals <- na.omit(rowvals)
-					if (length(rowvals) > 0) {
-						rowvals[] <- as.numeric(rowvals)
-					
-						mxe <- .jnew("mebridge") 		
-						p <- .jcall(mxe, "[D", "predict", lambdas, .jarray(colnames(rowvals)), .jarray(rowvals), args) 
-
-						naind <- as.vector(attr(rowvals, "na.action"))
-						if (!is.null(naind)) {
-							res[-naind] <- p
-						} else {
-							res <- p
-						}
-						res[res == -9999] <- NA
-					}	
-					return(res)	
-				} 
-		
-				for (i in 1:nodes) {
-					sendCall(cl[[i]], clFun, i, tag=i)
-				}
-		        
-				if (inMemory) {
-					for (i in 1:tr$n) {
-						pbStep(pb, i)
-						d <- recvOneData(cl)
-						if (! d$value$success) {
-							stop('cluster error')
-						}
-						res <- matrix(d$value$value, nrow=ncol(out))		
-						cols <- tr$row[d$value$tag]:(tr$row[d$value$tag]+dim(res)[2]-1)
-						v[, cols] <- res
-
-						ni <- nodes+i
-						if (ni <= tr$n) {
-							sendCall(cl[[d$node]], clFun, ni, tag=ni)
-						}
-					}
-				} else {
-					for (i in 1:tr$n) {
-						pbStep(pb, i)
-						d <- recvOneData(cl)
-						if (! d$value$success ) { stop('cluster error') }
-						out <- writeValues(out, d$value$value, tr$row[d$value$tag])
-						
-						if ((nodes + i) <= tr$n) {
-							sendCall(cl[[d$node]], clFun, nodes+i, tag=i)
-						}
-					}
-				}
-
-			} else {
 
 				tr <- blockSize(out, n=nlayers(x)+2)
 				pb <- pbCreate(tr$n, ...)	
@@ -188,7 +121,6 @@ setMethod('predict', signature(object='MaxEnt'),
 					}
 					pbStep(pb, i) 
 				} 
-			}
 			
 			pbClose(pb)
 			if (inMemory) {
