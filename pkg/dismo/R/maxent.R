@@ -108,6 +108,10 @@ if (!isGeneric("maxent")) {
 }
 
 .getMeVersion <- function() {
+	jar <- paste(system.file(package="dismo"), "/java/maxent.jar", sep='')
+	if (!file.exists(jar)) {
+		stop('file missing:\n', jar, '.\nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
+	}
 	.rJava()
 	mxe <- .jnew("meversion") 
 	v <- try(.jcall(mxe, "S", "meversion") )
@@ -124,17 +128,11 @@ if (!isGeneric("maxent")) {
 
 setMethod('maxent', signature(x='missing', p='missing'), 
 	function(x, p, silent=FALSE, ...) {
-		.rJava()
-		jar <- paste(system.file(package="dismo"), "/java/maxent.jar", sep='')
-		if (!file.exists(jar)) {
-			warning('maxent program is missing: ', jar, '\nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
-			return(FALSE)
-		}
 		v <- .getMeVersion()
 		if (!silent) {
 			cat('This is MaxEnt version', v, '\n' )
 		}
-		return(TRUE)
+		invisible(TRUE)
 	}
 )
 
@@ -265,15 +263,10 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 }
 
 
+
 setMethod('maxent', signature(x='data.frame', p='vector'), 
 	function(x, p, args=NULL, path, silent=FALSE, ...) {
 	
-		jar <- paste(system.file(package="dismo"), "/java/maxent.jar", sep='')
-		if (!file.exists(jar)) {
-			stop('file missing:\n', jar, '.\nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
-		}
-		.rJava()
-		
 		MEversion <- .getMeVersion()
 
 		x <- cbind(p, x)

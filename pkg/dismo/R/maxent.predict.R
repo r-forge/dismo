@@ -1,4 +1,4 @@
-# Author: Robert J. Hijmans, r.hijmans@gmail.com
+# Author: Robert J. Hijmans
 # Date: December 2009
 # Version 0.1
 # Licence GPL v3
@@ -12,6 +12,8 @@ if (!isGeneric("predict")) {
 
 setMethod('predict', signature(object='MaxEntReplicates'), 
 	function(object, x, ext=NULL, filename='', args="", ...) {
+		MEversion <- .getMeVersion()
+
 		n <- length(object@models)
 		if (filename != '') {
 			filename <- trim(filename)
@@ -33,7 +35,8 @@ setMethod('predict', signature(object='MaxEntReplicates'),
 setMethod('predict', signature(object='MaxEnt'), 
 	function(object, x, ext=NULL, args="", filename='', ...) {
 
-		.rJava()
+		MEversion <- .getMeVersion()
+		
 		args <- c(args, "")
 
 		#if (! file.exists(object@path)) {
