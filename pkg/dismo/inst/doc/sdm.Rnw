@@ -715,10 +715,17 @@ plot(bc, a=1, b=2, p=0.85)
 @
 
 We evaluate the model in a similar way, by providing presence and background (absence) points, the model, and a RasterStack:
-<<sdm61>>=
+<<sdm61a>>=
 e <- evaluate(pres_test, backg_test, bc, pred_nf)
 e
 @
+
+Find a threshold
+<<sdm61b>>=
+tr <- threshold(e, 'spec_sens')
+e
+@
+
 
 And we use the RasterStack with predictor variables to make a prediction to a RasterLayer:
 
@@ -728,8 +735,7 @@ pb
 par(mfrow=c(1,2))
 plot(pb, main='Bioclim, raw values')
 plot(wrld_simpl, add=TRUE, border='dark grey')
-threshold <- e@t[which.max(e@TPR + e@TNR)]
-plot(pb > threshold, main='presence/absence')
+plot(pb > tr, main='presence/absence')
 plot(wrld_simpl, add=TRUE, border='dark grey')
 points(pres_train, pch='+')
 @
@@ -756,8 +762,8 @@ pd = predict(pred_nf, dm, ext=ext, progress='')
 par(mfrow=c(1,2))
 plot(pd, main='Domain, raw values')
 plot(wrld_simpl, add=TRUE, border='dark grey')
-threshold <- e@t[which.max(e@TPR + e@TNR)]
-plot(pd > threshold, main='presence/absence')
+tr <- threshold(e, 'spec_sens')
+plot(pd > tr, main='presence/absence')
 plot(wrld_simpl, add=TRUE, border='dark grey')
 points(pres_train, pch='+')
 @
@@ -776,8 +782,8 @@ par(mfrow=c(1,2))
 pm[pm < -10] <- -10
 plot(pm, main='Mahalanobis distance')
 plot(wrld_simpl, add=TRUE, border='dark grey')
-threshold <- e@t[which.max(e@TPR + e@TNR)]
-plot(pm > threshold, main='presence/absence')
+tr <- threshold(e, 'spec_sens')
+plot(pm > tr, main='presence/absence')
 plot(wrld_simpl, add=TRUE, border='dark grey')
 points(pres_train, pch='+')
 @
@@ -836,8 +842,8 @@ pg <- predict(predictors, gm2, ext=ext)
 par(mfrow=c(1,2))
 plot(pg, main='GLM/gaussian, raw values')
 plot(wrld_simpl, add=TRUE, border='dark grey')
-threshold <- e2@t[which.max(e@TPR + e@TNR)]
-plot(pg > threshold, main='presence/absence')
+tr <- threshold(e2, 'spec_sens')
+plot(pg > tr, main='presence/absence')
 plot(wrld_simpl, add=TRUE, border='dark grey')
 points(pres_train, pch='+')
 points(backg_train, pch='-', cex=0.25)
@@ -895,8 +901,8 @@ if (file.exists(jar)) {
 	par(mfrow=c(1,2))
 	plot(px, main='Maxent, raw values')
 	plot(wrld_simpl, add=TRUE, border='dark grey')
-	threshold <- e@t[which.max(e@TPR + e@TNR)]
-	plot(px > threshold, main='presence/absence')
+	tr <- threshold(e, 'spec_sens')
+	plot(px > tr, main='presence/absence')
 	plot(wrld_simpl, add=TRUE, border='dark grey')
 	points(pres_train, pch='+')
 } else {	
@@ -931,8 +937,8 @@ pr <- predict(predictors, rf1, ext=ext)
 par(mfrow=c(1,2))
 plot(pr, main='Random Forest, regression')
 plot(wrld_simpl, add=TRUE, border='dark grey')
-threshold <- e@t[which.max(e@TPR + e@TNR)]
-plot(pr > threshold, main='presence/absence')
+tr <- threshold(e, 'spec_sens')
+plot(pr > tr, main='presence/absence')
 plot(wrld_simpl, add=TRUE, border='dark grey')
 points(pres_train, pch='+')
 points(backg_train, pch='-', cex=0.25)
@@ -958,8 +964,8 @@ ps <- predict(predictors, svm, ext=ext)
 par(mfrow=c(1,2))
 plot(ps, main='Support Vector Machine')
 plot(wrld_simpl, add=TRUE, border='dark grey')
-threshold <- e@t[which.max(e@TPR + e@TNR)]
-plot(ps > threshold, main='presence/absence')
+tr <- threshold(e, 'spec_sens')
+plot(ps > tr, main='presence/absence')
 plot(wrld_simpl, add=TRUE, border='dark grey')
 points(pres_train, pch='+')
 points(backg_train, pch='-', cex=0.25)
@@ -988,8 +994,8 @@ e
 par(mfrow=c(1,2))
 plot(ds, main='Geographic Distance')
 plot(wrld_simpl, add=TRUE, border='dark grey')
-threshold <- e@t[which.max(e@TPR + e@TNR)]
-plot(ds > threshold, main='presence/absence')
+tr <- threshold(e, 'spec_sens')
+plot(ds > tr, main='presence/absence')
 plot(wrld_simpl, add=TRUE, border='dark grey')
 points(pres_train, pch='+')
 points(backg_train, pch='-', cex=0.25)
@@ -1029,8 +1035,8 @@ e
 par(mfrow=c(1,2))
 plot(pc, main='Circles')
 plot(wrld_simpl, add=TRUE, border='dark grey')
-threshold <- e@t[which.max(e@TPR + e@TNR)]
-plot(pc > threshold, main='presence/absence')
+tr <- threshold(e, 'spec_sens')
+plot(pc > tr, main='presence/absence')
 plot(wrld_simpl, add=TRUE, border='dark grey')
 points(pres_train, pch='+')
 points(backg_train, pch='-', cex=0.25)
@@ -1054,8 +1060,8 @@ par(mfrow=c(1,2))
 
 plot(iw, main='Inv. Dist. Weighted')
 plot(wrld_simpl, add=TRUE, border='dark grey')
-threshold <- e@t[which.max(e@TPR + e@TNR)]
-pa <- mask(iw > threshold, seamask)
+tr <- threshold(e, 'spec_sens')
+pa <- mask(iw > tr, seamask)
 plot(pa, main='presence/absence')
 plot(wrld_simpl, add=TRUE, border='dark grey')
 points(pres_train, pch='+')

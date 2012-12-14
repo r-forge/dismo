@@ -12,7 +12,7 @@ if (!isGeneric("threshold")) {
 
 
 setMethod('threshold', signature(x='ModelEvaluation'),
-	function(x, ...) {
+	function(x, stat='', ...) {
 		r <- list()
 		# maximum kappa
 		r$kappa <- x@t[which.max(x@kappa)]
@@ -24,7 +24,12 @@ setMethod('threshold', signature(x='ModelEvaluation'),
 		
 		r <- data.frame(r)
 		rownames(r) <- 'thresholds'
-		r
+		if (stat != '') {
+			stopifnot (stat %in% c('', 'kappa', 'spec_sens', 'no_omission')) {
+			r[, stat]
+		} else {
+			r
+		}
 	}
 )
 
