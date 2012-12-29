@@ -605,7 +605,10 @@ We can extract several things from the objects in 'e', but let's restrict oursel
 auc <- sapply( e, function(x){slot(x, 'auc')} )
 auc
 mean(auc)
-sapply( e, function(x){ x@t[which.max(x@TPR + x@TNR)] } )
+
+ sapply( e, function(x){ x@t[which.max(x@TPR + x@TNR)] } )
+# equivalent  
+# sapply( e, function(x){ x@t[which.max(x@TPR + x@TNR)] } )
 @
 
 
