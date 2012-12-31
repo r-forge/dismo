@@ -25,7 +25,7 @@ setMethod('threshold', signature(x='ModelEvaluation'),
 		r <- data.frame(r)
 		rownames(r) <- 'thresholds'
 		if (stat != '') {
-			stopifnot (stat %in% c('', 'kappa', 'spec_sens', 'no_omission')) {
+			stopifnot (stat %in% c('', 'kappa', 'spec_sens', 'no_omission')) 
 			r[, stat]
 		} else {
 			r

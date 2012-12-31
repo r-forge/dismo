@@ -36,7 +36,7 @@ Jean-Pierre Rossi <jean-pierre.rossi@supagro.inra.fr>, Robert Hijmans, Paulo van
 \examples{
 
 set.seed(9)
-b <- raster(ncol=10, nrow=10)
+r <- raster(ncol=10, nrow=10)
 r1 <- setValues(r, (1:ncell(r))/10 + rnorm(ncell(r)))
 r2 <- setValues(r, (1:ncell(r))/10 + rnorm(ncell(r)))
 r3 <- setValues(r, (1:ncell(r))/10 + rnorm(ncell(r)))

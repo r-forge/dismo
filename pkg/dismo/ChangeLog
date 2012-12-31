@@ -1,7 +1,8 @@
-to do:
-make location of maxent.jar a setting
-
 --- development version
+Improved "mess" function (for speed and for large raster)
+new functions "nicheEquivalency" and "nicheOverlap"
+
+--- 1-September-2012, version 0.7-23
 Running Sys.setenv(NOAWT=TRUE) before calling rJava, to solve maxent/mac issues. Suggested by Pascal Title.
 New function "mess" by Jean-Pierre Rossi
 
