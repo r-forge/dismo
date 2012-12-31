@@ -1,6 +1,9 @@
-#author: Jean-Pierre Rossi <jean-pierre.rossi@supagro.inra.fr>
+# author: Jean-Pierre Rossi <jean-pierre.rossi@supagro.inra.fr>
+# modifications by Robert Hijmans
+# messi2 function by Paulo van Breugel
 
-.messi2 <- function(p,v){
+
+.messi2 <- function(p,v) {
 	v <- na.omit(v)
 	f <- 100*findInterval(p, sort(v)) / length(v)
 	minv <- min(v)
@@ -14,7 +17,6 @@
 
 
 .messOld <- function(x, v, full=FALSE) {
-
 	stopifnot(NCOL(v) == nlayers(x))
 	out <- raster(x)
 	E <- getValues(x)
