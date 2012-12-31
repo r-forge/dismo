@@ -21,7 +21,7 @@
 
 	nl <- nlayers(x)
 	if (nl == 1) {
-		rmess <- .messi2(E, v[,i])
+		rmess <- .messi2(E, v)
 		names(out) <- 'mess'
 		return( setValues(out, rmess) )
 
