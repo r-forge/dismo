@@ -3,7 +3,22 @@
 # messi2 function by Paulo van Breugel
 
 
-.messi2 <- function(p,v) {
+.messi2 <- function(p,v){
+  f<-100*findInterval(p,sort(v))/length(v)
+  a <- length(p)
+  maxv <- max(v)
+  minv <- min(v)
+  opt1 <- 100*(p-minv)/(maxv-minv)
+  opt2 <- 2*f
+  opt3 <- 2 * (100-f)
+  opt4 <- 100*(maxv-p)/(maxv-minv)
+  simi <- ifelse(f==0, opt1, ifelse(f<=50, opt2, ifelse(f<100, opt3,opt4)))
+  return(simi)
+}
+
+
+.messi2b <- function(p,v) {
+# seems slightly faster than messi2
 	v <- na.omit(v)
 	f <- 100*findInterval(p, sort(v)) / length(v)
 	minv <- min(v)
@@ -14,6 +29,33 @@
 			100*(maxv-p)/(maxv-minv)
 	)))
 }
+
+
+.messi3 <- function(p,v) {
+# seems 2-3 times faster than messi2
+	v <- na.omit(v)
+	f <- 100*findInterval(p, sort(v)) / length(v)
+	minv <- min(v)
+	maxv <- max(v)
+	res <- 2*f 
+	f[is.na(f)] <- -99
+	i <- f==0 
+	res[i] <- 100*(p[i]-minv)/(maxv-minv)
+	#i <- f>0 & f<=50
+	#res[] <- 2 * f[i]
+	i <- f>50 & f<100
+	res[i] <- 2*(100-f[i])
+	i <- f==100
+	res[i] <- 100*(maxv-p[i])/(maxv-minv)
+	res
+}
+
+
+#P = runif(100000)
+#V=runif(25)
+#system.time(x <- .messi2a(P,V))
+#system.time(y <- .messi2b(P,V))
+#system.time(z <- .messi3(P,V))
 
 
 .messOld <- function(x, v, full=FALSE) {
@@ -53,11 +95,11 @@ mess <- function(x, v, full=FALSE, filename='', ...) {
 	if (canProcessInMemory(x)) {
 		x <- getValues(x)
 		if (nl == 1) {
-			rmess <- .messi2(x, v)
+			rmess <- .messi3(x, v)
 			names(out) <- 'mess'
 			out <- setValues(out, rmess)
 		} else {
-			x <- sapply(1:ncol(x), function(i) .messi2(x[,i], v[,i]))
+			x <- sapply(1:ncol(x), function(i) .messi3(x[,i], v[,i]))
 			rmess <- raster:::.rowMin(x)
 			if (full) {
 				out <- brick(out, nl=nl+1)
@@ -83,7 +125,7 @@ mess <- function(x, v, full=FALSE, filename='', ...) {
 			out <- writeStart(out, filename, ...)
 			for (i in 1:tr$n) {
 				vv <- getValues(x, row=tr$row[i], nrows=tr$nrows[i])
-				vv <- .messi2(vv, v)
+				vv <- .messi3(vv, v)
 				out <- writeValues(out, vv, tr$row[i])
 				pbStep(pb) 
 			}
@@ -98,7 +140,7 @@ mess <- function(x, v, full=FALSE, filename='', ...) {
 				out <- writeStart(out, filename, ...)
 				for (i in 1:tr$n) {
 					vv <- getValues(x, row=tr$row[i], nrows=tr$nrows[i])
-					vv <- sapply(1:ncol(v), function(i) .messi2(vv[,i], v[,i]))
+					vv <- sapply(1:ncol(v), function(i) .messi3(vv[,i], v[,i]))
 					m <- raster:::.rowMin(vv)
 					out <- writeValues(out, cbind(vv, m), tr$row[i])
 					pbStep(pb) 
@@ -112,7 +154,7 @@ mess <- function(x, v, full=FALSE, filename='', ...) {
 				out <- writeStart(out, filename, ...)
 				for (i in 1:tr$n) {
 					vv <- getValues(x, row=tr$row[i], nrows=tr$nrows[i])
-					vv <- sapply(1:ncol(v), function(i) .messi2(vv[,i], v[,i]))
+					vv <- sapply(1:ncol(v), function(i) .messi3(vv[,i], v[,i]))
 					m <- raster:::.rowMin(vv)
 					out <- writeValues(out, m, tr$row[i])
 					pbStep(pb) 
