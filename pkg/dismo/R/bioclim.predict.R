@@ -102,14 +102,11 @@ function(object, x, tails=NULL, ext=NULL, filename='', useC=TRUE, ...) {
 		}
 		
 		if (canProcessInMemory(out, 2)) {
-			inmem=TRUE
+			inmem <- TRUE
 			v <- matrix(NA, ncol=nrow(out), nrow=ncol(out))
 		} else {
 			inmem <- FALSE
-			if  (filename == '') {
-				filename <- rasterTmpFile()
-				out <- writeStart(out, filename, ...)
-			}
+			out <- writeStart(out, filename, ...)
 		}
 
 		tr <- blockSize(out, n=nlayers(x)+2)
