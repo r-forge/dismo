@@ -2,7 +2,7 @@
 
 \alias{nicheOverlap}
 
-\title{Niche Overlap}
+\title{Niche overlap}
 
 \description{
 Compute niche overlap from predictions of species distributions with the I similarity statistic of Warren et al. (2009). The statistic ranges from 0 (no overlap) to 1 (the distributions are identical).
@@ -19,7 +19,7 @@ Compute niche overlap from predictions of species distributions with the I simil
 
 \value{numeric}
 
-\author{Based on SDMTools::Istat by Jeremy VanDerWal}
+\author{ Based on SDMTools::Istat by Jeremy VanDerWal }
 
 \references{ Warren, D.L., R.E. Glor, M. Turelli, and D. Funk. 2009. Environmental niche equivalency versus conservatism: quantitative approaches to niche evolution. Evolution 62:2868-2883. }
 

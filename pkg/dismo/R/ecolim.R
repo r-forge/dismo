@@ -19,12 +19,12 @@ setClass('EcoLim',
 )
 
 
-if (!isGeneric("ecoLim")) {
-	setGeneric("ecoLim", function(x, y, ...)
+if (!isGeneric("ecolim")) {
+	setGeneric("ecolim", function(x, y, ...)
 		standardGeneric("ecoLim"))
 }	
 
-setMethod('ecoLim', signature(x='matrix', y='matrix'), 
+setMethod('ecolim', signature(x='matrix', y='matrix'), 
 	function(x, y=matrix(c(0,0,1,1,0,0)), ...) {
 		stopifnot(NCOL(x) == NCOL(y))
 		cn <- colnames(x)
