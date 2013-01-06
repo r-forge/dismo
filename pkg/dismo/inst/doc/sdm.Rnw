@@ -388,7 +388,7 @@ files <- list.files(path=paste(system.file(package="dismo"),
 files
 predictors <- stack(files)
 predictors
-layerNames(predictors)
+names(predictors)
 plot(predictors)
 @
 
@@ -490,7 +490,7 @@ response(bc)
 In most cases, howver, the purpose is SDM is to creat a map of suitability scores. We can do that by providing the predict function with a Raster* object and a model object. As long as the variable names in the model object are available as layers (layerNames) in the Raster* object.
 
 <<sdm27c, fig=TRUE, width=9, height=6>>=
-layerNames(predictors)
+names(predictors)
 p <- predict(predictors, m1)
 plot(p)
 @
@@ -1148,7 +1148,7 @@ using uncertainty field in georeferences. How to target the "important" uncertai
 
 \noindent Austin, M.P., and T.M. Smith, 1989. A new model for the continuum concept. Vegetatio 83:35-47.
 
-\noindent Bahn, V. and B.J. McGill, 2007. Can niche-based distribution models outperform spatial interpolation? Global Ecology and Biogeography 16: 733–742.
+\noindent Bahn, V., and B.J. McGill, 2007. Can niche-based distribution models outperform spatial interpolation? Global Ecology and Biogeography 16: 733–742.
 
 \noindent Breiman, L., 2001a. Statistical Modeling: The Two Cultures. Statistical Science 16: 199-215.
 
@@ -1218,27 +1218,27 @@ using uncertainty field in georeferences. How to target the "important" uncertai
 
 \noindent Mahalanobis, P.C., 1936. On the generalised distance in statistics. Proceedings of the National Institute of Sciences of India 2: 49-55.
 
-\noindent Mellert K.H., Fensterer V., Küchenhoff H., Reger B., Kölling C., Klemmt H.J., Ewald J. (2011 in press) Hypothesis-driven species distribution models for tree species in the Bavarian Alps. J. Veg. Sci.
+\noindent Mellert K.H., V. Fensterer, H. Küchenhoff, B. Reger, C. Kölling, H.J. Klemmt, and J. Ewald, 2011. Hypothesis-driven species distribution models for tree species in the Bavarian Alps. Journal of Vegetation Science 22: 635–646.
 
 \noindent Nix, H.A., 1986. A biogeographic analysis of Australian elapid snakes. In: Atlas of Elapid Snakes of Australia. (Ed.) R. Longmore, pp. 4-15. Australian Flora and Fauna Series Number 7. Australian Government Publishing Service: Canberra.
 
 \noindent Olson, D.M, E. Dinerstein, E.D. Wikramanayake, N.D. Burgess, G.V.N. Powell, E.C. Underwood, J.A. D'amico, I. Itoua, H.E. Strand, J.C. Morrison, C.J. Loucks, T.F. Allnutt, T.H. Ricketts, Y. Kura, J.F. Lamoreux, W.W. Wettengel, P. Hedao, and K.R. Kassem. 2001. Terrestrial Ecoregions of the World: A New Map of Life on Earth. BioScience 51:933-938
 
-\noindent Peterson, A.T., J. Soberón, R.G. Pearson, R.P. Anderson, E. Martínez-Meyer, M. Nakamura & M.B. Araújo, 2011. Ecological Niches and Geographic Distributions. Monographs in Population Biology 49. Princeton University Press, 328p.
+\noindent Peterson, A.T., J. Soberón, R.G. Pearson, R.P. Anderson, E. Martínez-Meyer, M. Nakamura and M.B. Araújo, 2011. Ecological Niches and Geographic Distributions. Monographs in Population Biology 49. Princeton University Press, 328p.
 
-\noindent Phillips S.J., Elith J. (2011 in press) Logistic methods for resource selection functions and presence-only species distribution models, AAAI (Association for the Advancement of Artificial Intelligence), San Francisco, USA.
+\noindent Phillips S.J. and J.. Elith, 2011. Logistic methods for resource selection functions and presence-only species distribution models, AAAI (Association for the Advancement of Artificial Intelligence), San Francisco, USA.
 
 \noindent Phillips, S.J., R.P. Anderson, R.E. Schapire, 2006. Maximum entropy modeling of species geographic distributions. Ecological Modelling 190:231-259.
 
 \noindent Phillips, S.J., M. Dudik, J. Elith, C.H. Graham, A. Lehmann, J. Leathwick, and S. Ferrier. 2009. Sample selection bias and presence-only distribution models: implications for background and pseudo-absence data. Ecological Applications 19:181-197.
 
-\noindent Potts J., Elith J. (2006) Comparing species abundance models. Ecol. Model. 199:153-163.
+\noindent Potts J. and J. Elith, 2006. Comparing species abundance models. Ecological Modelling 199:153-163.
 
 \noindent Vapnik, V., 1998. Statistical Learning Theory. Wiley, New York.
 
-\noindent VanDerWal J., Shoo L.P., Graham C., Williams S.E., 2009. Selecting pseudo-absence data for presence-only distribution modeling: how far should you stray from what you know? Ecol. Model. 220:589-594.
+\noindent VanDerWal J., L.P. Shoo, C. Graham and S.E. Williams, 2009. Selecting pseudo-absence data for presence-only distribution modeling: how far should you stray from what you know? Ecological Modelling 220:589-594.
 
-\noindent Ward G., Hastie T., Barry S.C., Elith J., Leathwick J.R., 2009. Presence-only data and the EM algorithm. Biometrics 65:554-563.
+\noindent Ward G., T. Hastie, S.C. Barry, J. Elith and J.R. Leathwick, 2009. Presence-only data and the EM algorithm. Biometrics 65:554-563.
 
 \noindent Wieczorek, J., Q. Guo and R.J. Hijmans, 2004. The point-radius method for georeferencing point localities and calculating associated uncertainty. International Journal of Geographic Information Science 18: 745-767.
 
