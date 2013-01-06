@@ -20,7 +20,7 @@ ecolim(x, y, ...)
 \arguments{
   \item{x}{Matrix with driver variables}
   \item{y}{Matrix with responses (between 0 and 1)}
-  \item{...}{Additinal arguments. None implemented}
+  \item{...}{Additional arguments. None implemented}
 }
 
 
