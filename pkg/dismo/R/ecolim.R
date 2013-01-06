@@ -21,7 +21,7 @@ setClass('EcoLim',
 
 if (!isGeneric("ecolim")) {
 	setGeneric("ecolim", function(x, y, ...)
-		standardGeneric("ecoLim"))
+		standardGeneric("ecolim"))
 }	
 
 setMethod('ecolim', signature(x='matrix', y='matrix'), 
