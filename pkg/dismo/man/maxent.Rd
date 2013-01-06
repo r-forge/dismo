@@ -117,10 +117,10 @@ plot(me)
 # response(me)
 
 # predict to entire dataset
-r <- predict(me, predictors, progress='window') 
+r <- predict(me, predictors) 
 
-# with options:
-# r <- predict(me, predictors, progress='text', args=c("outputformat=raw"))
+# with some options:
+# r <- predict(me, predictors, args=c("outputformat=raw"), progress='text', filename='maxent_prediction.grd')
 
 plot(r)
 points(occ)
