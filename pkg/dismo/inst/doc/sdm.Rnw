@@ -546,7 +546,7 @@ auc
 Below we show how you can compute these, and other statistics more conveniently, with the \texttt{evaluate} function in the dismo package. See ?evaluate for info on additional evaluation measures that are available. ROC/AUC can also be computed with the \texttt{ROCR} package. 
 
 <<sdm40, echo=TRUE, fig=TRUE, width=7,height=5 >>=
-e = evaluate(p=p, a=a)
+e <- evaluate(p=p, a=a)
 class(e)
 e
 par(mfrow=c(1, 2))
@@ -726,7 +726,7 @@ e
 Find a threshold
 <<sdm61b>>=
 tr <- threshold(e, 'spec_sens')
-e
+tr
 @
 
 
@@ -991,7 +991,7 @@ seamask <- crop(predictors[[1]], ext)
 distm <- geoDist(pres_train, lonlat=TRUE)
 ds <- predict(seamask, distm, mask=TRUE)
 
-e <- evaluate(distm, p=pres_test, a=backg_test, tr=quantile(ds, c(1:50/50)))
+e <- evaluate(distm, p=pres_test, a=backg_test)
 e
 
 par(mfrow=c(1,2))
@@ -1032,7 +1032,7 @@ This model draws circles around all 'presence' points.
 circ <- circles(pres_train, lonlat=TRUE)
 pc <- predict(seamask, circ, mask=TRUE)
 
-e <- evaluate(circ, p=pres_test, a=backg_test, tr=quantile(ds, c(1:50/50)))
+e <- evaluate(circ, p=pres_test, a=backg_test)
 e
 
 par(mfrow=c(1,2))
@@ -1054,7 +1054,7 @@ Spatial-only models for presence/background (or absence) data are also available
 <<sdm106, fig=TRUE, width=9, height=6>>=
 idwm <- geoIDW(p=pres_train, a=data.frame(back_train))
 
-e <- evaluate(idwm, p=pres_test, a=backg_test, tr=quantile(ds, c(1:50/50)))
+e <- evaluate(idwm, p=pres_test, a=backg_test)
 e
 
 iw <- predict(seamask, idwm, mask=TRUE)
@@ -1077,7 +1077,7 @@ points(backg_train, pch='-', cex=0.25)
 va <- data.frame(back_train[sample(nrow(back_train), 100), ])
 vorm <- voronoiHull(p=pres_train, a=va)
 
-e <- evaluate(vorm, p=pres_test, a=backg_test, tr=quantile(ds, c(1:50/50)))
+e <- evaluate(vorm, p=pres_test, a=backg_test)
 e
 
 vo <- predict(seamask, vorm, mask=T)
