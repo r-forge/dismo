@@ -42,15 +42,15 @@ This document provides an introduction to species distribution modeling with \R.
 
 In SDM, the following steps are usually taken: (1) locations of occurrence of a species (or other phenomenon) are compiled. (2) values of environmental predictor variables (such as climate) at these locations are extracted from spatial databases (3) the environmental values are used  to fit a model predicting likelihood of presence, or another measure such as abundance of the species. (4) The model is used to predict the likelihood of presence across an area of interest (and perhaps for a future or past climate).
 
-In this text we assume that you are familiar with most of the concepts in SDM. If in doubt, you could consult, for example, Richard Pearson's introduction to the subject: \url{http://biodiversityinformatics.amnh.org/index.php?section_id=111}, the book by Janet Franklin (2009), or the somewhat more theoretical book by Peterson et al. (2011), or the recent review article by Elith and Leathwick (2009). It is important to have a good understanding of the interplay of environmental (niche) and geographic (biotope) space – see Colwell and Rangel (2009) and Peterson et al. (2011) for a discussion. SDM is a widely used approach but there is much debate on when and how to best use this method. While we refer to some of these issues, in this document we do not provide an in-depth discussion of this scientific debate. Rather, our objective is to provide practical guidance to implemeting the basic steps of SDM. We leave it to you to use other sources to determine the appropriate methods for their research; and to use the ample opportunities provided by the \R environment to improve existing approaches and to develop new ones. 
+In this text we assume that you are familiar with most of the concepts in SDM. If in doubt, you could consult, for example, Richard Pearson's introduction to the subject: \url{http://biodiversityinformatics.amnh.org/index.php?section_id=111}, the book by Janet Franklin (2009), or the somewhat more theoretical book by Peterson \textit{et al.} (2011), or the recent review article by Elith and Leathwick (2009). It is important to have a good understanding of the interplay of environmental (niche) and geographic (biotope) space – see Colwell and Rangel (2009) and Peterson \textit{et al.} (2011) for a discussion. SDM is a widely used approach but there is much debate on when and how to best use this method. While we refer to some of these issues, in this document we do not provide an in-depth discussion of this scientific debate. Rather, our objective is to provide practical guidance to implemeting the basic steps of SDM. We leave it to you to use other sources to determine the appropriate methods for your research; and to use the ample opportunities provided by the \R environment to improve existing approaches and to develop new ones. 
 
-We also assume that you are already familiar with the \R language and environment. It would be particularly useful if you already had some experience with statistical model fitting (e.g. the \texttt{glm} function) and with the '\verb@raster@' package. To familiarize yourself with model fitting see, for instance, the Documentation section on the CRAN webpage (http://cran.r-project.org/) and any introduction to \R txt. For the  '\verb@raster@' package you could consult its vignette. When we present code we will give some hints on how to understand the code, if we think it might be confusing. We will do more of this earlier on in this document, so if you are relatively inexperienced with \R and would like to ease into it, read this text in the presented order.   
+We also assume that you are already somewhat familiar with the \R language and environment. It would be particularly useful if you already had some experience with statistical model fitting (e.g. the \texttt{glm} function) and with spatial data handling as implemented in the packages '\verb@raster@' and '\verb@sp@'. To familiarize yourself with model fitting see, for instance, the Documentation section on the CRAN webpage (http://cran.r-project.org/) and any introduction to \R txt. For the  '\verb@raster@' package you could consult its vignette (available at \url{http://cran.r-project.org/web/packages/raster/vignettes/Raster.pdf}). When we present \R code we will provide some explanation if we think it might be difficult or confusing. We will do more of this earlier on in this document, so if you are relatively inexperienced with \R and would like to ease into it, read this text in the presented order.   
 
 SDM have been implemented in \R in many different ways. Here we focus on the functions in the '\verb@dismo@' and the '\verb@raster@' packages (but we also refer to other packages). If you want to test, or build on, some of the examples presented here, make sure you have the latest versions of these packages, and their dependencies, installed. If you are using a recent version of \R, you can do that with: 
 
 \texttt{install.packages(c('raster', 'rgdal', 'dismo', 'rJava'))}
 
-This document consists of 4 main parts. Part I is concerned with data preparation. This is often the most time consuming part of a species distribution modeling project. You need to collect a sufficient number of occurrence records that document presence (and perhaps absence or abundance) of the species of interest. You also need to have accurate and relevant spatial predictor variables at a sufficiently high spatial resolution. We first discuss some aspects of assembling and cleaning species records, followed by a discussion of aspects of choosing and using the predictor variables.  A particularly important concern in species distribution modeling is that the species occurrence data adequately represent the species' distribution. For instance, the species should be correctly identified, the coordinates of the location data need to be accurate enough to allow the general species/environment to be established, and the sample unbiased, or accompanied by information on known biases such that these can be taken into account. Part II introduces the main steps in SDM: fitting a model, making a prediction, and evaluating the result. Part III introduces different modeling methods in more detail (profile methods, regression methods, machine learning methods, and geographic methods). In Part IV we discuss a number of applications (e.g. predicting the effect of climate change), and a number of more advanced topics. 
+This document consists of 4 main parts. Part I is concerned with data preparation. This is often the most time consuming part of a species distribution modeling project. You need to collect a sufficient number of occurrence records that document presence (and perhaps absence or abundance) of the species of interest. You also need to have accurate and relevant environmental data (predictor variables) at a sufficiently high spatial resolution. We first discuss some aspects of assembling and cleaning species records, followed by a discussion of aspects of choosing and using the predictor variables.  A particularly important concern in species distribution modeling is that the species occurrence data adequately represent the actual distribution of the species studied. For instance, the species should be correctly identified, the coordinates of the location data need to be accurate enough to allow the general species/environment to be established, and the sample unbiased, or accompanied by information on known biases such that these can be taken into account. Part II introduces the main steps in SDM: fitting a model, making a prediction, and evaluating the result. Part III introduces different modeling methods in more detail (profile methods, regression methods, machine learning methods, and geographic methods). In Part IV we discuss a number of applications (e.g. predicting the effect of climate change), and a number of more advanced topics. 
 
 This is a work in progress. Suggestions are welcomed. 
 
@@ -69,7 +69,7 @@ Importing occurrence data into \R is easy. But collecting, georeferencing, and c
 \section{Importing occurrence data}
 
 In most cases you will have a file with point locality data representing the known distribution of a species. Below is an example of using \verb@read.table@ to read records that are stored in a text file. The \R commands used are in \textit{italics} and preceded by a '>'. Comments are preceded by a hash (\#). 
-We are using an example file that is installed with the '\verb@dismo@'  package, and for that reason we use a complex way to construct the filename, but you can replace that with your own filename. (remember to use forward slashes in the path of filenames!).  \verb@system.file@ inserts the file path to where dismo is installed. If you haven't used the \verb@paste@ function before, it's worth familiarizing yourself with it (type \verb@?paste@ in the command window). It's very useful.  
+We are using an example file that is installed with the '\verb@dismo@'  package, and for that reason we use a complex way to construct the filename, but you can replace that with your own filename. (remember to use forward slashes in the path of filenames!).  \verb@system.file@ inserts the file path to where dismo is installed. If you haven't used the \verb@paste@ function before, it's worth familiarizing yourself with it (type \verb@?paste@ in the command window). 
 
 <<sdm1>>=
 # loads the dismo library
@@ -89,7 +89,7 @@ head(bradypus)
 @
 
 
-You can also read such data directly out of Excel or from a database (see e.g. the \verb@RODBC@ package). Because this is csv (comma separated values) file, we could also have used the \texttt{read.csv} function. No matter how you do it, the objective is to get a matrix (or a \verb@data.frame@) with at least 2 columns to hold the coordinates. Coordinates are typically longitude and latitude, but they could also be Easting and Northing in UTM or another coordinate reference system (map projection). The convention used here is to organize the coordinates columns so that longitude is the first and latitude the second column (think x and y axes in a plot; longitude is x, latitude is y); they often are  in the reverse order, leading to undesired results. In many cases you will have additional columns, e.g., a column to indicate the species if you are modeling multiple species; and a column to indicate whether this is a 'presence' or an 'absence' record (a much used convention is to code presence with a 1 and absence with a 0). 
+You can also read such data directly out of Excel or from a database (see e.g. the \verb@RODBC@ package). Because this is a csv (comma separated values) file, we could also have used the \texttt{read.csv} function. No matter how you do it, the objective is to get a matrix (or a \verb@data.frame@) with at least 2 columns that hold the coordinates of the locations where a species was observed. Coordinates are typically expressed as longitude and latitude (i.e. angular), but they could also be Easting and Northing in UTM or another planar coordinate reference system (map projection). The convention used here is to organize the coordinates columns so that longitude is the first and latitude the second column (think x and y axes in a plot; longitude is x, latitude is y); they often are  in the reverse order, leading to undesired results. In many cases you will have additional columns, e.g., a column to indicate the species if you are modeling multiple species; and a column to indicate whether this is a 'presence' or an 'absence' record (a much used convention is to code presence with a 1 and absence with a 0). 
 
 If you do not have any species distribution data you can get started by downloading data from the Global Biodiversity Inventory Facility (GBIF) (\url{http://www.gbif.org/}). In the dismo package there is a function '\texttt{gbif}' that you can use for this. The data used below were downloaded (and saved to a permanent data set for use in this vignette) using the \texttt{gbif} function like this: 
 
@@ -103,7 +103,7 @@ If you want to understand the order of the arguments given here to \texttt{gbif}
 Many species occurence records may not have geographic coordinates. Out of the 699 records that GBIF returned (March 2010), there were only 54 records with coordinates. 
 
 <<sdm2>>=
-# load the saved acaule data
+# load the saved S. acaule data
 data(acaule)
 
 # how many rows and colums?
@@ -135,14 +135,14 @@ points(acgeo$lon, acgeo$lat, col='orange', pch=20, cex=0.75)
 points(acgeo$lon, acgeo$lat, col='red', cex=0.75)
 @
 
-The "wrld\_simpl" dataset contains rough country outlines. You can use other datasets of polygons (or lines or points) as well. For example, you can download higher resolution data country and subnational administrative boundaries data with the \texttt{getData} function of the \texttt{raster} package. You can also read your own shapefile data into \R using the \texttt{readOGR} function in the \texttt{rgdal} package or the \texttt{readShapePoly} function in the \texttt{maptools} package.
+The \texttt{wrld\_simpl} dataset contains rough country outlines. You can use other datasets of polygons (or lines or points) as well. For example, you can download higher resolution data country and subnational administrative boundaries data with the \texttt{getData} function of the \texttt{raster} package. You can also read your own shapefile data into \R using the \texttt{shapefile} function in the \texttt{raster} package.
 
 
 \section{Data cleaning}
 
 Data 'cleaning' is particularly important for data sourced from species distribution data warehouses such as GBIF. Such efforts do not specifically gather data for the purpose of species distribution modeling, so you need to understand the data and clean them appropriately, for your application. Here we provide an example.  
 
-\textit{Solanum acaule} is a species that occurs in the higher parts of the Andes mountains of Peru and Bolivia. Do you see any errors on the map? There are three records that have plausible latitudes, but longitudes that are clearly wrong, as they are in the Atlantic Ocean, south of West Africa. It looks like they have a longitude that is zero. In many data-bases you will find values that are 'zero' where 'no data' was intended.  The \texttt{gbif} function (when using the default arguments) sets coordinates that are (0, 0) to \texttt{NA}, but not if one of the coordinates is zero. Let's see if we find them by searching for records with longitudes of zero.
+\textit{Solanum acaule} is a species that occurs in the higher parts of the Andes mountains of southern Peru, Bolivia and northern Argentina. Do you see any errors on the map? There are three records that have plausible latitudes, but longitudes that are clearly wrong, as they are in the Atlantic Ocean, south of West Africa. It looks like they have a longitude that is zero. In many data-bases you will find values that are 'zero' where 'no data' was intended.  The \texttt{gbif} function (when using the default arguments) sets coordinates that are (0, 0) to \texttt{NA}, but not if one of the coordinates is zero. Let's see if we find them by searching for records with longitudes of zero.
 
 Let's have a look at these records:
 <<sdm4>>=
@@ -151,12 +151,12 @@ lonzero = subset(acgeo, lon==0)
 lonzero[, 1:13]
 @
 
-The records are from Bolivia (BOL), Peru (PER) and Argentina (ARG), confirming that coordinates are in error (it could have been that the coordinates were correct for a location in the Ocean, perhaps referring to a location a fish was caught rather than a place where \textit{S. acaule} was collected). 
+The records are from Bolivia (BOL), Peru (PER) and Argentina (ARG), confirming that coordinates are in error. Alternatively, it could have been that the coordinates were correct for a location in the Ocean, perhaps referring to a location a fish was caught rather than a place where \textit{S. acaule} was collected). Records with the wrong species name can be among the hardest to correct (e.g., distinguishing between brown bears and sasquatch, Lozier \textit{et al.}, 2009). 
 
 
 \subsection{Duplicate records}
 
-Interestingly, another data quality issue is revealed above: each record occurs twice. This could happen because plant samples are often split and send to multiple herbariums. But in this case it seems that the data from IPK are duplicated in the GBIF database. Duplicates can be removed with the \texttt{duplicated} function.
+Interestingly, another data quality issue is revealed above: each record occurs twice. This could happen because plant samples are often split and send to multiple herbariums. But in this case it seems that the data from IPK (The Leibniz Institute of Plant Genetics and Crop Plant Research) were duplicated in the GBIF database. Duplicates can be removed with the \texttt{duplicated} function.
 
 
 <<sdm5a>>=
@@ -167,7 +167,7 @@ lonzero  <-  lonzero[dups, ]
 lonzero[,1:13]
 @
 
-Another approach might be to detect duplicates for the same species and some coordinates in the data, even if the records were from collections by different people or in different years. (in our case, using species is redundant as we have data for only species)
+Another approach might be to detect duplicates for the same species and some coordinates in the data, even if the records were from collections by different people or in different years. (in our case, using species is redundant as we have data for only one species)
 
 <<sdm5b>>=
 dups2 <- duplicated(acgeo[, c('species', 'lon', 'lat')])
@@ -182,7 +182,7 @@ acg <- acg[acg$lon != 0, ]
 
 
 \section{Cross-checking}
-It is important to cross-check coordinates by visual and other means. One approach is to compare the country (and lower level administrative subdivisions) of the site as specified by the records, with the country implied by the coordinates (Hijmans \textit{et al}., 1999). In the example below we use the \texttt{coordinates} function from the '\verb@sp@' package to create a \texttt{SpatialPointsDataFrame}, and then the \texttt{overlay} function, also from '\verb@sp@', to do a point-in-polygon query with the countries polygons.
+It is important to cross-check coordinates by visual and other means. One approach is to compare the country (and lower level administrative subdivisions) of the site as specified by the records, with the country implied by the coordinates (Hijmans \textit{et al}., 1999). In the example below we use the \texttt{coordinates} function from the \texttt{sp} package to create a \texttt{SpatialPointsDataFrame}, and then the \texttt{overlay} function, also from \texttt{sp}, to do a point-in-polygon query with the countries polygons.
 
 <<sdm6>>=
 library(sp)
@@ -280,6 +280,23 @@ points(acgeo)
 # selected points in red
 points(acsel, cex=1, col='red', pch='x')
 @
+
+
+\section{Exercises}
+
+1) use the gbif function to download records for the hippopotamus. Use option "geo=FALSE" to also get records with no (numerical) georeference.
+
+2) summarize the data: how many records, how many have coordinates, how many without coordinates have a textual georeference (locality description)?
+
+4) use the geocode function to georeference records without coordinates (how many new mappalble records did you get?)
+
+5) make a simple map of all the records, using a color and symbol to distinguish between the coordinates from gbif and the ones from google
+
+6) use the 'rasterize' function to create a raster of the number of observations and map that
+
+7) do you think the observations are a reasonable representation of the distribution (and ecological niche) of the hippo?
+
+
 
 \chapter{Absence and background points}
 
@@ -1215,6 +1232,8 @@ using uncertainty field in georeferences. How to target the "important" uncertai
 \noindent Lobo, J.M. 2008. More complex distribution models or more representative data? Biodiversity Informatics 5: 14-19.
 
 \noindent Lobo, J.M., A. Jiménez-Valverde and R. Real, 2007. AUC: a misleading measure of the performance of predictive distribution models. Global Ecology and Biogeography 17: 145-151.
+
+\noindent Lozier, J.D., P. Aniello, and M.J. Hickerson, 2009. Predicting the distribution of Sasquatch in western North America: anything goes with ecological niche modelling. Journal of Biogeography 36: 1623–1627
 
 \noindent Mahalanobis, P.C., 1936. On the generalised distance in statistics. Proceedings of the National Institute of Sciences of India 2: 49-55.
 
