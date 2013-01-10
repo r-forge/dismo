@@ -22,6 +22,8 @@ nicheOverlap <- function (x, y, mask=TRUE, checkNegatives=TRUE) {
 	
     cs <- cellStats(s, 'sum', na.rm=TRUE)
 	r <- overlay(s, fun=function(i,j) (sqrt(i / cs[1]) - sqrt(j / cs[2] ))^2)
-	1 - 0.5 * sqrt(cellStats(r, 'sum', na.rm=TRUE))
+	H2 <- cellStats(r, 'sum', na.rm=TRUE)
+	1 - 0.5 * H2
 }
+
 
