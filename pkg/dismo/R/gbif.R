@@ -7,7 +7,7 @@
 # implemented trycatch to deal with poor response from GBIF server
 # suggestion and changed code provided by John Baumgartner
 
-gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, removeZeros=TRUE, download=TRUE, getAlt=TRUE, ntries=5, nrecs=1000, start=1, end=NULL, feedback=3) {
+gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, removeZeros=FALSE, download=TRUE, getAlt=TRUE, ntries=5, nrecs=1000, start=1, end=NULL, feedback=3) {
 	
 	if (! require(XML)) { stop('You need to install the XML package to use this function') }
 
@@ -168,15 +168,21 @@ gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, rem
 	z[,'lat'] <- gsub(',', '.', z[,'lat'])
 	z[,'lon'] <- as.numeric(z[,'lon'])
 	z[,'lat'] <- as.numeric(z[,'lat'])
-	
+
+	i <- sapply(z[,'lon']== 0, isTRUE)
+	j <- sapply(z[,'lat']== 0, isTRUE)
 	if (removeZeros) {
-		i <- isTRUE(z[,'lon']== 0 & z[,'lat']==0)
+		k <- i | j
 		if (geo) {
-			z <- z[!i,]
+			z <- z[!k,]
 		} else {
-			z[i,'lat'] <- NA 
-			z[i,'lon'] <- NA 
+			z[k,'lat'] <- NA 
+			z[k,'lon'] <- NA 
 		}
+	} else {
+		k <- i & j
+		z[k,'lat'] <- NA 
+		z[k,'lon'] <- NA 
 	}
 		
 	if (getAlt) {
