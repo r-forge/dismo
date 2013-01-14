@@ -38,7 +38,7 @@ set.seed(0)
 
 \chapter{Introduction}
 
-This document provides an & introduction to species distribution modeling with \R. Species distribution modeling (SDM) is also known under other names including & climate envelope-modeling, habitat modeling, and (environmental or ecological) niche-modeling. The assumption of SDM is that you can predict the entire, or potential, spatial distribution of a phenomenon, by relating sites of known occurrence (and perhaps non-occurrence) with predictor variables known for these sites and for all other sites. The common application of this method is to predict species ranges with climate data as predictors.  
+This document provides an introduction to species distribution modeling with \R. Species distribution modeling (SDM) is also known under other names including climate envelope-modeling, habitat modeling, and (environmental or ecological) niche-modeling. The assumption of SDM is that you can predict the entire, or potential, spatial distribution of a phenomenon, by relating sites of known occurrence (and perhaps non-occurrence) with predictor variables known for these sites and for all other sites. The common application of this method is to predict species ranges with climate data as predictors.  
 
 In SDM, the following steps are usually taken: (1) locations of occurrence of a species (or other phenomenon) are compiled. (2) values of environmental predictor variables (such as climate) at these locations are extracted from spatial databases (3) the environmental values are used  to fit a model predicting likelihood of presence, or another measure such as abundance of the species. (4) The model is used to predict the likelihood of presence across an area of interest (and perhaps for a future or past climate).
 
@@ -89,7 +89,7 @@ head(bradypus)
 @
 
 
-You can also read such data directly out of Excel or from a database (see e.g. the \verb@RODBC@ package). Because this is a csv (comma separated values) file, we could also have used the \texttt{read.csv} function. No matter how you do it, the objective is to get a matrix (or a \verb@data.frame@) with at least 2 columns that hold the coordinates of the locations where a species was observed. Coordinates are typically expressed as longitude and latitude (i.e. angular), but they could also be Easting and Northing in UTM or another planar coordinate reference system (map projection). The convention used here is to organize the coordinates columns so that longitude is the first and latitude the second column (think x and y axes in a plot; longitude is x, latitude is y); they often are  in the reverse order, leading to undesired results. In many cases you will have additional columns, e.g., a column to indicate the species if you are modeling multiple species; and a column to indicate whether this is a 'presence' or an 'absence' record (a much used convention is to code presence with a 1 and absence with a 0). 
+You can also read such data directly out of Excel files or from a database (see e.g. the \verb@RODBC@ package). Because this is a csv (comma separated values) file, we could also have used the \texttt{read.csv} function. No matter how you do it, the objective is to get a matrix (or a \verb@data.frame@) with at least 2 columns that hold the coordinates of the locations where a species was observed. Coordinates are typically expressed as longitude and latitude (i.e. angular), but they could also be Easting and Northing in UTM or another planar coordinate reference system (map projection). The convention used here is to organize the coordinates columns so that longitude is the first and latitude the second column (think x and y axes in a plot; longitude is x, latitude is y); they often are  in the reverse order, leading to undesired results. In many cases you will have additional columns, e.g., a column to indicate the species if you are modeling multiple species; and a column to indicate whether this is a 'presence' or an 'absence' record (a much used convention is to code presence with a 1 and absence with a 0). 
 
 If you do not have any species distribution data you can get started by downloading data from the Global Biodiversity Inventory Facility (GBIF) (\url{http://www.gbif.org/}). In the dismo package there is a function '\texttt{gbif}' that you can use for this. The data used below were downloaded (and saved to a permanent data set for use in this vignette) using the \texttt{gbif} function like this: 
 
@@ -253,10 +253,26 @@ b <- try(  geocode(loc, oneRecord=T) )
 b
 @
 
+Before using the geocode function it is best to write the records to a table and "clean" them in a spreadsheet. Cleaning involves traslation, expanding abbreviations, correcting misspellings, and making duplicates exactely the same so that they can be georeferenced only once. Then read the the table back into R, and create unique localities, georeference these and merge them with the origninal data. For the geocoding it would be better to use the biogeomancer browser interface as it allows for much more (and necessary) interaction and editing.
+
+Here is how you could do some data preparation and cleaning before using georef:
+
+<<sdm10>>=
+loc <- apply(georef[, c('locality', 'adm1', 'adm2', 'country')], 1, function(x) paste0(x, collapse=', '))
+loc <- gsub("NA,", "", loc)
+loc <- gsub("NA", "", loc)
+loc <- gsub("PER", "Peru", loc)
+loc <- gsub("BOL", "Bolivia", loc)
+loc <- gsub("ARG", "Argentina", loc)
+loc <- trim(loc)
+uloc <- unique(loc)
+#georef(uloc[1:5])
+@ 
 
 \section{Sampling bias}
 
 Sampling bias is frequently present in occurrence records (Hijmans \textit{et al}., 2001). One can attempt to remove some of the bias by subsampling records, and this is illustrated below. However, subsampling reduces the number of records, and it cannot correct the data for areas that have not been sampled at all. It also suffers from the problem that locally dense records might be a true reflection of the relative suitable of habitat. The example below illustrates how one could go about subsampling. This is not a general recommendation to subsample, or to subsample in this way. See Phillips \textit{et al}. (2009) for an approach with MaxEnt to deal with bias in occurrence records used in SDM.
+
 <<sdm20, fig=TRUE, echo=TRUE>>=
 # create a RasterLayer with the extent of acgeo
 r <- raster(acgeo)
@@ -284,18 +300,21 @@ points(acsel, cex=1, col='red', pch='x')
 
 \section{Exercises}
 
-1) use the gbif function to download records for the hippopotamus. Use option "geo=FALSE" to also get records with no (numerical) georeference.
+\begin{hangparas}{3em}{1}
+\noindent 1) use the gbif function to download records for the African elephant (or another species of your preference, try to get one with between 10 and 100 records). Use option "geo=FALSE" to also get records with no (numerical) georeference.
 
-2) summarize the data: how many records, how many have coordinates, how many without coordinates have a textual georeference (locality description)?
+\noindent 2) summarize the data: how many records, how many have coordinates, how many without coordinates have a textual georeference (locality description)?
 
-4) use the geocode function to georeference records without coordinates (how many new mappalble records did you get?)
+\noindent 3) use the geocode function to georeference up to 10 records without coordinates
 
-5) make a simple map of all the records, using a color and symbol to distinguish between the coordinates from gbif and the ones from google
+\noindent 4) make a simple map of all the records, using a color and symbol to distinguish between the coordinates from gbif and the ones returned by Google (via the geocode function). Use 'gmap' to create a basemap.
 
-6) use the 'rasterize' function to create a raster of the number of observations and map that
+\noindent 5) use the 'rasterize' function to create a raster of the number of observations and make a map. Use "wrld\_simpl" from the maptools package for country boundaries.
 
-7) do you think the observations are a reasonable representation of the distribution (and ecological niche) of the hippo?
+\noindent 6) do you think the observations are a reasonable representation of the distribution (and ecological niche) of the hippo?
 
+\noindent 7) map the uncertainty associated with the georeferences. Some records in data returned by gbif have that. You can also extract it from the data returned by the geocode function.
+\end{hangparas}
 
 
 \chapter{Absence and background points}
@@ -1159,7 +1178,6 @@ using uncertainty field in georeferences. How to target the "important" uncertai
 \part{References}
 
 \begin{hangparas}{3em}{1}
-
 
 \noindent Austin M.P., 2002. Spatial prediction of species distribution: an interface between ecological theory and statistical modelling. Ecological Modelling 157: 101-18.
 
