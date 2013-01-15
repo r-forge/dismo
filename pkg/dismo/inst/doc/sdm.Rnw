@@ -190,7 +190,7 @@ library(sp)
 coordinates(acgeo) <- ~lon+lat
 class(acgeo)
 # use the coordinates to do a spatial query of the polygons
-# in wrld_simpl wich is a SpatialPolygonsDataFrame object
+# in wrld_simpl (a SpatialPolygonsDataFrame)
 class(wrld_simpl)
 ov <- overlay(acgeo, wrld_simpl)
 # ov has, for each point, the record number of wrld_simpl
@@ -210,7 +210,7 @@ i <- which(is.na(cntr))
 i
 # these are the same records, with longitude=0, as identified above:
 acgeo@data[i,'catalogNumber']
-# which points has coordinates that are in a different country than
+# which points have coordinates that are in a different country than
 #  listed in the ‘country’ field of the gbif record
 j <- which(cntr != acgeo@data$country)
 j
@@ -258,7 +258,8 @@ Before using the geocode function it is best to write the records to a table and
 Here is how you could do some data preparation and cleaning before using georef:
 
 <<sdm10>>=
-loc <- apply(georef[, c('locality', 'adm1', 'adm2', 'country')], 1, function(x) paste0(x, collapse=', '))
+loc <- apply(georef[, c('locality', 'adm1', 'adm2', 'country')], 1, 
+                function(x) paste0(x, collapse=', '))
 loc <- gsub("NA,", "", loc)
 loc <- gsub("NA", "", loc)
 loc <- gsub("PER", "Peru", loc)
@@ -309,11 +310,12 @@ points(acsel, cex=1, col='red', pch='x')
 
 \noindent 4) make a simple map of all the records, using a color and symbol to distinguish between the coordinates from gbif and the ones returned by Google (via the geocode function). Use 'gmap' to create a basemap.
 
-\noindent 5) use the 'rasterize' function to create a raster of the number of observations and make a map. Use "wrld\_simpl" from the maptools package for country boundaries.
+\noindent 5) do you think the observations are a reasonable representation of the distribution (and ecological niche) of the species?
 
-\noindent 6) do you think the observations are a reasonable representation of the distribution (and ecological niche) of the hippo?
+\noindent 6) use the 'rasterize' function to create a raster of the number of observations and make a map. Use "wrld\_simpl" from the maptools package for country boundaries.
 
 \noindent 7) map the uncertainty associated with the georeferences. Some records in data returned by gbif have that. You can also extract it from the data returned by the geocode function.
+
 \end{hangparas}
 
 
