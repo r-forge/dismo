@@ -20,7 +20,18 @@ The purpose of using this function should be to display the locations on a map i
 }
 
 \value{
-matrix
+\code{data.frame} with the following fields:
+
+\item{ID}{integer identifier (the elements of argument \code{x}}
+\item{interpreted_locality}{locality as interpreted by the Google API}
+\item{lon}{longitude}
+\item{lat}{latitude}
+\item{lonmin}{minimum longitude of the bounding box}
+\item{lonmax}{maximum longitude of the bounding box}
+\item{latmin}{minimum latitude of the bounding box}
+\item{latmax}{maximum latitude of the bounding box}
+\item{uncertainty}{distance from c(lon, lat) to the farthest corner of the bounding box}
+\item{original_locality}{the value in \code{x}}
 }
 
 \seealso{\code{\link[dismo]{biogeomancer}}}

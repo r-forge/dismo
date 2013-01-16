@@ -7,7 +7,12 @@
 # implemented trycatch to deal with poor response from GBIF server
 # suggestion and changed code provided by John Baumgartner
 
-gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, removeZeros=FALSE, download=TRUE, getAlt=TRUE, ntries=5, nrecs=1000, start=1, end=NULL, feedback=3) {
+# 2013-01-15
+# translate ISO2 codes to full country names
+# add "cloc"
+
+
+ggbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, removeZeros=FALSE, download=TRUE, getAlt=TRUE, ntries=5, nrecs=1000, start=1, end=NULL, feedback=3) {
 	
 	if (! require(XML)) { stop('You need to install the XML package to use this function') }
 
@@ -217,6 +222,17 @@ gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, rem
 		}
 	}
 
+	iso <- raster:::.ISO()
+	z$ISO2 <- z$country
+	i <- match(z$ISO2, iso[, 'ISO2'])
+	z$country <- iso[i, 1]
+	
+	fullloc <- trim(as.matrix(z[, c('locality', 'adm1', 'adm2', 'country', 'continent')]))
+	fullloc <- apply(fullloc, 1, function(x) paste(x, collapse=', '))
+	fullloc <- gsub("NA, ", "", fullloc)
+	fullloc <- gsub('\"', "", fullloc)
+	z$cloc <- fullloc
+	
 #	if (inherits(ext, 'SpatialPolygons')) { overlay	}
 	return(z)
 }
