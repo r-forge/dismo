@@ -96,12 +96,5 @@ geocode <- function(x, oneRecord=FALSE, extent=NULL, progress='', ...) {
 
 #a = geocode('San Jose, Mexico', oneRecord=F)
 
-
-
-
-
-
- a = geocode('San Jose, Mexico', oneRecord=T)
-
  
  

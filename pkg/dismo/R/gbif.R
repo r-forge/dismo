@@ -12,7 +12,7 @@
 # add "cloc"
 
 
-ggbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, removeZeros=FALSE, download=TRUE, getAlt=TRUE, ntries=5, nrecs=1000, start=1, end=NULL, feedback=3) {
+gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, removeZeros=FALSE, download=TRUE, getAlt=TRUE, ntries=5, nrecs=1000, start=1, end=NULL, feedback=3) {
 	
 	if (! require(XML)) { stop('You need to install the XML package to use this function') }
 
@@ -230,6 +230,7 @@ ggbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, re
 	fullloc <- trim(as.matrix(z[, c('locality', 'adm1', 'adm2', 'country', 'continent')]))
 	fullloc <- apply(fullloc, 1, function(x) paste(x, collapse=', '))
 	fullloc <- gsub("NA, ", "", fullloc)
+	fullloc <- gsub(", NA", "", fullloc)
 	fullloc <- gsub('\"', "", fullloc)
 	z$cloc <- fullloc
 	
@@ -239,6 +240,6 @@ ggbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, re
 
 #sa <- gbif('solanum')
 #sa <- gbif('solanum', '*')
-#sa <- gbif('solanum', 'acaule')
+#sa <- gbif('solanum', 'acaule*')
 #sa <- gbif('solanum', 'acaule var acaule')
 
