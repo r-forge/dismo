@@ -94,13 +94,13 @@ You can also read such data directly out of Excel files or from a database (see 
 If you do not have any species distribution data you can get started by downloading data from the Global Biodiversity Inventory Facility (GBIF) (\url{http://www.gbif.org/}). In the dismo package there is a function '\texttt{gbif}' that you can use for this. The data used below were downloaded (and saved to a permanent data set for use in this vignette) using the \texttt{gbif} function like this: 
 
 
-\verb@acaule = gbif("solanum", "acaule", geo=FALSE)@
+\verb@acaule = gbif("solanum", "acaule*", geo=FALSE)@
 
 
-If you want to understand the order of the arguments given here to \texttt{gbif} or find out what other arguments you can use with this function, check out the help file (remember you can't access help files if the library is not loaded), by typing: \texttt{?gbif} or \texttt{help(gbif)}
+If you want to understand the order of the arguments given here to \texttt{gbif} or find out what other arguments you can use with this function, check out the help file (remember you can't access help files if the library is not loaded), by typing: \texttt{?gbif} or \texttt{help(gbif)}. Note the use of the asterix in "acaule*" to not only request \textit{Solanum acaule}, but also variations such as the full name, \textit{Solanum acaule} Bitter, or subspecies such as \textit{Solanum acaule} subsp. \texit{aemulans}.
 
  
-Many species occurence records may not have geographic coordinates. Out of the 699 records that GBIF returned (March 2010), there were only 54 records with coordinates. 
+Many occurence records may not have geographic coordinates. In this case, out of the 1366 records that GBIF returned (January 2013), there were 1082 records with coordinates (this was 699 and 54 in March 2010, a tremendous improvement!)
 
 <<sdm2>>=
 # load the saved S. acaule data
@@ -123,7 +123,7 @@ Below is a simple way to make a map of the occurrence localities of \textit{Sola
 <<sdm3, fig=TRUE, echo=TRUE>>=
 library(maptools)
 data(wrld_simpl)
-plot(wrld_simpl, xlim=c(-80,10), ylim=c(-60,10), axes=TRUE, 
+plot(wrld_simpl, xlim=c(-80,70), ylim=c(-60,10), axes=TRUE, 
         col='light yellow')
 
 # restore the box around the map
@@ -142,22 +142,29 @@ The \texttt{wrld\_simpl} dataset contains rough country outlines. You can use ot
 
 Data 'cleaning' is particularly important for data sourced from species distribution data warehouses such as GBIF. Such efforts do not specifically gather data for the purpose of species distribution modeling, so you need to understand the data and clean them appropriately, for your application. Here we provide an example.  
 
-\textit{Solanum acaule} is a species that occurs in the higher parts of the Andes mountains of southern Peru, Bolivia and northern Argentina. Do you see any errors on the map? There are three records that have plausible latitudes, but longitudes that are clearly wrong, as they are in the Atlantic Ocean, south of West Africa. It looks like they have a longitude that is zero. In many data-bases you will find values that are 'zero' where 'no data' was intended.  The \texttt{gbif} function (when using the default arguments) sets coordinates that are (0, 0) to \texttt{NA}, but not if one of the coordinates is zero. Let's see if we find them by searching for records with longitudes of zero.
+\textit{Solanum acaule} is a species that occurs in the higher parts of the Andes mountains of southern Peru, Bolivia and northern Argentina. Do you see any errors on the map? 
+
+There are a few records that map in the ocean just south of Pakistan. Any idea why that may have happened? It is a common mistake, missing minus signs. The coordinates are around (65.4, 23.4) but they should in Northern Argentina, around (-65.4, -23.4) (you can use the "click" function to query the coordintates on the map). There are two records (rows 303 and 885) that map to the same spot in Antarctica (-76.3, -76.3). The locality description says that is should be in Huarochiri, near Lima, Peru. So the longitude is probably correct, and erroneously copied to the latitude. Interestingly the record occurs twice. The orignal source is the International Potato Center, and a copy is provided by "SINGER" that aling the way appears to have "corrected" the country to Antarctica:
+
+<<sdm4a>>=
+acaule[c(303,885),1:10]
+@
+
+The point in Brazil (record acaule[98,]) should be in soutern Bolivia, so this is probably due to a typo in the longitude. Likewise, there are also three records that have plausible latitudes, but longitudes that are clearly wrong, as they are in the Atlantic Ocean, south of West Africa. It looks like they have a longitude that is zero. In many data-bases you will find values that are 'zero' where 'no data' was intended.  The \texttt{gbif} function (when using the default arguments) sets coordinates that are (0, 0) to \texttt{NA}, but not if one of the coordinates is zero. Let's see if we find them by searching for records with longitudes of zero.
 
 Let's have a look at these records:
-<<sdm4>>=
+<<sdm4b>>=
 lonzero = subset(acgeo, lon==0)
 # show all records, only the first 13 columns
 lonzero[, 1:13]
 @
 
-The records are from Bolivia (BOL), Peru (PER) and Argentina (ARG), confirming that coordinates are in error. Alternatively, it could have been that the coordinates were correct for a location in the Ocean, perhaps referring to a location a fish was caught rather than a place where \textit{S. acaule} was collected). Records with the wrong species name can be among the hardest to correct (e.g., distinguishing between brown bears and sasquatch, Lozier \textit{et al.}, 2009). 
+The records are from Bolivia, Peru and Argentina, confirming that coordinates are in error. Alternatively, it could have been that the coordinates were correct, perhaps referring to a location in the Atlantic Ocean where a fish was caught rather than a place where \textit{S. acaule} was collected). Records with the wrong species name can be among the hardest to correct (e.g., distinguishing between brown bears and sasquatch, Lozier \textit{et al.}, 2009). The one record in Ecuador is like that, there is some debate whether that is actually a specimen of texit{S. albicans} or an anomalous hexaploid variety of texit{S. acaule}. 
 
 
 \subsection{Duplicate records}
 
-Interestingly, another data quality issue is revealed above: each record occurs twice. This could happen because plant samples are often split and send to multiple herbariums. But in this case it seems that the data from IPK (The Leibniz Institute of Plant Genetics and Crop Plant Research) were duplicated in the GBIF database. Duplicates can be removed with the \texttt{duplicated} function.
-
+Interestingly, another data quality issue is revealed above: each record in 'lonzero' occurs twice. This could happen because plant samples are often split and send to multiple herbariums. But in this case it seems that the IPK (The Leibniz Institute of Plant Genetics and Crop Plant Research) provided these data twice to the GBIF database (perhaps from seperate databases at IPK?). The function 'duplicated' can sometimes be used to remove duplicates.
 
 <<sdm5a>>=
 # which records are duplicates (only for the first 10 columns)?
@@ -170,13 +177,23 @@ lonzero[,1:13]
 Another approach might be to detect duplicates for the same species and some coordinates in the data, even if the records were from collections by different people or in different years. (in our case, using species is redundant as we have data for only one species)
 
 <<sdm5b>>=
-dups2 <- duplicated(acgeo[, c('species', 'lon', 'lat')])
+# differentiating by (sub) species
+# dups2 <- duplicated(acgeo[, c('species', 'lon', 'lat')])
+# ignoring (sub) species and other naming variation
+dups2 <- duplicated(acgeo[, c('lon', 'lat')])
 # number of duplicates
 sum(dups2)
 # keep the records that are _not_ duplicated
 acg <- acgeo[!dups2, ]
-# let's also remove the records with longitude=0
-acg <- acg[acg$lon != 0, ]
+
+
+Let's repatriate the records near Pakistan to Argentina, and remove the records in Brazil, Antarctica, and with longitude=0
+
+<<sdm5c>>=
+i <- acg$lon > 0 & acg$lat > 0
+acg$lon[i] <- -1 * acg$lon[i]
+acg$lat[i] <- -1 * acg$lat[i]
+acg <- acg[acg$lon < -50 & acg$lat > -50, ]
 @
 
 
@@ -187,46 +204,45 @@ It is important to cross-check coordinates by visual and other means. One approa
 <<sdm6>>=
 library(sp)
 # make a SpatialPointsDataFrame
-coordinates(acgeo) <- ~lon+lat
-class(acgeo)
+coordinates(acg) <- ~lon+lat
+projection(acg) <- CRS('+proj=lonlat')
+class(acg)
 # use the coordinates to do a spatial query of the polygons
 # in wrld_simpl (a SpatialPolygonsDataFrame)
 class(wrld_simpl)
-ov <- overlay(acgeo, wrld_simpl)
+ov <- overlay(acg, wrld_simpl)
+
 # ov has, for each point, the record number of wrld_simpl
 # we can use the record number to extract the country name 
 # first find the variable name
-names(wrld_simpl@data)
-head(wrld_simpl@data)
+names(wrld_simpl)
+head(wrld_simpl)
 
-# We clearly need the variable 'NAME' in the data.frame 
-# (stored in the 'data' slot) of wrld_simpl
+# We need the variable 'NAME' in the data.frame of wrld_simpl
 
-cntr <- as.character(wrld_simpl@data$NAME[ov])
+cntr <- as.character(wrld_simpl$NAME[ov])
 
 # which points (identified by their record numbers) do not match 
 # any country (i.e. are in an ocean)
 i <- which(is.na(cntr))
 i
-# these are the same records, with longitude=0, as identified above:
-acgeo@data[i,'catalogNumber']
+# there are none (because we already removed the points that mapped in the ocean)
+
 # which points have coordinates that are in a different country than
 #  listed in the ‘country’ field of the gbif record
-j <- which(cntr != acgeo@data$country)
-j
+j <- which(cntr != acg$country)
 # for the mismatches, bind the country names of the polygons and points
-cbind(cntr, acgeo@data$country)[j,]
-# fortunately the mismatch is simply because of the use of abbreviations
-# instead of full country names in these records.
+cbind(cntr, acg$country)[j,]
+
+# In this case the mismatch is probably because wrld_simpl is not very precise
+# as the records map to locations very close to the border between Bolivia and its neighbors.
+plot(acg)
+plot(wrld_simpl, add=T, border='blue', lwd=2)
+points(acg[j, ], col='red', pch=20, cex=2)
 @
 
-See the sp package for more information on the \texttt{overlay} function and the related function \texttt{over}. At first it may be confusing that it returns indices (row numbers).  These indices, stored in variables \texttt{i} and \texttt{j} were used to get the relevant records.
-Note that the polygons that we used in the example above are not very precise, and they should not be used in a real analysis. See \url{http://www.gadm.org/} for more detailed administrative division files, or use the '\verb@getData@' function from the raster package (e.g. \texttt{getData('gadm', country='PER', level=0)} to get the national borders of Peru. 
+See the sp package for more information on the \texttt{overlay} function and the related function \texttt{over}. At first it may be confusing that it returns indices (row numbers).  These indices, stored in variables \texttt{i} and \texttt{j} were used to get the relevant records. The wrld\_simpl polygons that we used in the example above are not very precise, and they probably should not be used in a real analysis. See \url{http://www.gadm.org/} for more detailed administrative division files, or use the '\verb@getData@' function from the raster package (e.g. \texttt{getData('gadm', country='BOL', level=0)} to get the national borders of Bolivia; and \texttt{getData('countries')} to get all country boundaries).
 
-<<sdm7>>=
-# now let’s remove the records that have a longitude of 0
-acgeo  <- acgeo[ coordinates(acgeo)[,'lon'] != 0,  ]
-@
 
 \section{Georeferencing}
 
@@ -238,37 +254,19 @@ dim(georef)
 georef[1:3,1:13]
 @
 
-Among the first records is an old acquaintance. The record, with catalog number WKS 30048 was also in the set of records that had a longitude of zero degrees. 
 
 We recommend using a tool like BioGeomancer: \url{http://bg.berkeley.edu/latest} (Guralnick \textit{et al}., 2006) to georeference textual locality descriptions. An important feature of BioGeomancer is that it attempts to capture the uncertainty associated with each georeference (Wieczorek \textit{et al}., 2004). The dismo package has a function \texttt{biogeomancer} that you can use for this, and that we demonstrate below, but its use is generally not recommended because you really need a detailed map interface for accurate georeferencing. 
 
-Here is an example for one of the records with longitude = 0, using Google's geocoding service. We put the function into a 'try' function, to assure elegant error handling if the computer is not connected to the Internet.
+Here is an example for one of the records with longitude = 0, using Google's geocoding service. We put the function into a 'try' function, to assure elegant error handling if the computer is not connected to the Internet. Note that we use the "cloc" (concatenated locality) field.
 
 <<sdm9>>=
-args(biogeomancer)
-# the first locality:
-loc <- paste(lonzero$locality[1], ", Peru")
-loc
-b <- try(  geocode(loc, oneRecord=T) )
+georef$cloc[4]
+b <- try(  geocode(georef$cloc[4]) )
 b
 @
 
 Before using the geocode function it is best to write the records to a table and "clean" them in a spreadsheet. Cleaning involves traslation, expanding abbreviations, correcting misspellings, and making duplicates exactely the same so that they can be georeferenced only once. Then read the the table back into R, and create unique localities, georeference these and merge them with the origninal data. For the geocoding it would be better to use the biogeomancer browser interface as it allows for much more (and necessary) interaction and editing.
 
-Here is how you could do some data preparation and cleaning before using georef:
-
-<<sdm10>>=
-loc <- apply(georef[, c('locality', 'adm1', 'adm2', 'country')], 1, 
-                function(x) paste0(x, collapse=', '))
-loc <- gsub("NA,", "", loc)
-loc <- gsub("NA", "", loc)
-loc <- gsub("PER", "Peru", loc)
-loc <- gsub("BOL", "Bolivia", loc)
-loc <- gsub("ARG", "Argentina", loc)
-loc <- trim(loc)
-uloc <- unique(loc)
-#georef(uloc[1:5])
-@ 
 
 \section{Sampling bias}
 
