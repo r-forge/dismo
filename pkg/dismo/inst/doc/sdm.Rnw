@@ -185,7 +185,7 @@ dups2 <- duplicated(acgeo[, c('lon', 'lat')])
 sum(dups2)
 # keep the records that are _not_ duplicated
 acg <- acgeo[!dups2, ]
-
+@
 
 Let's repatriate the records near Pakistan to Argentina, and remove the records in Brazil, Antarctica, and with longitude=0
 
@@ -274,7 +274,7 @@ Sampling bias is frequently present in occurrence records (Hijmans \textit{et al
 
 <<sdm20, fig=TRUE, echo=TRUE>>=
 # create a RasterLayer with the extent of acgeo
-r <- raster(acgeo)
+r <- raster(acg)
 # set the resolution of the cells to 1 degrees
 res(r) <- 1
 
@@ -282,16 +282,16 @@ res(r) <- 1
 r <- extend(r, extent(r)+1)
 
 # get the cell number for each point
-cell <- cellFromXY(r, acgeo)
+cell <- cellFromXY(r, acg)
 dup <- duplicated(cell)
 # select the records that are not duplicated. A random selection
 # within duplicates might be better (but more elaborate).
-acsel <- acgeo[!dup, ]
+acsel <- acg[!dup, ]
 
 # display the results
 p <- rasterToPolygons(r)
 plot(p, border='gray')
-points(acgeo)  
+points(acg)
 # selected points in red
 points(acsel, cex=1, col='red', pch='x')
 @
@@ -355,16 +355,15 @@ points(bg2, cex=0.5)
 There are several approaches one could use to sample 'pseudo-absence' points, i.e. points from more restricted area than 'background'. VanDerWal et al. (2009) sampled withn a radius of presence points. Here is one way to implement that, using the \textit{Solanum acaule} data.
 
 <<sdm21b, fig=TRUE, width=9, height=6>>=
-pts <- acg[, c('lon', 'lat')]
-
 # circles with a radius of 50 km
-x <- circles(pts, d=50000, lonlat=T, col='light gray')
+x <- circles(acg, d=50000, lonlat=T, col='light gray')
 
-plot(x@polygons, axes=T)
-points(pts, pch='x')
+library(rgeos)
+pol <-  gUnaryUnion(x@polygons)
+plot(pol, axes=TRUE)
 
 # sample randomly from all circles
-samp1 <- spsample(x@polygons, 250, type='random', iter=25)
+samp1 <- spsample(pol, 250, type='random', iter=25)
 points(samp1, cex=0.5, col='red')
 
 # get unique cells
