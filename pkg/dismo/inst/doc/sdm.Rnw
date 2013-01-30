@@ -97,7 +97,7 @@ If you do not have any species distribution data you can get started by download
 \verb@acaule = gbif("solanum", "acaule*", geo=FALSE)@
 
 
-If you want to understand the order of the arguments given here to \texttt{gbif} or find out what other arguments you can use with this function, check out the help file (remember you can't access help files if the library is not loaded), by typing: \texttt{?gbif} or \texttt{help(gbif)}. Note the use of the asterix in "acaule*" to not only request \textit{Solanum acaule}, but also variations such as the full name, \textit{Solanum acaule} Bitter, or subspecies such as \textit{Solanum acaule} subsp. \texit{aemulans}.
+If you want to understand the order of the arguments given here to \texttt{gbif} or find out what other arguments you can use with this function, check out the help file (remember you can't access help files if the library is not loaded), by typing: \texttt{?gbif} or \texttt{help(gbif)}. Note the use of the asterix in "acaule*" to not only request \textit{Solanum acaule}, but also variations such as the full name, \textit{Solanum acaule} Bitter, or subspecies such as \textit{Solanum acaule} subsp. \textit{aemulans}.
 
  
 Many occurence records may not have geographic coordinates. In this case, out of the 1366 records that GBIF returned (January 2013), there were 1082 records with coordinates (this was 699 and 54 in March 2010, a tremendous improvement!)
@@ -272,7 +272,7 @@ Before using the geocode function it is best to write the records to a table and
 
 Sampling bias is frequently present in occurrence records (Hijmans \textit{et al}., 2001). One can attempt to remove some of the bias by subsampling records, and this is illustrated below. However, subsampling reduces the number of records, and it cannot correct the data for areas that have not been sampled at all. It also suffers from the problem that locally dense records might be a true reflection of the relative suitable of habitat. The example below illustrates how one could go about subsampling. This is not a general recommendation to subsample, or to subsample in this way. See Phillips \textit{et al}. (2009) for an approach with MaxEnt to deal with bias in occurrence records used in SDM.
 
-<<sdm20, fig=TRUE, echo=TRUE>>=
+<<sdm10, fig=TRUE, echo=TRUE>>=
 # create a RasterLayer with the extent of acgeo
 r <- raster(acg)
 # set the resolution of the cells to 1 degrees
@@ -299,7 +299,7 @@ points(acsel, cex=1, col='red', pch='x')
 
 At this point, it could be useful to save the cleaned data set. For example with the function \texttt{write.table} or \texttt{write.csv} so that we can use them later. Such a file is available through dismo and can be retrieved like this:
 
-<<sdm20b>>
+<<sdm12>>
 file <- paste(system.file(package="dismo"), '/ex/acaule.csv', sep='')
 acsel <- read.csv(file)
 @
@@ -342,22 +342,30 @@ In the example below, we first get the list of filenames with the predictor rast
 
 Note that if the mask has the longitude/latitute coordinate reference system, function \texttt{randomPoints} selects cells according to cell area, which varies by latitude (as in Elith et al., 2011)
 
-
-<<sdm21a, fig=TRUE, width=9, height=6>>=
+<<sdm15a>>=
+# get the file names 
 files <- list.files(path=paste(system.file(package="dismo"), '/ex', 
                        sep=''),  pattern='grd',  full.names=TRUE )
 
-					   
-mask <- raster(files[[1]])
+# we use the first file to create a RasterLayer
+mask <- raster(files[1])
+
 # select 500 random points
 # set seed to assure that the examples will always
 # have the same random sample.
+set.seed(1963)
 bg <- randomPoints(mask, 500 )
+@
+
+And inspect the results by plotting
+<<sdm15, fig=TRUE, width=9, height=6>>=
 # set up the plotting area for two maps
 par(mfrow=c(1,2))
 plot(!is.na(mask), legend=FALSE)
 points(bg, cex=0.5)
-# now limiting the area of sampling by spatial extent
+
+# now we repeat the sampling, but limit 
+# the area of sampling using a spatial extent
 e <- extent(-80, -53, -39, -22)
 bg2 <- randomPoints(mask, 50, ext=e)
 plot(!is.na(mask), legend=FALSE)
@@ -369,47 +377,62 @@ points(bg2, cex=0.5)
 There are several approaches one could use to sample 'pseudo-absence' points, i.e. points from more restricted area than 'background'. VanDerWal et al. (2009) sampled withn a radius of presence points. Here is one way to implement that, using the \textit{Solanum acaule} data.
 
 We first read the cleaned and subsetted \textit{S. acaule} data that we produced in the previous chapter from the csv file that comes with dismo:
-<<sdm21b, fig=TRUE, width=9, height=6>>=
+<<sdm16a>>=
 file <- paste(system.file(package="dismo"), '/ex/acaule.csv', sep='')
 ac <- read.csv(file)
 @
 
-ac is a \texttt{data.frame}. Let's change it into a \texttt{SpatialPointsDataFrame}
+\texttt{ac} is a \texttt{data.frame}. Let's change it into a \texttt{SpatialPointsDataFrame}
+
+<<sdm16b>>=
 coordinates(ac) <- ~lon+lat
 projection(ac) <- CRS('+proj=lonlat')
 @
 
-<<sdm21c, fig=TRUE, width=9, height=6>>=
+We first create a 'cricles' model (see the chapter about geographic models), using an arbitrary radius of 50 km
+<<sdm17>>=
 # circles with a radius of 50 km
-x <- circles(ac, d=50000, lonlat=T, col='light gray')
+x <- circles(ac, d=50000, lonlat=TRUE)
+@
 
+Now we use the \texttt{rgeos} library to 'dissolve' the circles (remove boundaries were circles overlap). 
+
+<<sdm18>>=
 library(rgeos)
 pol <-  gUnaryUnion(x@polygons)
-plot(pol, axes=TRUE)
+@ 
 
+And then we take a random sample of points within the polygons. We only want one point per grid cell.
+
+<<sdm19>>=
 # sample randomly from all circles
 samp1 <- spsample(pol, 250, type='random', iter=25)
-points(samp1, cex=0.5, col='red')
-
 # get unique cells
 cells <- cellFromXY(mask, samp1)
 length(cells)
 cells <- unique(cells)
 length(cells)
 xy <- xyFromCell(mask, cells)
+@
+
+
+Plot to inspect the results:
+
+<<sdm20, fig=TRUE, width=9, height=6>>=
+plot(pol, axes=TRUE)
 points(xy, cex=0.75, pch=20, col='blue')
 @
 
-Note that the blue points are not all within the circles, as they now reprsenst the centers of the selected cells from mask. We could choose to select only those cells that have theirs centers within the circles, using the overlay function.
+Note that the blue points are not all within the polygons (circles), as they now represent the centers of the selected cells from mask. We could choose to select only those cells that have their centers within the circles, using the overlay function.
 
-<<sdm21d>>=
+<<sdm21a>>=
 o <- overlay(x@polygons, SpatialPoints(xy))
 xyInside <- xy[!is.na(o), ]
 @
 
 Similar results could also be achieved via the raster functions \texttt{rasterize} or \texttt{extract}.
 
-<<sdm21e, fig=TRUE, width=9, height=6>>=
+<<sdm21b, fig=TRUE, width=9, height=6>>=
 # extract cell numbers for the circles
 v <- extract(mask, x@polygons, cellnumbers=T)
 # use rbind to combine the elements in list v
@@ -417,7 +440,7 @@ v <- do.call(rbind, v)
 
 # get unique cell numbers from which you could sample
 v <- unique(v[,1])
-v
+head(v)
 
 # to display the results
 m <- mask
@@ -457,7 +480,10 @@ We can also make a plot of a single layer in a RasterStack, and plot some additi
 <<sdm23a, fig=TRUE, echo=TRUE>>=
 library(maptools)
 data(wrld_simpl)
+file <- paste(system.file(package="dismo"), "/ex/bradypus.csv", sep="")
 bradypus <- read.table(file,  header=TRUE,  sep=',')
+# we do not need the first column
+bradypus  <- bradypus[,-1]
 @
 
 And now plot:
@@ -465,10 +491,10 @@ And now plot:
 # first layer of the RasterStack
 plot(predictors, 1)
 
-# note the "add=TRUE" argument
+# note the "add=TRUE" argument with plot
 plot(wrld_simpl, add=TRUE)
-
-points(bradypus, col='red', cex=0.5)
+# with the points function, "add" is implicit
+points(bradypus, col='blue')
 @
 
 The example above uses data representing 'bioclimatic variables' from the WorldClim database (\url{http://www.worldclim.org}, Hijmans \textit{et al}., 2004) and 'terrestrial biome' data from the WWF. (\url{http://www.worldwildlife.org/science/data/item1875.html}, Olsen \textit{et al}., 2001). You can go to these websites if you want higher resolution data. You can also use the \texttt{getData} function from the \texttt{raster} package to download WorldClim climate data.
