@@ -3,18 +3,58 @@
 # Version 1.0
 # October 2010
 
-geocode <- function(x, oneRecord=FALSE, extent=NULL, progress='', ...) {
-
-	if (!is.null(list(...)$oneRecords)) {
-		warning('argument "oneRecord" is no longer used')
+geocoder <- function(x, oneRecord=FALSE, extent=NULL, progress='', ...) {
+	ntry <- list(...)$ntry
+	if (is.null(ntry)) ntry <- 10
+	reps <- min(ntry, 10)
+	x <- as.character(x)
+	xx <- unique(x)
+	xx <- data.frame(ID=1:length(xx), place=xx)
+	resall <- .geocode(xx$place, oneRecord=oneRecord, extent=extent, progress=progress)
+	
+	if (reps > 1) {
+		n <- 0
+		for (i in 2:reps) {
+			print(paste('try', i, '...'))
+			flush.console()
+			j <- which(is.na(resall[,2]))
+			if (length(j) == 0) break
+			ids <- unique(resall[j,1])
+			res <- .geocode(xx[ids, 'place'], oneRecord=oneRecord, extent=extent, progress=progress)
+			k <- which(!is.na(res[,2]))
+			if (length(k) == 0) {
+				if (n == 2) break
+				n <- n + 1
+			} else {
+				n <- 0
+			}
+			if (oneRecord) {
+				res$ID <- j[match(res$ID, 1:length(j))]
+				resall[j,] <- res
+			} else {
+				resall <- resall[-j, ,drop=FALSE]
+				res$ID <- j[match(res$ID, 1:length(j))]
+				resall <- rbind(resall, res)
+			}
+		}
 	}
+	x <- data.frame(ID=1:length(x), originalPlace=x)
+	resall$ID <- NULL
+	res <- merge(x, resall, by='originalPlace', all.x=TRUE)
+	rownames(res) <- NULL
+	res <- res[order(res$ID), , drop=FALSE]
+	res$ID <- NULL
+	res
+}
 
+
+.geocode <- function(x, oneRecord=FALSE, extent=NULL, progress='', ...) {
 	if (! require(XML)) stop('You need to install the XML package to be able use this function')
 
 	burl <- "http://maps.google.com/maps/api/geocode/xml?address="
-	
-
-	res <- data.frame(matrix(ncol=8, nrow=0))
+	res1 <- data.frame(matrix(NA, ncol=8, nrow=1))
+	colnames(res1) <- c('ID', 'interpretedPlace', 'longitude', 'latitude', 'xmin', 'xmax', 'ymin', 'ymax')
+	res <- res1[-1, ,drop=FALSE]
 	pb <- pbCreate(length(x), progress)
 	for (z in 1:length(x)) {
 		r <- x[z]
@@ -40,7 +80,7 @@ geocode <- function(x, oneRecord=FALSE, extent=NULL, progress='', ...) {
 			
 			if (status != "OK") {
 				cat(status, ':', r, '\n')
-				w <- matrix(NA, ncol=ncol(res), nrow=1)
+				w <- res1 
 				w[1] <- z
 				res <- rbind(res, w)
 				next
@@ -71,24 +111,24 @@ geocode <- function(x, oneRecord=FALSE, extent=NULL, progress='', ...) {
 			} else {
 				w <- data.frame(z, place, location, w)
 			}
-
+			colnames(w) <- colnames(res)
 			res <- rbind(res, w)
 		} else {
-			w <- matrix(NA, ncol=ncol(res), nrow=1)
+			w <- res1
 			w[1] <- z
+			colnames(w) <- colnames(res)
 			res <- rbind(res, w)
 		}
 		pbStep(pb, z) 
 	} 
 	pbClose(pb)
 
-	colnames(res) <- c('ID', 'formatted_locality', 'lon', 'lat', 'lonmin', 'lonmax', 'latmin', 'latmax')
 	rownames(res) <- 1:nrow(res)
 	
 	da <- pointDistance(res[,3:4], res[,c(5,7)], longlat=T)
 	db <- pointDistance(res[,3:4], res[,c(6,8)], longlat=T)
 	res$uncertainty <- round(pmin(da, db))
-	xx <- data.frame(ID=1:length(x), original_locality=x)
+	xx <- data.frame(ID=1:length(x), originalPlace=x)
 	
 	merge(res, xx, by='ID')
 }

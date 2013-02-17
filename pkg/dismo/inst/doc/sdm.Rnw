@@ -234,8 +234,9 @@ j <- which(cntr != acg$country)
 # for the mismatches, bind the country names of the polygons and points
 cbind(cntr, acg$country)[j,]
 
-# In this case the mismatch is probably because wrld_simpl is not very precise
-# as the records map to locations very close to the border between Bolivia and its neighbors.
+# In this case the mismatch is probably because wrld_simpl is not
+# very precise as the records map to locations very close to the 
+# border between Bolivia and its neighbors.
 plot(acg)
 plot(wrld_simpl, add=T, border='blue', lwd=2)
 points(acg[j, ], col='red', pch=20, cex=2)
@@ -297,9 +298,9 @@ points(acsel, cex=1, col='red', pch='x')
 @
 
 
-At this point, it could be useful to save the cleaned data set. For example with the function \texttt{write.table} or \texttt{write.csv} so that we can use them later. Such a file is available through dismo and can be retrieved like this:
+At this point, it could be useful to save the cleaned data set. For example with the function \texttt{write.table} or \texttt{write.csv} so that we can use them later. The same file is available through dismo and can be retrieved like this:
 
-<<sdm12>>
+<<sdm12, echo=TRUE>>=
 file <- paste(system.file(package="dismo"), '/ex/acaule.csv', sep='')
 acsel <- read.csv(file)
 @
@@ -477,7 +478,7 @@ plot(predictors)
 
 
 We can also make a plot of a single layer in a RasterStack, and plot some additional data on top of it. First get the world boundaries and the bradypus data:
-<<sdm23a, fig=TRUE, echo=TRUE>>=
+<<sdm23a, echo=TRUE>>=
 library(maptools)
 data(wrld_simpl)
 file <- paste(system.file(package="dismo"), "/ex/bradypus.csv", sep="")
@@ -544,7 +545,7 @@ A simple formula could look like: \texttt{y \~{} x1 + x2 + x3}, i.e. y is a func
 
 Note that in the examples below, we are using the data.frame 'sdmdata' that as generated in the previous chapter.
 <<sdm25>>=
-m1 = glm(pb ~ bio1 + bio5 + bio12, data=sdmdata)
+m1 <- glm(pb ~ bio1 + bio5 + bio12, data=sdmdata)
 class(m1)
 summary(m1)
 
@@ -555,7 +556,7 @@ m2
 Models that are implemented in dismo do not use a formula (and most models only take presence points). For example:
 
 <<sdm26, fig=TRUE>>=
-bc = bioclim(sdmdata[,c('bio1', 'bio5', 'bio12')])
+bc <- bioclim(sdmdata[,c('bio1', 'bio5', 'bio12')])
 class(bc)
 bc
 pairs(bc)
@@ -655,10 +656,10 @@ Now back to some real data, presence-only in this case. We'll divide the data in
 
 
 <<sdm41, fig=TRUE>>=
-rand <- round(0.75 * runif(nrow(sdmdata)))
-traindata <- sdmdata[rand==0,]
+samp <- sample(nrow(sdmdata), round(0.75 * nrow(sdmdata)))
+traindata <- sdmdata[samp,]
 traindata <- traindata[traindata[,1] == 1, 2:9]
-testdata <- sdmdata[rand==1,]
+testdata <- sdmdata[-samp,]
 bc <- bioclim(traindata)
 e <- evaluate(testdata[testdata==1,], testdata[testdata==0,], bc)
 e
@@ -756,13 +757,28 @@ evaluate(bc, p=pres_test_pwd, a=back_test_pwd, x=predictors)
 
 A large number of algorithms has been used in species distribution modeling. They can be classified as 'profile', 'regression', and 'machine learning' methods. Profile methods only consider 'presence' data, not absence or background data. Regression and machine learning methods use both presence and absence or background data. The distinction between regression and machine learning methods is not sharp, but it is perhaps still useful as way to classify models. Another distinction that one can make is between presence-only and presence-absence models. Profile methods are always presence-only, other methods can be either, depending if they are used with survey-absence or with pseudo-absence/backround data. An entirely different class of models consists of models that only, or primarily, use the geographic location of known occurences, and do not rely on the values of predictor variables at these locations. We refer to these models as 'geographic models'. Below we discuss examples of these different types of models.
 
+Let's first recreate the data we have used so far, such that you can step into the code starting here:
+<<sdm46a, echo=TRUE>>=
+files <- list.files(path=paste(system.file(package="dismo"), 
+              '/ex', sep=''), pattern='grd', full.names=TRUE )
+predictors <- stack(files)
+
+file <- paste(system.file(package="dismo"), "/ex/bradypus.csv", sep="")
+bradypus <- read.table(file,  header=TRUE,  sep=',')
+bradypus  <- bradypus[,-1]
+presvals <- extract(predictors, bradypus)
+pb <- c(rep(1, nrow(presvals)), rep(0, nrow(absvals)))
+sdmdata <- data.frame(cbind(pb, rbind(presvals, absvals)))
+sdmdata[,'biome'] = as.factor(sdmdata[,'biome'])
+@
+
 We will use the same data to illustrate all models, except that some models cannot use categorical variables. So for those models we drop the categorical variables from the predictors stack.
 
-<<sdm46, echo=TRUE>>=
+<<sdm46b, echo=TRUE>>=
 pred_nf <- dropLayer(predictors, 'biome')
 @
 
-We'll use the \textit{Bradypus} data for presence of a species. Let’s make a training and a testing set.
+We use the \textit{Bradypus} data for presence of a species. First we make a training and a testing set.
 <<sdm47, echo=TRUE>>=
 group <- kfold(bradypus, 5)
 pres_train <- bradypus[group != 1, ]
@@ -889,7 +905,7 @@ points(pres_train, pch='+')
 
 \chapter{Regression models}
 
-The remaining models need to be fit presence textif{and} absence (background) data. With the exception of 'maxent', we cannot fit the model with a RasterStack and points. Instead, we need to extract the environmental data values ourselves, and fit the models with these values. 
+The remaining models need to be fit with presence \textit{and} absence (background) data. With the exception of 'maxent', we cannot fit the model with a RasterStack and points. Instead, we need to extract the environmental data values ourselves, and fit the models with these values. 
 
 <<sdm65>>=
 train <- rbind(pres_train, backg_train)
@@ -980,10 +996,7 @@ if (file.exists(jar)) {
 @
 
 A response plot:
-
 <<sdm68b, fig=TRUE, width=9, height=6>>=
-# checking if the jar file is present. If not, skip this bit
-jar <- paste(system.file(package="dismo"), "/java/maxent.jar", sep='')
 if (file.exists(jar)) {
 	response(xm)
 } else {
@@ -1071,9 +1084,26 @@ points(backg_train, pch='-', cex=0.25)
 @
 
 
+\chapter{Combining model predictions}
+
+Seperate model predictions:
+
+<<sdm82, fig=TRUE, width=9, height=6>>=
+models <- stack(pb, pd, pm, pg, px, pr, ps)
+names(models) <- c("bioclim", "domain", "mahal", "glm", "maxent", "rf", "svm")
+plot(models)
+@
+
+Simple average:
+
+<<sdm83, fig=TRUE, width=9, height=6>>=
+plot(mean(models), main='average score')
+@
+
+
 \chapter{Geographic models}
 
-The 'geograhic models' described here are not commonly used in species distribution modeling. They use the geographic location of known occurences, and do not rely on the values of predictor variables at these locations. We are exploring their use in comparing and contrasting them with the other approaches (Bahn and McGill, 2007); in model evaluation as as null-models (Hijmans 2012); to sample background points; and generally to help think about the duality between geographic and environmental space (Colwel and Rangel, 2009). Below we show examples of these different types of models.
+The 'geographic models' described here are not commonly used in species distribution modeling. They use the geographic location of known occurences, and do not rely on the values of predictor variables at these locations. We are exploring their use in comparing and contrasting them with the other approaches (Bahn and McGill, 2007); in model evaluation as as null-models (Hijmans 2012); to sample background points; and generally to help think about the duality between geographic and environmental space (Colwel and Rangel, 2009). Below we show examples of these different types of models.
 
 \section{Geographic Distance}
 
