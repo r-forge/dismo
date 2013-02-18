@@ -271,25 +271,21 @@ Before using the geocode function it is best to write the records to a table and
 
 \section{Sampling bias}
 
-Sampling bias is frequently present in occurrence records (Hijmans \textit{et al}., 2001). One can attempt to remove some of the bias by subsampling records, and this is illustrated below. However, subsampling reduces the number of records, and it cannot correct the data for areas that have not been sampled at all. It also suffers from the problem that locally dense records might be a true reflection of the relative suitable of habitat. The example below illustrates how one could go about subsampling. This is not a general recommendation to subsample, or to subsample in this way. See Phillips \textit{et al}. (2009) for an approach with MaxEnt to deal with bias in occurrence records used in SDM.
+Sampling bias is frequently present in occurrence records (Hijmans \textit{et al}., 2001). One can attempt to remove some of the bias by subsampling records, and this is illustrated below. However, subsampling reduces the number of records, and it cannot correct the data for areas that have not been sampled at all. It also suffers from the problem that locally dense records might in fact be a true reflection of the relative suitable of habitat. As in many steps in SDM, you need to understand something about your data and species to implement them well. See Phillips \textit{et al}. (2009) for an approach with MaxEnt to deal with bias in occurrence records for a group of species.
 
 <<sdm10, fig=TRUE, echo=TRUE>>=
 # create a RasterLayer with the extent of acgeo
 r <- raster(acg)
-# set the resolution of the cells to 1 degrees
+# set the resolution of the cells to (for example) 1 degree
 res(r) <- 1
 
 # expand (extend) the extent of the RasterLayer a little
 r <- extend(r, extent(r)+1)
 
-# get the cell number for each point
-cell <- cellFromXY(r, acg)
-dup <- duplicated(cell)
-# select the records that are not duplicated. A random selection
-# within duplicates might be better (but more elaborate).
-acsel <- acg[!dup, ]
+# sample:
+acsel <- gridSample(acg, r, n=1) 
 
-# display the results
+# to illustrate the method and show the result
 p <- rasterToPolygons(r)
 plot(p, border='gray')
 points(acg)
@@ -297,8 +293,9 @@ points(acg)
 points(acsel, cex=1, col='red', pch='x')
 @
 
+Note that with the \texttt{gridSample} function you can also do 'chess-board' sampling. This can be useful to split the data in 'training' and 'testing' sets (see the model evaluation chapter).
 
-At this point, it could be useful to save the cleaned data set. For example with the function \texttt{write.table} or \texttt{write.csv} so that we can use them later. The same file is available through dismo and can be retrieved like this:
+At this point, it could be useful to save the cleaned data set. For example with the function \texttt{write.table} or \texttt{write.csv} so that we can use them later. We did that, and the saved file is available through dismo and can be retrieved like this:
 
 <<sdm12, echo=TRUE>>=
 file <- paste(system.file(package="dismo"), '/ex/acaule.csv', sep='')
@@ -1353,7 +1350,7 @@ using uncertainty field in georeferences. How to target the "important" uncertai
 
 \noindent Peterson, A.T., J. Soberón, R.G. Pearson, R.P. Anderson, E. Martínez-Meyer, M. Nakamura and M.B. Araújo, 2011. Ecological Niches and Geographic Distributions. Monographs in Population Biology 49. Princeton University Press, 328p.
 
-\noindent Phillips S.J. and J.. Elith, 2011. Logistic methods for resource selection functions and presence-only species distribution models, AAAI (Association for the Advancement of Artificial Intelligence), San Francisco, USA.
+\noindent Phillips S.J. and J. Elith, 2011. Logistic methods for resource selection functions and presence-only species distribution models, AAAI (Association for the Advancement of Artificial Intelligence), San Francisco, USA.
 
 \noindent Phillips, S.J., R.P. Anderson, R.E. Schapire, 2006. Maximum entropy modeling of species geographic distributions. Ecological Modelling 190: 231-259.
 
