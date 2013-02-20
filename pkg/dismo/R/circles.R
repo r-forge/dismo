@@ -102,7 +102,7 @@ setMethod('circles', signature(p='data.frame'),
 		if (missing(d)) {
 			d <- .avgDist(p, lonlat=lonlat, ...) / 2
 		}
-		ci@polygons <- .generateCircles(p, d=d, lonlat=lonlat, ....)
+		ci@polygons <- .generateCircles(p, d=d, lonlat=lonlat, ...)
 		return(ci)
 	}
 )
