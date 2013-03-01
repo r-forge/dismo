@@ -3,7 +3,7 @@
 # Version 1.0
 # October 2010
 
-geocoder <- function(x, oneRecord=FALSE, extent=NULL, progress='', ...) {
+geocode <- function(x, oneRecord=FALSE, extent=NULL, progress='', ...) {
 	ntry <- list(...)$ntry
 	if (is.null(ntry)) ntry <- 10
 	reps <- min(ntry, 10)
