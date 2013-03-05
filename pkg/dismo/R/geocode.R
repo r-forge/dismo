@@ -11,8 +11,9 @@ geocode <- function(x, oneRecord=FALSE, extent=NULL, progress='', ...) {
 	xx <- unique(x)
 	xx <- data.frame(ID=1:length(xx), place=xx)
 	resall <- .geocode(xx$place, oneRecord=oneRecord, extent=extent, progress=progress)
-	
-	if (reps > 1) {
+
+	k <- which(is.na(resall[,3]))
+	if (length(k) > 0 & reps > 1) {
 		n <- 0
 		for (i in 2:reps) {
 			print(paste('try', i, '...'))
