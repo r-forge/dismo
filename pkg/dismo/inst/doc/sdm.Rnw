@@ -945,7 +945,8 @@ gm2 <- glm(pa ~ bio1+bio5 + bio6 + bio7 + bio8 + bio12 + bio16 + bio17,
             family = gaussian(link = "identity"), data=envtrain)
 			
 evaluate(testpres, testbackg, gm1)
-e2 <- evaluate(testpres, testbackg, gm2)
+ge2 <- evaluate(testpres, testbackg, gm2)
+ge2
 @
 
 
@@ -954,7 +955,7 @@ pg <- predict(predictors, gm2, ext=ext)
 par(mfrow=c(1,2))
 plot(pg, main='GLM/gaussian, raw values')
 plot(wrld_simpl, add=TRUE, border='dark grey')
-tr <- threshold(e2, 'spec_sens')
+tr <- threshold(ge2, 'spec_sens')
 plot(pg > tr, main='presence/absence')
 plot(wrld_simpl, add=TRUE, border='dark grey')
 points(pres_train, pch='+')
@@ -1006,7 +1007,7 @@ if (file.exists(jar)) {
 if (file.exists(jar)) {
 	e <- evaluate(pres_test, backg_test, xm, predictors)
 	e
-	px = predict(predictors, xm, ext=ext, progress='')
+	px <- predict(predictors, xm, ext=ext, progress='')
 	par(mfrow=c(1,2))
 	plot(px, main='Maxent, raw values')
 	plot(wrld_simpl, add=TRUE, border='dark grey')
@@ -1039,14 +1040,15 @@ model <- factor(pa) ~ bio1 + bio5 + bio6 + bio7 + bio8 + bio12 + bio16 + bio17
 rf2 <- randomForest(model, data=envtrain)
 rf3 <- randomForest(envtrain[,1:8], factor(pb_train))
 
-e = evaluate(testpres, testbackg, rf1)
-e
+erf <- evaluate(testpres, testbackg, rf1)
+erf
+
 pr <- predict(predictors, rf1, ext=ext)
 
 par(mfrow=c(1,2))
 plot(pr, main='Random Forest, regression')
 plot(wrld_simpl, add=TRUE, border='dark grey')
-tr <- threshold(e, 'spec_sens')
+tr <- threshold(erf, 'spec_sens')
 plot(pr > tr, main='presence/absence')
 plot(wrld_simpl, add=TRUE, border='dark grey')
 points(pres_train, pch='+')
@@ -1066,14 +1068,14 @@ and the 'svm' function in package 'e1071'. 'ksvm' includes many different SVM fo
 <<sdm81, fig=TRUE, width=9, height=6>>=
 library(kernlab)
 svm <- ksvm(pa ~ bio1+bio5+bio6+bio7+bio8+bio12+bio16+bio17, data=envtrain)
-e <- evaluate(testpres, testbackg, svm)
-e
+esv <- evaluate(testpres, testbackg, svm)
+esv
 ps <- predict(predictors, svm, ext=ext)
 
 par(mfrow=c(1,2))
 plot(ps, main='Support Vector Machine')
 plot(wrld_simpl, add=TRUE, border='dark grey')
-tr <- threshold(e, 'spec_sens')
+tr <- threshold(esv, 'spec_sens')
 plot(ps > tr, main='presence/absence')
 plot(wrld_simpl, add=TRUE, border='dark grey')
 points(pres_train, pch='+')
@@ -1083,18 +1085,29 @@ points(backg_train, pch='-', cex=0.25)
 
 \chapter{Combining model predictions}
 
+
 Seperate model predictions:
 
-<<sdm82, fig=TRUE, width=9, height=6>>=
-models <- stack(pb, pd, pm, pg, px, pr, ps)
-names(models) <- c("bioclim", "domain", "mahal", "glm", "maxent", "rf", "svm")
+<<sdm82>>=
+models <- stack(pb, pd, pm, pg, pr, ps)
+names(models) <- c("bioclim", "domain", "mahal", "glm", "rf", "svm")
 plot(models)
 @
 
 Simple average:
 
 <<sdm83, fig=TRUE, width=9, height=6>>=
-plot(mean(models), main='average score')
+m <- mean(models)
+plot(m, main='average score')
+@
+
+This is a problematic approach as the values predicted by the models are not all on the same (between 0 and 1) scale; so you may want to fix that first. Another concern could be weighting. Let's combine three models weighted by their AUC scores. Here, to create the weights, we substract 0.5 (the random expectation) and square the result to give further weight to higher AUC values.
+
+<<sdm84, fig=TRUE, width=9, height=6>>=
+auc <- sapply(list(ge2, erf, esv), function(x) x@auc)
+w <- (auc-0.5)^2
+m2 <- weighted.mean( models[[c("glm", "rf", "svm")]], w)
+plot(m2, main='weighted mean of three models')
 @
 
 
