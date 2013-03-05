@@ -76,7 +76,7 @@ function(object, x, fun=min, ext=NULL, filename='', ...) {
 			stop('missing variables in x')
 		}
 		x <- x[, fn ,drop=FALSE]
-		ec <- matrix(ncol=length(ln), nrow=nrow(x))
+		ec <- matrix(ncol=length(fn), nrow=nrow(x))
 		for (i in 1:ncol(ec)) {
 			ec[,i] <- object@funs[[i]](x[,i])
 		}
@@ -98,8 +98,8 @@ function(object, x, fun=min, ext=NULL, filename='', ...) {
 		if (! all(fn %in% ln )) {
 			stop('missing variables in Raster object')
 		}
-		if ( inherits(x, 'RasterStack') & (length(fn) < length(ln))) {
-			x <- x[[ln]]
+		if ( (inherits(x, 'RasterStack')) & (length(fn) < length(ln))) {
+			x <- x[[fn]]
 		}
 		
 		if (canProcessInMemory(out, 2)) {
@@ -118,7 +118,7 @@ function(object, x, fun=min, ext=NULL, filename='', ...) {
 		
 		for (i in 1:tr$n) {
 			rr <- firstrow + tr$row[i] - 1
-			vals <- getValuesBlock(x, row=rr, nrows=tr$nrows[i], firstcol, ncols)[, ln, drop=FALSE]
+			vals <- getValuesBlock(x, row=rr, nrows=tr$nrows[i], firstcol, ncols)[, fn, drop=FALSE]
 	
 			ec <- matrix(0, ncol=ncol(vals), nrow=nrow(vals))
 			for (j in 1:length(fn)) {
