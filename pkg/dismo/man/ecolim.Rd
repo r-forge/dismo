@@ -46,7 +46,36 @@ p <- predict(e, env)
 
 occurence <- paste(system.file(package="dismo"), '/ex/bradypus.csv', sep='')
 occ <- read.table(occurence, header=TRUE, sep=',')[,-1]
-e1 <- evaluate(e, p=occtest, a=bg, x=env)
+occtest <- occ[fold == 1, ]
+occtrain <- occ[fold != 1, ]
+
+\dontrun{
+v <- c(0,200,250,400, 0,1000,3000, 4000)
+
+f <- function(p) {
+	bio1 <- p[1:4]
+	if(any((bio1[2:4] - bio1[1:3]) < 0)) return(999)
+	bio12 <- p[5:8]
+	if(any((bio12[2:4] - bio12[1:3]) < 0)) return(999)
+	r1 <- c(0, 0, 0.5, 1)
+	r2 <- c(0, 0, 1, 1)
+	e <- ecolim(cbind(bio1, bio12), cbind(r1, r2)) 
+	1-evaluate(e, p=occtrain, a=bg, x=env)@auc
+}
+
+# patience...
+z <- optim(v, f)
+
+bio1 <- z$par[1:4]
+bio12 <- z$par[5:8]
+e2 <- ecolim(cbind(bio1, bio12), cbind(r1, r2)) 
+evaluate(e2, p=occtest, a=bg, x=env)
+
+p2 <- predict(e2, env)
+plot(p2)
+
+}
+
 
 
 }
