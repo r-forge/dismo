@@ -25,7 +25,7 @@ if (!isGeneric("ecolim")) {
 }	
 
 setMethod('ecolim', signature(x='matrix', y='matrix'), 
-	function(x, y=matrix(c(0,0,1,1,0,0)), ...) {
+	function(x, y=matrix(c(0,0,1,1,0,0)), extrapolate=TRUE,...) {
 		stopifnot(NCOL(x) == NCOL(y))
 		cn <- colnames(x)
 		if (any(cn == "")) {
@@ -33,9 +33,11 @@ setMethod('ecolim', signature(x='matrix', y='matrix'),
 		}
 		m <- new('EcoLim')
 		f <- list()
+		extrapolate <- as.logical(extrapolate)+1
+		extrapolate <- rep(extrapolate, length.out=ncol(x))
 		for (i in 1:ncol(x)) {
 			xy <- na.omit(cbind(x[,i], y[,i]))
-			f[[i]] <- approxfun(xy[,1], xy[,2], ...)
+			f[[i]] <- approxfun(xy[,1], xy[,2], rule=extrapolate[i],...)
 		}
 		m@funs <- f
 		m@x <- x
@@ -60,7 +62,7 @@ function(x, ...) {
 	par(mfrow=c(nr,nc))
 	nm <- colnames(x@x)
 	for (i in 1:n) {
-		plot(x@x[,i], x@funs[[i]](x@x[,i]), type='l', xlab=nm[i], ylab='response')
+		plot(x@x[,i], x@funs[[i]](x@x[,i]), type='l', xlab=nm[i], ylab='response', ...)
 	}
 } )
 
