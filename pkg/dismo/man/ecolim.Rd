@@ -46,8 +46,11 @@ p <- predict(e, env)
 
 occurence <- paste(system.file(package="dismo"), '/ex/bradypus.csv', sep='')
 occ <- read.table(occurence, header=TRUE, sep=',')[,-1]
+fold <- kfold(occ, k=5)
 occtest <- occ[fold == 1, ]
 occtrain <- occ[fold != 1, ]
+bg <- randomPoints(env, 1000)
+
 
 \dontrun{
 v <- c(0,200,250,400, 0,1000,3000, 4000)
@@ -70,16 +73,15 @@ bio1 <- z$par[1:4]
 bio12 <- z$par[5:8]
 e2 <- ecolim(cbind(bio1, bio12), cbind(r1, r2)) 
 evaluate(e2, p=occtest, a=bg, x=env)
+pwd <- pwdSample(occtest,bg,occtrain)
+ptest <- occtest[!is.na(pwd),]
+atest <- bg[na.omit(pwd),]
+evaluate(e2, p=ptest, a=atest, x=env)
 
 p2 <- predict(e2, env)
 plot(p2)
-
 }
-
-
-
 }
-
 
 \keyword{spatial}
 
