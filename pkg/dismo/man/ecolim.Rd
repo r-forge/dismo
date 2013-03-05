@@ -80,7 +80,7 @@ f <- function(p) {
 	x[] <- p
 	# numbers must go up
 	if ( any(x[-1,] < x[-nrow(x), ]) ) return(Inf)
-	e <- ecolim(cbind(bio1, bio12), y) 
+	e <- ecolim(x, y) 
 	# we are minimizing, hence 1-AUC
 	1-evaluate(e, p=occtrain, a=bg, x=env)@auc
 }
