@@ -44,6 +44,10 @@ e <- ecolim(cbind(bio1, bio12), cbind(r1, r2))
 p <- predict(e, env)
 #plot(p)
 
+occurence <- paste(system.file(package="dismo"), '/ex/bradypus.csv', sep='')
+occ <- read.table(occurence, header=TRUE, sep=',')[,-1]
+e1 <- evaluate(e, p=occtest, a=bg, x=env)
+
 
 }
 
