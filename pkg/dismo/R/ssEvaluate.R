@@ -1,6 +1,6 @@
 
 
-ssEvaluate <- function(p, a, reference, lonlat=TRUE, binsize=15, pwd=TRUE, predp, preda, model, predictors, fun=predict) {
+dcEvaluate <- function(p, a, reference, lonlat=TRUE, binsize=15, predp, preda, model, predictors, fun=predict) {
 	
 	if (missing(predp)) {
 		p <- na.omit(p)
@@ -40,6 +40,7 @@ ssEvaluate <- function(p, a, reference, lonlat=TRUE, binsize=15, pwd=TRUE, predp
 		preda <- fun(model, pa)
 	}
 	e <- list()
+	pwd <- TRUE
 	for (d in 1:(length(dist)-1)) {
 		
 		if (pwd) {
