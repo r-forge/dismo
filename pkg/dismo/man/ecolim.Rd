@@ -13,8 +13,9 @@ Simple generic limiting factor based model, in the tradition of the PLANTGRO mod
 }
 
 \usage{
-\S4method{ecolim}{matrix, matrix}(x, y, extrapolate=TRUE, ...)
+\S4method{ecolim}{matrix,matrix}(x, y, extrapolate=TRUE, ...)
 }
+ 
  
 
 \arguments{
