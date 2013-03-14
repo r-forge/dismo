@@ -1085,8 +1085,7 @@ points(backg_train, pch='-', cex=0.25)
 
 \chapter{Combining model predictions}
 
-
-Seperate model predictions:
+Rather than relying on a single "best" model, some auhtors (e.g. Thuillier, 2003) have argued for using many models and applying some sort of model averaging. See the biomod2 package for an implementation. You can of course implement these approaches yourself. Below is a very brief example. We first make a RasterStack of our individual model predictions:
 
 <<sdm82>>=
 models <- stack(pb, pd, pm, pg, pr, ps)
@@ -1094,14 +1093,14 @@ names(models) <- c("bioclim", "domain", "mahal", "glm", "rf", "svm")
 plot(models)
 @
 
-Simple average:
+Now we can compute the simple average:
 
 <<sdm83, fig=TRUE, width=9, height=6>>=
 m <- mean(models)
 plot(m, main='average score')
 @
 
-This is a problematic approach as the values predicted by the models are not all on the same (between 0 and 1) scale; so you may want to fix that first. Another concern could be weighting. Let's combine three models weighted by their AUC scores. Here, to create the weights, we substract 0.5 (the random expectation) and square the result to give further weight to higher AUC values.
+However, this is a problematic approach as the values predicted by the models are not all on the same (between 0 and 1) scale; so you may want to fix that first. Another concern could be weighting. Let's combine three models weighted by their AUC scores. Here, to create the weights, we substract 0.5 (the random expectation) and square the result to give further weight to higher AUC values.
 
 <<sdm84, fig=TRUE, width=9, height=6>>=
 auc <- sapply(list(ge2, erf, esv), function(x) x@auc)
@@ -1267,10 +1266,6 @@ There are many sophistications that are required by the realities that (a) there
 
 • SDMTools
 
-• Model averaging
-
-• See the BIOMOD for on multi-model inference.
-
 • Dealing with uncertainty 
 using uncertainty field in georeferences. How to target the "important" uncertainties (will vary with the application), an example of partial plots with standard errors, and predicting the upper and lower bounds; the idea of testing sensitivity to decisions made in the modeling process (including dropping out points etc etc). 
 
@@ -1372,6 +1367,8 @@ using uncertainty field in georeferences. How to target the "important" uncertai
 \noindent Phillips, S.J., M. Dudik, J. Elith, C.H. Graham, A. Lehmann, J. Leathwick, and S. Ferrier. 2009. Sample selection bias and presence-only distribution models: implications for background and pseudo-absence data. Ecological Applications 19: 181-197.
 
 \noindent Potts J. and J. Elith, 2006. Comparing species abundance models. Ecological Modelling 199: 153-163.
+
+\noindent Thuiller, W. 2003. BIOMOD - optimizing predictions of species distributions and projecting potential future shifts under global change. Global Change Biology 9: 1353-1362.
 
 \noindent Vapnik, V., 1998. Statistical Learning Theory. Wiley, New York.
 
