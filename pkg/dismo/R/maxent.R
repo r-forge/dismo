@@ -219,7 +219,11 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 				}
 			}
 
-			xy <- randomPoints( raster(x,1), nbg, p, warn=0 )
+			if (nlayers(x) > 1) {
+				xy <- randomPoints( raster(x,1), nbg, p, warn=0 )
+			} else {
+				xy <- randomPoints(x, nbg, p, warn=0 )			
+			}
 			av <- data.frame(extract(x, xy))
 			av <- na.omit(av)
 			if (nrow(av) == 0) {
