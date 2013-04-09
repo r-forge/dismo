@@ -426,6 +426,7 @@ setMethod("plot", signature(x='MaxEnt', y='missing'),
 			r <- sort(r)
 		}
 		dotchart(r, main=main, xlab=xlab, ...)
+		invisible(r)
 	}
 )
 
