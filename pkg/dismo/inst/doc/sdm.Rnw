@@ -507,6 +507,9 @@ We now have a set of predictor variables (rasters) and occurrence points. The ne
 
 <<sdm24a>>=
 presvals <- extract(predictors, bradypus)
+# setting random seed to always create the same
+# random set of points for this example
+set.seed(0)
 backgr <- randomPoints(predictors, 500)
 absvals <- extract(predictors, backgr)
 pb <- c(rep(1, nrow(presvals)), rep(0, nrow(absvals)))
@@ -764,6 +767,9 @@ file <- paste(system.file(package="dismo"), "/ex/bradypus.csv", sep="")
 bradypus <- read.table(file,  header=TRUE,  sep=',')
 bradypus  <- bradypus[,-1]
 presvals <- extract(predictors, bradypus)
+set.seed(0)
+backgr <- randomPoints(predictors, 500)
+absvals <- extract(predictors, backgr)
 pb <- c(rep(1, nrow(presvals)), rep(0, nrow(absvals)))
 sdmdata <- data.frame(cbind(pb, rbind(presvals, absvals)))
 sdmdata[,'biome'] = as.factor(sdmdata[,'biome'])
@@ -977,7 +983,7 @@ All the model fitting methods discussed here can be tuned in several ways. We do
 
 \section{Maxent}
 
-MaxEnt (Maximum Entropy; Phillips \textit{et al}., 2004, 2006) is the most widely used SDM algorithm. Elith \textit{et al}. (2010) provide an explanation of the algorithm (and software) geared towards ecologists. MaxEnt is available as a stand-alone Java program. Dismo has a function 'maxent' that communicates with this program. To use it you must first download the program from \url{http://www.cs.princeton.edu/~schapire/maxent/}. Put the file 'maxent.jar' in the 'java' folder of the 'dismo' package. That is the folder returned by \texttt{system.file("java", package="dismo")}. Please note that this program (\texttt{maxent.jar}) cannot be redistributed or used for commercial purposes. 
+MaxEnt (Maximum Entropy; Phillips \textit{et al}., 2006) is the most widely used SDM algorithm. Elith \textit{et al}. (2010) provide an explanation of the algorithm (and software) geared towards ecologists. MaxEnt is available as a stand-alone Java program. Dismo has a function 'maxent' that communicates with this program. To use it you must first download the program from \url{http://www.cs.princeton.edu/~schapire/maxent/}. Put the file 'maxent.jar' in the 'java' folder of the 'dismo' package. That is the folder returned by \texttt{system.file("java", package="dismo")}. Please note that this program (\texttt{maxent.jar}) cannot be redistributed or used for commercial purposes. 
 
 Because MaxEnt is implemented in dismo you can fit it like the profile methods (e.g. Bioclim). That is, you can provide presence points and a RasterStack. However, you can also first fit a model, like with the other methods such as glm. But in the case of MaxEnt you cannot use the formula notation.
 
