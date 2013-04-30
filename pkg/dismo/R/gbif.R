@@ -214,26 +214,25 @@ gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, rem
 		alt, 
 		z[ ,c("institution", "collection", "catalogNumber",  "basisOfRecord", "collector", "earliestDateCollected", "latestDateCollected",  "gbifNotes", "downloadDate", "maxElevationM", "minElevationM", "maxDepthM", "minDepthM")])
 	}
+
+	if (dim(z)[1] > 0) {
 	
-	if (sp) {
-		i <- z[!(is.na(z[,'lon'] | is.na(z[,'lat']))), ]
-		if (dim(z)[1] > 0) {
+		iso <- raster:::.ISO()
+		z$ISO2 <- z$country
+		i <- match(z$ISO2, iso[, 'ISO2'])
+		z$country <- iso[i, 1]
+		
+		fullloc <- trim(as.matrix(z[, c('locality', 'adm1', 'adm2', 'country', 'continent')]))
+		fullloc <- apply(fullloc, 1, function(x) paste(x, collapse=', '))
+		fullloc <- gsub("NA, ", "", fullloc)
+		fullloc <- gsub(", NA", "", fullloc)
+		fullloc <- gsub('\"', "", fullloc)
+		z$cloc <- fullloc
+
+		if (sp) {
 			coordinates(z) <- ~lon+lat
 		}
-	}
-
-	iso <- raster:::.ISO()
-	z$ISO2 <- z$country
-	i <- match(z$ISO2, iso[, 'ISO2'])
-	z$country <- iso[i, 1]
-	
-	fullloc <- trim(as.matrix(z[, c('locality', 'adm1', 'adm2', 'country', 'continent')]))
-	fullloc <- apply(fullloc, 1, function(x) paste(x, collapse=', '))
-	fullloc <- gsub("NA, ", "", fullloc)
-	fullloc <- gsub(", NA", "", fullloc)
-	fullloc <- gsub('\"', "", fullloc)
-	z$cloc <- fullloc
-	
+	}	
 #	if (inherits(ext, 'SpatialPolygons')) { overlay	}
 	return(z)
 }
