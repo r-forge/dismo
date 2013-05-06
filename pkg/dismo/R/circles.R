@@ -37,7 +37,7 @@
 	brng <- 1:n * 360/n
 	brng <- brng * toRad
 	if (lonlat) { 
-		xy = xy * toRad 
+		xy <- xy * toRad 
 	}
 	pols <- list()
 	for (i in 1:nrow(xy)) {
