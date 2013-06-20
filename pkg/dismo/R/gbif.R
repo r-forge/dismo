@@ -25,7 +25,7 @@
 }
 
 
-gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE, sp=FALSE, removeZeros=FALSE, download=TRUE, getAlt=TRUE, ntries=5, nrecs=1000, start=1, end=NULL, feedback=3) {
+gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE, sp=FALSE, removeZeros=FALSE, download=TRUE, getAlt=TRUE, returnConcept=FALSE,ntries=5, nrecs=1000, start=1, end=NULL, feedback=3) {
 	
 	if (! require(XML)) { stop('You need to install the XML package to use this function') }
 
@@ -70,13 +70,22 @@ gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE
 	} else {
 		ex <- NULL
 	}
-	genus <- trim(genus)
-	species <- trim(species)
-	gensp <- paste(genus, species)
-	spec <- gsub("   ", " ", species) 
-	spec <- gsub("  ", " ", spec) 	
-	spec <- gsub(" ", "%20", spec)  # for genus species var. xxx
-    spec <- paste(genus, '+', spec, sep='')
+	
+	getkey <- TRUE
+	if (is.logical(concept)) {
+		genus <- trim(genus)
+		species <- trim(species)
+		gensp <- paste(genus, species)
+		spec <- gsub("   ", " ", species) 
+		spec <- gsub("  ", " ", spec) 	
+		spec <- gsub(" ", "%20", spec)  # for genus species var. xxx
+		spec <- paste(genus, '+', spec, sep='')
+	} else {
+		key <- concept
+		gensp <- concept
+		concept <- TRUE
+		getkey <- FALSE
+	}
 	
 	if (sp) geo <- TRUE
 	if (geo) { cds <- '&coordinatestatus=true' 
@@ -87,8 +96,12 @@ gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE
 		args <- paste('&', paste(args, collapse='&'), sep='')
 	}
 	
+	if (returnConcept) concept <- TRUE
 	if (concept) {
-		key <- .GBIFKey(spec)
+		if (getkey) {
+			key <- .GBIFKey(spec)
+		}
+		if (returnConcept) return(key)
 		url <- paste(base, 'count?taxonconceptkey=', key, cds, ex, args, sep='')
 	} else {
 		url <- paste(base, 'count?scientificname=', spec, cds, ex, args, sep='')
