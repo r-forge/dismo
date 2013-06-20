@@ -1,4 +1,5 @@
 --- development version
+Added argument "concept" to function gbif to allow querying for synonyms. Suggested by Aaron Dodd
 
 --- 4-January-2013, version 0.8-5
 Improved "mess" function (for speed and for large raster)
