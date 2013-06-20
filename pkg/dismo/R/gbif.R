@@ -19,7 +19,7 @@
 	if (! require(XML)) { stop('You need to install the XML package to use this function') }
 	url <- "http://data.gbif.org/ws/rest/taxon/list?dataproviderkey=1&rank=species&scientificname="
 	url <- paste0(url, species)
-   	doc <- try(readLines(url, warn = FALSE))
+   	doc <- xmlInternalTreeParse(url)
 	node <- getNodeSet(doc, "//tc:TaxonConcept")
 	xmlGetAttr(node[[1]], 'gbifKey')
 }
@@ -46,12 +46,12 @@ gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE
 
 		nodes <- getNodeSet(doc, "//to:Identification")
 		varNames <- c("taxonName")
-		dims = c(length(nodes), length(varNames)) 
-		tax = as.data.frame(replicate(dims[2], rep(as.character(NA), dims[1]), simplify = FALSE), stringsAsFactors = FALSE)
-		names(tax) = varNames
+		dims <- c(length(nodes), length(varNames)) 
+		tax <- as.data.frame(replicate(dims[2], rep(as.character(NA), dims[1]), simplify = FALSE), stringsAsFactors = FALSE)
+		names(tax) <- varNames
     # Fill in the rows based on the names.
 		for(i in seq(length = dims[1])) {
-			tax[i,] = xmlSApply(nodes[[i]], xmlValue)[varNames]
+			tax[i,] <- xmlSApply(nodes[[i]], xmlValue)[varNames]
 		}
 		cbind(tax, ans)
 	}
@@ -96,6 +96,7 @@ gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE
 	
 	tries <- 0
     while (TRUE)  {
+	
 		tries <- tries + 1
 		if (tries > 5) { # if you cannot do this in 5 tries, you might as well stop
 			stop('GBIF server does not return a valid answer after 5 tries')
