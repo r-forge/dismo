@@ -12,15 +12,16 @@ This function downloads species occurence records from the Global Biodiversity I
 
 
 \usage{
-gbif(genus, species="", ext=NULL, args=NULL, geo=TRUE, sp=FALSE, removeZeros=FALSE, download=TRUE,
+gbif(genus, species="", concept=FALSE, ext=NULL, args=NULL, geo=TRUE, sp=FALSE, removeZeros=FALSE, download=TRUE,
      getAlt=TRUE, ntries=5, nrecs=1000, start=1, end=NULL, feedback=3)
 }
  
 \arguments{
-  \item{genus}{Character. genus name}
-  \item{species}{Character. species name. Use '*' to download the entire genus. Append '*' to the species name to get all sub-taxa }
+  \item{genus}{character. genus name}
+  \item{species}{character. species name. Use '*' to download the entire genus. Append '*' to the species name to get all naming variants (e.g. with and witout species author name) and sub-taxa }
+  \item{concept}{logical. If \code{TRUE} records for species that are synonyms (according to the GBIF species concept key) are also downloaded}  
   \item{ext}{Extent object to limit the geographic extent of the records. An extent can be created using functions like \code{\link{drawExtent}} and \code{\link{extent}}}
-  \item{args}{Character. Additional arguments to refine the query. See examples for the format, and the  (\href{http://data.gbif.org/ws/rest/occurrence/}{web service documentation}) (under 3. SEARCH FOR RECORDS) for more details. This is intended for use with arguments like 'originisocountrycode' or 'startdate' that narrow down the search. Other arguments such as 'format' may cause the function to fail}
+  \item{args}{character. Additional arguments to refine the query. See examples for the format, and the  (\href{http://data.gbif.org/ws/rest/occurrence/}{web service documentation}) (under 3. SEARCH FOR RECORDS) for more details. This is intended for use with arguments like 'originisocountrycode' or 'startdate' that narrow down the search. Other arguments such as 'format' may cause the function to fail}
   \item{geo}{Logical. If \code{TRUE}, only records that have a georeference (longitude and latitude values) will be downloaded}
   \item{sp}{Logical. If \code{TRUE}, \code{geo} will be set to \code{TRUE} and a \link[sp]{SpatialPointsDataFrame} will be returned}
   \item{removeZeros}{Logical. If \code{TRUE}, all records that have a latiude OR longitude of zero will be removed if \code{geo==TRUE}, or set to \code{NA} if \code{geo==FALSE}. If \code{FALSE}, only records that have a latiude AND longitude that are zero will be removed or set to \code{NA}}.

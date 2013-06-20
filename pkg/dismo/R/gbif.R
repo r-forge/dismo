@@ -11,8 +11,21 @@
 # translate ISO2 codes to full country names
 # add "cloc"
 
+# 2013-06-19
+# added 'species concept' option
+# suggested by Aaron Dodd
 
-gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, removeZeros=FALSE, download=TRUE, getAlt=TRUE, ntries=5, nrecs=1000, start=1, end=NULL, feedback=3) {
+.GBIFKey <- function(species) {
+	if (! require(XML)) { stop('You need to install the XML package to use this function') }
+	url <- "http://data.gbif.org/ws/rest/taxon/list?dataproviderkey=1&rank=species&scientificname="
+	url <- paste0(url, species)
+   	doc <- try(readLines(url, warn = FALSE))
+	node <- getNodeSet(doc, "//tc:TaxonConcept")
+	xmlGetAttr(node[[1]], 'gbifKey')
+}
+
+
+gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE, sp=FALSE, removeZeros=FALSE, download=TRUE, getAlt=TRUE, ntries=5, nrecs=1000, start=1, end=NULL, feedback=3) {
 	
 	if (! require(XML)) { stop('You need to install the XML package to use this function') }
 
@@ -73,7 +86,13 @@ gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, rem
 		args <- trim(as.character(args))
 		args <- paste('&', paste(args, collapse='&'), sep='')
 	}
-    url <- paste(base, 'count?scientificname=', spec, cds, ex, args, sep='')
+	
+	if (concept) {
+		key <- .GBIFKey(spec)
+		url <- paste(base, 'count?taxonconceptkey=', key, cds, ex, args, sep='')
+	} else {
+		url <- paste(base, 'count?scientificname=', spec, cds, ex, args, sep='')
+	}	
 	
 	tries <- 0
     while (TRUE)  {
@@ -143,9 +162,12 @@ gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, rem
 			if ((group > ss & group %% 20 == 0)  |  group == iter ) { cat('\n') }
 			flush.console()
 		}
-				
-        aurl <- paste(base, 'list?scientificname=', spec, '&mode=processed&format=darwin&startindex=', format(start, scientific=FALSE), '&maxresults=', format(nrecs, scientific=FALSE), cds, ex, args, sep='')
 
+		if (concept) {
+			aurl <- paste(base, 'list?taxonconceptkey=', key, '&mode=processed&format=darwin&startindex=', format(start, scientific=FALSE), '&maxresults=', format(nrecs, scientific=FALSE), cds, ex, args, sep='')
+		} else {
+			aurl <- paste(base, 'list?scientificname=', spec, '&mode=processed&format=darwin&startindex=', format(start, scientific=FALSE), '&maxresults=', format(nrecs, scientific=FALSE), cds, ex, args, sep='')
+		}
 		tries <- 0
         #======= if download fails due to server problems, keep trying  =======#
         while (TRUE) {
