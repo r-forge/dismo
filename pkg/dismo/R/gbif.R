@@ -16,12 +16,19 @@
 # suggested by Aaron Dodd
 
 .GBIFKey <- function(species) {
-	if (! require(XML)) { stop('You need to install the XML package to use this function') }
+#	if (! require(XML)) { stop('You need to install the XML package to use this function') }
 	url <- "http://data.gbif.org/ws/rest/taxon/list?dataproviderkey=1&rank=species&scientificname="
 	url <- paste0(url, species)
    	doc <- xmlInternalTreeParse(url)
-	node <- getNodeSet(doc, "//tc:TaxonConcept")
-	xmlGetAttr(node[[1]], 'gbifKey')
+	
+	node <- getNodeSet(doc, "//gbif:summary")
+	m <- xmlGetAttr(node[[1]], 'totalReturned')
+	if (!(as.integer(m) > 0)) {
+		return(NA)
+	} else {
+		node <- getNodeSet(doc, "//tc:TaxonConcept")
+		xmlGetAttr(node[[1]], 'gbifKey')
+	}
 }
 
 
@@ -81,7 +88,8 @@ gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE
 		spec <- gsub(" ", "%20", spec)  # for genus species var. xxx
 		spec <- paste(genus, '+', spec, sep='')
 	} else {
-		key <- concept
+		key <- round(as.numeric(concept))
+		if (key < 1) stop('concept should be a positive integer')
 		gensp <- concept
 		concept <- TRUE
 		getkey <- FALSE
@@ -102,7 +110,12 @@ gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE
 			key <- .GBIFKey(spec)
 		}
 		if (returnConcept) return(key)
-		url <- paste(base, 'count?taxonconceptkey=', key, cds, ex, args, sep='')
+		if (is.na(key)) {
+			concept <- FALSE
+			url <- paste(base, 'count?scientificname=', spec, cds, ex, args, sep='')
+		} else {
+			url <- paste(base, 'count?taxonconceptkey=', key, cds, ex, args, sep='')
+		}
 	} else {
 		url <- paste(base, 'count?scientificname=', spec, cds, ex, args, sep='')
 	}	
