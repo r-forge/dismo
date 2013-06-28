@@ -164,6 +164,16 @@ gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE
 	if (! download) { return(n) }
 	nrecs <- min(max(nrecs, 1), 1000)
 	
+	start <- max(1, start)
+	if (start > n) {
+		stop('"start" is larger than the number of records')
+	}
+	if (is.null(end)) {
+		end <- n
+	} else {
+		stopifnot(end >= start)
+	}
+	
     iter <- n %/% nrecs
 	breakout <- FALSE
 	if (start > 1) {
@@ -172,19 +182,25 @@ gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE
 		ss <- 0
 	}
 	z <- NULL
+	start <- start-1
     for (group in ss:iter) {
-        start <- group * nrecs
+		if (group > 0) {
+			start <- group * nrecs
+			if (end < start) break
+		}	
+		if (group == iter) { 
+			thisend <- min(end, n) - 1
+			nrecs <- thisend-start+1
+		} else { 
+			thisend <- start+nrecs-1 
+			thisend <- min(end, thisend)
+		}
+		
 		if (feedback > 1) {
-			if (group == iter) { 
-				end <- n-1 
-				nrecs <- 1+end-start
-			} else { 
-				end <- start + nrecs - 1 
-			}
 			if (group == ss) { 
-				cat(start, '-', end+1, sep='')  
+				cat((start+1), '-', thisend+1, sep='')  
 			} else { 
-				cat('-', end+1, sep='')  
+				cat('-', thisend+1, sep='')  
 			}
 			if ((group > ss & group %% 20 == 0)  |  group == iter ) { cat('\n') }
 			flush.console()
