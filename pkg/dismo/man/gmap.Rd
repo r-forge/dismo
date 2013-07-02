@@ -10,7 +10,7 @@ Retrieve a 'Google Map' that can be used as a background for plotting points and
 
 You should check the terms of service before you use these maps: \url{http://code.google.com/apis/maps/terms.html}
 
-The projection of the returned Raster object is "Mercator" (unless you use \code{lonlat=TRUE}, and other spatial data may need to be transformed before it can be plotted on top of the Google map. You can use the \code{Mercator} function to transform map coordinates and points between Mercator and longitude/latitude. For Spatial* objects, use \code{spTransform} in the \code{rgdal} package.
+The projection of the returned Raster object is "Mercator" (unless you use \code{lonlat=TRUE}), and other spatial data may need to be transformed before it can be plotted on top of the Google map. You can use the \code{Mercator} function to transform points from longitude/latitude to Mercator. For SpatialLines and SpatialPolygons objects, use \code{spTransform} in the \code{rgdal} package.
 
 This function uses the Google static maps web-service, and is based on functions by Markus Loecher for the \code{RgoogleMaps} package. 
 
