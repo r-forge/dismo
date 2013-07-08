@@ -18,7 +18,8 @@ The purpose of using this function should be to display the map in a browser. Yo
 }
 
 \usage{
-gmap(x, exp=1, type='terrain', filename='', style=NULL, scale=1, zoom=NULL, size=c(640, 640), rgb=FALSE, lonlat=FALSE, ...)
+gmap(x, exp=1, type='terrain', filename='', style=NULL, scale=1, zoom=NULL, 
+      size=c(640, 640), rgb=FALSE, lonlat=FALSE, ...)
 
 Mercator(p, inverse = FALSE)
 }

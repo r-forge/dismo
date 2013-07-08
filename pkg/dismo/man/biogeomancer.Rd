@@ -10,7 +10,8 @@ See \url{http://bg.berkeley.edu/latest/} for more information and a rich visual 
 }
 
 \usage{
-biogeomancer(country = "", adm1 = "", adm2 = "", locality = "", singleRecord=TRUE, progress="text")
+biogeomancer(country = "", adm1 = "", adm2 = "", locality = "", 
+             singleRecord=TRUE, progress="text")
 }
 
 \arguments{
