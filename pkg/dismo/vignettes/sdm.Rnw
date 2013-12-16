@@ -18,7 +18,7 @@
 \newcommand{\sub}[1]{\ensuremath{_{\textrm{#1}}}}
 \newcommand{\R}{{\normalfont\textsf{R }}{}}
 
-\SweaveOpts{png=TRUE}
+\SweaveOpts{pdf=FALSE, png=TRUE}
 \SweaveOpts{resolution=100}
 \SweaveOpts{keep.source=TRUE}
 

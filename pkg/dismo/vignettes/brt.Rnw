@@ -15,7 +15,7 @@
 \newcommand{\R}{{\normalfont\textsf{R }}{}}
 
 \SweaveOpts{keep.source=TRUE}
-\SweaveOpts{png=TRUE}
+\SweaveOpts{pdf=FALSE, png=TRUE}
 \SweaveOpts{resolution=100}
 
 <<foo,include=FALSE,echo=FALSE>>=
