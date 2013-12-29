@@ -38,7 +38,7 @@ gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE
 
 	gbifxmlToDataFrame <- function(s) {
 		# this sub-funciton was hacked from xmlToDataFrame in the XML package by Duncan Temple Lang
-		doc = xmlInternalTreeParse(s)
+		doc <- try(xmlInternalTreeParse(s))
 		nodes <- getNodeSet(doc, "//to:TaxonOccurrence")
 		if(length(nodes) == 0)   return(data.frame())
 		varNames <- c("continent", "country", "stateProvince", "county", "locality",  "decimalLatitude", "decimalLongitude", "coordinateUncertaintyInMeters", "maximumElevationInMeters", "minimumElevationInMeters", "maximumDepthInMeters", "minimumDepthInMeters", "institutionCode", "collectionCode", "catalogNumber",  "basisOfRecordString", "collector", "earliestDateCollected", "latestDateCollected",  "gbifNotes")
@@ -216,7 +216,8 @@ gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE
         while (TRUE) {
 			tries <- tries + 1
 			if (tries > ntries) {
-				warning('GBIF did not return the data in ', ntries, '  tries.')
+				warning('GBIF did not return the data in ', ntries, '  tries for:')
+				print(aurl)
 				breakout <- TRUE
 				break
 			}
