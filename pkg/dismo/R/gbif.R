@@ -34,11 +34,14 @@
 
 gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE, sp=FALSE, removeZeros=FALSE, download=TRUE, getAlt=TRUE, returnConcept=FALSE,ntries=5, nrecs=1000, start=1, end=NULL, feedback=3) {
 	
+	
 	if (! require(XML)) { stop('You need to install the XML package to use this function') }
 
 	gbifxmlToDataFrame <- function(s) {
 		# this sub-funciton was hacked from xmlToDataFrame in the XML package by Duncan Temple Lang
+		
 		doc <- try(xmlInternalTreeParse(s))
+
 		nodes <- getNodeSet(doc, "//to:TaxonOccurrence")
 		if(length(nodes) == 0)   return(data.frame())
 		varNames <- c("continent", "country", "stateProvince", "county", "locality",  "decimalLatitude", "decimalLongitude", "coordinateUncertaintyInMeters", "maximumElevationInMeters", "minimumElevationInMeters", "maximumDepthInMeters", "minimumDepthInMeters", "institutionCode", "collectionCode", "catalogNumber",  "basisOfRecordString", "collector", "earliestDateCollected", "latestDateCollected",  "gbifNotes")
@@ -62,6 +65,8 @@ gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE
 		}
 		cbind(tax, ans)
 	}
+
+	tmpfile <- paste(tempfile(), '.XML')
 
 	
 	if (!is.null(ext)) { 
@@ -221,8 +226,18 @@ gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE
 				breakout <- TRUE
 				break
 			}
-	    	zz <- try( gbifxmlToDataFrame(aurl))
-			if (class(zz) != 'try-error') break
+			zz <- try (download.file(aurl, tmpfile, quiet=TRUE))
+			if (class(zz) != 'try-error') {
+				break
+				print('download failure, trying again...')
+			}
+			xml <- scan(tmpfile, what='character', quiet=TRUE, sep='\n')
+			xml <- chartr('\a\v', '  ', xml)
+	    	zz <- try( gbifxmlToDataFrame(xml))
+			if (class(zz) != 'try-error') {
+				print('parsing failure, trying again...')
+				break
+			}
 	    }
 		
 		if (breakout) {
@@ -300,6 +315,8 @@ gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE
 		}
 	}	
 #	if (inherits(ext, 'SpatialPolygons')) { overlay	}
+	try(file.remove(tmpfile), silent=TRUE)
+	
 	return(z)
 }
 
