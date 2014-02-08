@@ -77,3 +77,21 @@
 	return(reyni)
 }
 	
+.chao1 <- function(x) {	
+	tab <- table(na.omit(x))
+	singletons <- sum(tab==1)
+	doubletons <- max(1, sum(tab==2))
+	length(tab) + singletons^2 / (2*doubletons)
+}
+
+.jack <- function(x) { 
+	x <- na.omit(x)
+	tab <- table(x)
+	singletons <- sum(tab==1)
+	N <- length(x)
+	length(tab)+ singletons*(N-1)/N
+}
+
+
+
+	
