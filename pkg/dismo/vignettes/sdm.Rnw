@@ -38,11 +38,11 @@ set.seed(0)
 
 \chapter{Introduction}
 
-This document provides an introduction to species distribution modeling with \R. Species distribution modeling (SDM) is also known under other names including climate envelope-modeling, habitat modeling, and (environmental or ecological) niche-modeling. The assumption of SDM is that you can predict the entire, or potential, spatial distribution of a phenomenon, by relating sites of known occurrence (and perhaps non-occurrence) with predictor variables known for these sites and for all other sites. The common application of this method is to predict species ranges with climate data as predictors.  
+This document provides an introduction to species distribution modeling with \R. Species distribution modeling (SDM) is also known under other names including climate envelope-modeling, habitat modeling, and (environmental or ecological) niche-modeling. The aim of SDM is to estimate the similarity of the conditions at any site to the conditions at the locations of known occurrence (and perhaps of non-occurrence) of a phenomenon. A common application of this method is to predict species ranges with climate data as predictors.  
 
-In SDM, the following steps are usually taken: (1) locations of occurrence of a species (or other phenomenon) are compiled. (2) values of environmental predictor variables (such as climate) at these locations are extracted from spatial databases (3) the environmental values are used  to fit a model predicting likelihood of presence, or another measure such as abundance of the species. (4) The model is used to predict the likelihood of presence across an area of interest (and perhaps for a future or past climate).
+In SDM, the following steps are usually taken: (1) locations of occurrence of a species (or other phenomenon) are compiled; (2) values of environmental predictor variables (such as climate) at these locations are extracted from spatial databases; (3) the environmental values are used to fit a model to estimate similarity to the sites of occurrence, or another measure such as abundance of the species; (4) The model is used to predict the variable of interest across an the region of interest (and perhaps for a future or past climate).
 
-In this text we assume that you are familiar with most of the concepts in SDM. If in doubt, you could consult, for example, Richard Pearson's introduction to the subject: \url{http://biodiversityinformatics.amnh.org/index.php?section_id=111}, the book by Janet Franklin (2009), or the somewhat more theoretical book by Peterson \textit{et al.} (2011), or the recent review article by Elith and Leathwick (2009). It is important to have a good understanding of the interplay of environmental (niche) and geographic (biotope) space – see Colwell and Rangel (2009) and Peterson \textit{et al.} (2011) for a discussion. SDM is a widely used approach but there is much debate on when and how to best use this method. While we refer to some of these issues, in this document we do not provide an in-depth discussion of this scientific debate. Rather, our objective is to provide practical guidance to implemeting the basic steps of SDM. We leave it to you to use other sources to determine the appropriate methods for your research; and to use the ample opportunities provided by the \R environment to improve existing approaches and to develop new ones. 
+We assume that you are familiar with most of the concepts in SDM. If in doubt, you could consult, for example, Richard Pearson's introduction to the subject: \url{http://biodiversityinformatics.amnh.org/index.php?section_id=111}, the book by Janet Franklin (2009), the somewhat more theoretical book by Peterson \textit{et al.} (2011), or the recent review article by Elith and Leathwick (2009). It is important to have a good understanding of the interplay of environmental (niche) and geographic (biotope) space – see Colwell and Rangel (2009) and Peterson \textit{et al.} (2011) for a discussion. SDM is a widely used approach but there is much debate on when and how to best use this method. While we refer to some of these issues, in this document we do not provide an in-depth discussion of this scientific debate. Rather, our objective is to provide practical guidance to implemeting the basic steps of SDM. We leave it to you to use other sources to determine the appropriate methods for your research; and to use the ample opportunities provided by the \R environment to improve existing approaches and to develop new ones. 
 
 We also assume that you are already somewhat familiar with the \R language and environment. It would be particularly useful if you already had some experience with statistical model fitting (e.g. the \texttt{glm} function) and with spatial data handling as implemented in the packages '\verb@raster@' and '\verb@sp@'. To familiarize yourself with model fitting see, for instance, the Documentation section on the CRAN webpage (http://cran.r-project.org/) and any introduction to \R txt. For the  '\verb@raster@' package you could consult its vignette (available at \url{http://cran.r-project.org/web/packages/raster/vignettes/Raster.pdf}). When we present \R code we will provide some explanation if we think it might be difficult or confusing. We will do more of this earlier on in this document, so if you are relatively inexperienced with \R and would like to ease into it, read this text in the presented order.   
 
@@ -159,7 +159,7 @@ lonzero = subset(acgeo, lon==0)
 lonzero[, 1:13]
 @
 
-The records are from Bolivia, Peru and Argentina, confirming that coordinates are in error. Alternatively, it could have been that the coordinates were correct, perhaps referring to a location in the Atlantic Ocean where a fish was caught rather than a place where \textit{S. acaule} was collected). Records with the wrong species name can be among the hardest to correct (e.g., distinguishing between brown bears and sasquatch, Lozier \textit{et al.}, 2009). The one record in Ecuador is like that, there is some debate whether that is actually a specimen of texit{S. albicans} or an anomalous hexaploid variety of texit{S. acaule}. 
+The records are from Bolivia, Peru and Argentina, confirming that coordinates are in error. Alternatively, it could have been that the coordinates were correct, perhaps referring to a location in the Atlantic Ocean where a fish was caught rather than a place where \textit{S. acaule} was collected). Records with the wrong species name can be among the hardest to correct (e.g., distinguishing between brown bears and sasquatch, Lozier \textit{et al.}, 2009). The one record in Ecuador is like that, there is some debate whether that is actually a specimen of \texit{S. albicans} or an anomalous hexaploid variety of \texit{S. acaule}. 
 
 
 \subsection{Duplicate records}
@@ -256,7 +256,7 @@ georef[1:3,1:13]
 @
 
 
-We recommend using a tool like BioGeomancer: \url{http://bg.berkeley.edu/latest} (Guralnick \textit{et al}., 2006) to georeference textual locality descriptions. An important feature of BioGeomancer is that it attempts to capture the uncertainty associated with each georeference (Wieczorek \textit{et al}., 2004). The dismo package has a function \texttt{biogeomancer} that you can use for this, and that we demonstrate below, but its use is generally not recommended because you really need a detailed map interface for accurate georeferencing. 
+For georeferencing, you can try to use the dismo package function \texttt{geocode} that sends requests to the Google API. We demonstrate below, but its use is generally not recommended because for accurate georeferencing you need a detailed map interface, and ideally one that allows you to capture the uncertainty associated with each georeference (Wieczorek \textit{et al}., 2004). 
 
 Here is an example for one of the records with longitude = 0, using Google's geocoding service. We put the function into a 'try' function, to assure elegant error handling if the computer is not connected to the Internet. Note that we use the "cloc" (concatenated locality) field.
 
@@ -266,7 +266,7 @@ b <- try(  geocode(georef$cloc[4]) )
 b
 @
 
-Before using the geocode function it is best to write the records to a table and "clean" them in a spreadsheet. Cleaning involves traslation, expanding abbreviations, correcting misspellings, and making duplicates exactely the same so that they can be georeferenced only once. Then read the the table back into R, and create unique localities, georeference these and merge them with the origninal data. For the geocoding it would be better to use the biogeomancer browser interface as it allows for much more (and necessary) interaction and editing.
+Before using the geocode function it is best to write the records to a table and "clean" them in a spreadsheet. Cleaning involves traslation, expanding abbreviations, correcting misspellings, and making duplicates exactly the same so that they can be georeferenced only once. Then read the the table back into \R, and create unique localities, georeference these and merge them with the original data.
 
 
 \section{Sampling bias}
@@ -308,21 +308,21 @@ In a real research project you would want to spend much more time on this first 
 \section{Exercises}
 
 \begin{hangparas}{3em}{1}
-\noindent 1) use the gbif function to download records for the African elephant (or another species of your preference, try to get one with between 10 and 100 records). Use option "geo=FALSE" to also get records with no (numerical) georeference.
+\noindent 1) Use the gbif function to download records for the African elephant (or another species of your preference, try to get one with between 10 and 100 records). Use option "geo=FALSE" to also get records with no (numerical) georeference.
 
-\noindent 2) summarize the data: how many records are there, how many have coordinates, how many records without coordinates have a textual georeference (locality description)?
+\noindent 2) Summarize the data: how many records are there, how many have coordinates, how many records without coordinates have a textual georeference (locality description)?
 
-\noindent 3) use the 'geocode' function to georeference up to 10 records without coordinates
+\noindent 3) Use the 'geocode' function to georeference up to 10 records without coordinates
 
-\noindent 4) make a simple map of all the records, using a color and symbol to distinguish between the coordinates from gbif and the ones returned by Google (via the geocode function). Use 'gmap' to create a basemap.
+\noindent 4) Make a simple map of all the records, using a color and symbol to distinguish between the coordinates from gbif and the ones returned by Google (via the geocode function). Use 'gmap' to create a basemap.
 
-\noindent 5) do you think the observations are a reasonable representation of the distribution (and ecological niche) of the species?
+\noindent 5) Do you think the observations are a reasonable representation of the distribution (and ecological niche) of the species?
 
 More advanced:
 
-\noindent 6) use the 'rasterize' function to create a raster of the number of observations and make a map. Use "wrld\_simpl" from the maptools package for country boundaries.
+\noindent 6) Use the 'rasterize' function to create a raster of the number of observations and make a map. Use "wrld\_simpl" from the maptools package for country boundaries.
 
-\noindent 7) map the uncertainty associated with the georeferences. Some records in data returned by gbif have that. You can also extract it from the data returned by the geocode function.
+\noindent 7) Map the uncertainty associated with the georeferences. Some records in data returned by gbif have that. You can also extract it from the data returned by the geocode function.
 
 \end{hangparas}
 
