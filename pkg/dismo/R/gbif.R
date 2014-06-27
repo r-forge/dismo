@@ -226,16 +226,16 @@ gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE
 				breakout <- TRUE
 				break
 			}
-			zz <- try (download.file(aurl, tmpfile, quiet=TRUE))
-			if (class(zz) != 'try-error') {
-				break
+			test <- try (download.file(aurl, tmpfile, quiet=TRUE))
+			if (class(test) == 'try-error') {
 				print('download failure, trying again...')
-			}
-			xml <- scan(tmpfile, what='character', quiet=TRUE, sep='\n')
-			xml <- chartr('\a\v', '  ', xml)
-	    	zz <- try( gbifxmlToDataFrame(xml))
-			if (class(zz) != 'try-error') {
-				print('parsing failure, trying again...')
+			} else {
+				xml <- scan(tmpfile, what='character', quiet=TRUE, sep='\n')
+				xml <- chartr('\a\v', '  ', xml)
+				zz <- try( gbifxmlToDataFrame(xml))
+				if (class(zz) == 'try-error') {
+					print('parsing failure, trying again...')
+				}
 				break
 			}
 	    }
@@ -255,20 +255,16 @@ gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE
 	z[,'lon'] <- as.numeric(z[,'lon'])
 	z[,'lat'] <- as.numeric(z[,'lat'])
 
-	i <- sapply(z[,'lon']== 0, isTRUE)
-	j <- sapply(z[,'lat']== 0, isTRUE)
+	k <- apply(z[ ,c('lon', 'lat')], 1, function(x) isTRUE(any(x==0)))
+
 	if (removeZeros) {
-		k <- i | j
 		if (geo) {
-			z <- z[!k,]
+			z <- z[!k, ]
 		} else {
-			z[k,'lat'] <- NA 
-			z[k,'lon'] <- NA 
+			z[k, c('lat', 'lon')] <- NA 
 		}
 	} else {
-		k <- i & j
-		z[k,'lat'] <- NA 
-		z[k,'lon'] <- NA 
+		z[k, c('lat', 'lon')] <- NA 
 	}
 		
 	if (getAlt) {
