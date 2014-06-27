@@ -201,42 +201,42 @@ acg <- acg[acg$lon < -50 & acg$lat > -50, ]
 \section{Cross-checking}
 It is important to cross-check coordinates by visual and other means. One approach is to compare the country (and lower level administrative subdivisions) of the site as specified by the records, with the country implied by the coordinates (Hijmans \textit{et al}., 1999). In the example below we use the \texttt{coordinates} function from the \texttt{sp} package to create a \texttt{SpatialPointsDataFrame}, and then the \texttt{overlay} function, also from \texttt{sp}, to do a point-in-polygon query with the countries polygons.
 
-<<sdm6>>=
+We can make a SpatialPointsDataFrame using the statistical function notation (with a tilde):
+<<sdm6a>>=
 library(sp)
-# make a SpatialPointsDataFrame
 coordinates(acg) <- ~lon+lat
-projection(acg) <- CRS('+proj=lonlat')
+projection(acg) <- CRS('+proj=longlat')
 class(acg)
-# use the coordinates to do a spatial query of the polygons
-# in wrld_simpl (a SpatialPolygonsDataFrame)
+@
+
+We can now  use the coordinates to do a spatial query of the polygons in wrld\_simpl (a SpatialPolygonsDataFrame)
+<<sdm6b>>=
 class(wrld_simpl)
 ov <- overlay(acg, wrld_simpl)
+@
 
-# ov has, for each point, the record number of wrld_simpl
-# we can use the record number to extract the country name 
-# first find the variable name
+Object 'ov' has, for each point, the record number of wrld_simpl. We can use the record number to extract the country name. First find the variable name
+
+<<sdm6c>>=
 names(wrld_simpl)
 head(wrld_simpl)
-
 # We need the variable 'NAME' in the data.frame of wrld_simpl
-
 cntr <- as.character(wrld_simpl$NAME[ov])
+@
 
-# which points (identified by their record numbers) do not match 
-# any country (i.e. are in an ocean)
+We should ask these two questions: (1) Which points (identified by their record numbers) do not match any country (that is, they are in an ocean)? (There are none (because we already removed the points that mapped in the ocean)). (2) Which points have coordinates that are in a different country than listed in the ‘country’ field of the gbif record
+
+<<sdm6d>>=
 i <- which(is.na(cntr))
 i
-# there are none (because we already removed the points that mapped in the ocean)
-
-# which points have coordinates that are in a different country than
-#  listed in the ‘country’ field of the gbif record
 j <- which(cntr != acg$country)
 # for the mismatches, bind the country names of the polygons and points
 cbind(cntr, acg$country)[j,]
+@
 
-# In this case the mismatch is probably because wrld_simpl is not
-# very precise as the records map to locations very close to the 
-# border between Bolivia and its neighbors.
+In this case the mismatch is probably because wrld_simpl is not very precise as the records map to locations very close to the border between Bolivia and its neighbors.
+
+<<sdm6d, fig=TRUE>>=
 plot(acg)
 plot(wrld_simpl, add=T, border='blue', lwd=2)
 points(acg[j, ], col='red', pch=20, cex=2)
@@ -1092,7 +1092,7 @@ points(backg_train, pch='-', cex=0.25)
 
 Rather than relying on a single "best" model, some auhtors (e.g. Thuillier, 2003) have argued for using many models and applying some sort of model averaging. See the biomod2 package for an implementation. You can of course implement these approaches yourself. Below is a very brief example. We first make a RasterStack of our individual model predictions:
 
-<<sdm82>>=
+<<sdm82, fig=TRUE>>=
 models <- stack(pb, pd, pm, pg, pr, ps)
 names(models) <- c("bioclim", "domain", "mahal", "glm", "rf", "svm")
 plot(models)
