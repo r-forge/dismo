@@ -294,7 +294,7 @@ gbif <- function(genus, species='', concept=FALSE, ext=NULL, args=NULL, geo=TRUE
 
 	if (dim(z)[1] > 0) {
 	
-		iso <- raster:::.ISO()
+		iso <- ccodes()
 		z$ISO2 <- z$country
 		i <- match(z$ISO2, iso[, 'ISO2'])
 		z$country <- iso[i, 1]
