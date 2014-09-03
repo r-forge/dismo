@@ -404,7 +404,7 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 
 
 .meTmpDir <- function() {
-	return( paste(raster:::.tmpdir(), 'maxent', sep="") )
+	return( paste(raster::tmpDir(), 'maxent', sep="") )
 }
 
 
