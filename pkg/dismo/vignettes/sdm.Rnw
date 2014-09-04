@@ -199,32 +199,31 @@ acg <- acg[acg$lon < -50 & acg$lat > -50, ]
 
 
 \section{Cross-checking}
-It is important to cross-check coordinates by visual and other means. One approach is to compare the country (and lower level administrative subdivisions) of the site as specified by the records, with the country implied by the coordinates (Hijmans \textit{et al}., 1999). In the example below we use the \texttt{coordinates} function from the \texttt{sp} package to create a \texttt{SpatialPointsDataFrame}, and then the \texttt{overlay} function, also from \texttt{sp}, to do a point-in-polygon query with the countries polygons.
+It is important to cross-check coordinates by visual and other means. One approach is to compare the country (and lower level administrative subdivisions) of the site as specified by the records, with the country implied by the coordinates (Hijmans \textit{et al}., 1999). In the example below we use the \texttt{coordinates} function from the \texttt{sp} package to create a \texttt{SpatialPointsDataFrame}, and then the \texttt{over} function, also from \texttt{sp}, to do a point-in-polygon query with the countries polygons.
 
 We can make a SpatialPointsDataFrame using the statistical function notation (with a tilde):
 <<sdm6a>>=
 library(sp)
 coordinates(acg) <- ~lon+lat
-projection(acg) <- CRS('+proj=longlat')
+crs(acg) <- crs(wrld_simpl)
 class(acg)
 @
 
 We can now  use the coordinates to do a spatial query of the polygons in wrld\_simpl (a SpatialPolygonsDataFrame)
 <<sdm6b>>=
 class(wrld_simpl)
-ov <- overlay(acg, wrld_simpl)
+ovr <- over(acg, wrld_simpl)
 @
 
-Object 'ov' has, for each point, the record number of wrld_simpl. We can use the record number to extract the country name. First find the variable name
+Object 'ov' has, for each point, the matching record from wrld\_simpl. We need the variable 'NAME' in the data.frame of wrld\_simpl
+
 
 <<sdm6c>>=
-names(wrld_simpl)
-head(wrld_simpl)
-# We need the variable 'NAME' in the data.frame of wrld_simpl
-cntr <- as.character(wrld_simpl$NAME[ov])
+head(ovr)
+cntr <- ovr$NAME
 @
 
-We should ask these two questions: (1) Which points (identified by their record numbers) do not match any country (that is, they are in an ocean)? (There are none (because we already removed the points that mapped in the ocean)). (2) Which points have coordinates that are in a different country than listed in the ‘country’ field of the gbif record
+We should ask these two questions: (1) Which points (identified by their record numbers) do not match any country (that is, they are in an ocean)? (There are none (because we already removed the points that mapped in the ocean)). (2) Which points have coordinates that are in a different country than listed in the 'country' field of the gbif record
 
 <<sdm6d>>=
 i <- which(is.na(cntr))
@@ -234,7 +233,7 @@ j <- which(cntr != acg$country)
 cbind(cntr, acg$country)[j,]
 @
 
-In this case the mismatch is probably because wrld_simpl is not very precise as the records map to locations very close to the border between Bolivia and its neighbors.
+In this case the mismatch is probably because wrld\_simpl is not very precise as the records map to locations very close to the border between Bolivia and its neighbors.
 
 <<sdm6d, fig=TRUE>>=
 plot(acg)
@@ -242,7 +241,7 @@ plot(wrld_simpl, add=T, border='blue', lwd=2)
 points(acg[j, ], col='red', pch=20, cex=2)
 @
 
-See the sp package for more information on the \texttt{overlay} function and the related function \texttt{over}. At first it may be confusing that it returns indices (row numbers).  These indices, stored in variables \texttt{i} and \texttt{j} were used to get the relevant records. The wrld\_simpl polygons that we used in the example above are not very precise, and they probably should not be used in a real analysis. See \url{http://www.gadm.org/} for more detailed administrative division files, or use the '\verb@getData@' function from the raster package (e.g. \texttt{getData('gadm', country='BOL', level=0)} to get the national borders of Bolivia; and \texttt{getData('countries')} to get all country boundaries).
+See the sp package for more information on the \texttt{over} function. The wrld\_simpl polygons that we used in the example above are not very precise, and they probably should not be used in a real analysis. See \url{http://www.gadm.org/} for more detailed administrative division files, or use the '\verb@getData@' function from the raster package (e.g. \texttt{getData('gadm', country='BOL', level=0)} to get the national borders of Bolivia; and \texttt{getData('countries')} to get all country boundaries).
 
 
 \section{Georeferencing}
