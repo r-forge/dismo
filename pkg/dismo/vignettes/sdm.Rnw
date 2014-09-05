@@ -383,7 +383,7 @@ ac <- read.csv(file)
 
 <<sdm16b>>=
 coordinates(ac) <- ~lon+lat
-projection(ac) <- CRS('+proj=lonlat')
+projection(ac) <- CRS('+proj=longlat')
 @
 
 We first create a 'cricles' model (see the chapter about geographic models), using an arbitrary radius of 50 km
@@ -423,7 +423,8 @@ points(xy, cex=0.75, pch=20, col='blue')
 Note that the blue points are not all within the polygons (circles), as they now represent the centers of the selected cells from mask. We could choose to select only those cells that have their centers within the circles, using the overlay function.
 
 <<sdm21a>>=
-o <- overlay(x@polygons, SpatialPoints(xy))
+spxy <- SpatialPoints(xy, proj4string=CRS('+proj=longlat'))
+o <- over(spxy, x@polygons)
 xyInside <- xy[!is.na(o), ]
 @
 

@@ -6,7 +6,7 @@
 # calculates a gradient boosting (gbm)object in which model complexity is 
 # determined using a training set with predictions made to a withheld set
 # an initial set of trees is fitted, and then trees are progressively added
-# testing performance # along the way, using gbm.perf until the optimal
+# testing performance # along the way, using gbm::gbm.perf until the optimal
 # number of trees is identified
 #
 # as any structured ordering of the data should be avoided, a copy of the data set 
@@ -101,7 +101,7 @@ function (data,                        # the input data frame
 
 # identify the best number of trees using method appropriate to model
 
-  best.trees <- gbm.perf(gbm.object, method = 'test', plot.it = FALSE) 
+  best.trees <- gbm::gbm.perf(gbm.object, method = 'test', plot.it = FALSE) 
 
   n.fitted <- n.trees
 
@@ -109,8 +109,8 @@ function (data,                        # the input data frame
 
   while(gbm.object$n.trees - best.trees < n.trees & n.fitted < max.trees){
 
-    gbm.object <- gbm.more(gbm.object, add.trees)
-    best.trees <- gbm.perf(gbm.object, method = 'test', plot.it = FALSE)
+    gbm.object <- gbm::gbm.more(gbm.object, add.trees)
+    best.trees <- gbm::gbm.perf(gbm.object, method = 'test', plot.it = FALSE)
     n.fitted <- n.fitted + add.trees
 
     if (n.fitted %% 100 == 0){ #report times along the way
@@ -136,7 +136,7 @@ function (data,                        # the input data frame
 
 #extract fitted values and summary table
   
-  fitted.values <- predict.gbm(gbm.object,x.data,n.trees = best.trees,type="response")
+  fitted.values <- gbm::predict.gbm(gbm.object,x.data,n.trees = best.trees,type="response")
   gbm.summary <- summary(gbm.object,n.trees = best.trees, plotit = FALSE)
 
   y_i <- y.data
