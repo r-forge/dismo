@@ -114,7 +114,7 @@ if (!isGeneric("maxent")) {
 	}
 	.rJava()
 	mxe <- rJava::.jnew("meversion") 
-	v <- try(rjava::.jcall(mxe, "S", "meversion") )
+	v <- try(rJava::.jcall(mxe, "S", "meversion") )
 	if (class(v) == 'try-error') {
 		stop('"dismo" needs a more recent version of Maxent (3.3.3b or later) \nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/
 		\n and put it in this folder:\n',
