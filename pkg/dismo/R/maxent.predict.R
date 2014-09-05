@@ -52,7 +52,6 @@ setMethod('predict', signature(object='MaxEnt'),
 		variables <- colnames(object@presence)
 		
 		#MEversion <- .getMeVersion()
-
 		mxe <- rJava::.jnew("mebridge") 		
 		args <- c("-z", args)
 		tst <- rJava::.jcall(mxe, "S", "testPredictArgs", lambdas, args) 
