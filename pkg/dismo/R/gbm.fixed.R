@@ -67,7 +67,7 @@ function (data,                        # the input dataframe
 
 #extract fitted values and summary table
   
-  fitted.values <- predict.gbm(gbm.object,x.data,n.trees = n.trees,type="response")
+  fitted.values <- gbm::predict.gbm(gbm.object,x.data,n.trees = n.trees,type="response")
   gbm.summary <- summary(gbm.object,n.trees = n.trees, plotit = FALSE)
 
   y_i <- y.data

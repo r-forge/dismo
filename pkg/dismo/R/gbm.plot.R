@@ -65,7 +65,7 @@ function(gbm.object,                # a gbm object - could be one from gbm.step
 
 		pred.data <- data[,gbm.call$gbm.x[k]]
 
-		response.matrix <- plot.gbm(gbm.object, k, return.grid = TRUE)
+		response.matrix <- gbm::plot.gbm(gbm.object, k, return.grid = TRUE)
 
 		predictors[[j]] <- response.matrix[,1]
 		if (is.factor(data[,gbm.call$gbm.x[k]])) {

@@ -153,7 +153,7 @@ function(gbm.object,          # a gbm object describing sample intensity
 # now make predictions to the withheld fold
 
     u_i <- eval.data[,gbm.y]
-    y_i <- predict.gbm(model.list[[i]], eval.data, n.trees, "response")
+    y_i <- gbm::predict.gbm(model.list[[i]], eval.data, n.trees, "response")
 
     original.deviances[i] <- round(calc.deviance(u_i,y_i, family = family, calc.mean = TRUE),4)
  
@@ -194,7 +194,7 @@ function(gbm.object,          # a gbm object describing sample intensity
     model.list[[i]] <- eval(parse(text=gbm.call.string))  # create a fixed size object
 
     u_i <- eval.data[,gbm.y]
-    y_i <- predict.gbm(model.list[[i]],eval.data,n.trees,"response")
+    y_i <- gbm::predict.gbm(model.list[[i]],eval.data,n.trees,"response")
 
     deviance <- round(calc.deviance(u_i,y_i, family = family, calc.mean = TRUE),4)
     

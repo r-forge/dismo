@@ -225,12 +225,12 @@ function (data,                             # the input dataframe
 
 		model.list[[i]] <- eval(parse(text = gbm.call))
 
-		fitted.values <- model.list[[i]]$fit  #predict.gbm(model.list[[i]], x.subset, type = "response", n.trees = n.trees)
+		fitted.values <- model.list[[i]]$fit  #gbm::predict.gbm(model.list[[i]], x.subset, type = "response", n.trees = n.trees)
 		if (!is.null(offset)) fitted.values <- fitted.values + offset[model.mask]
 		if (family == "bernoulli") fitted.values <- exp(fitted.values)/(1 + exp(fitted.values))
 		if (family == "poisson") fitted.values <- exp(fitted.values)
 
-		pred.values[pred.mask] <- predict.gbm(model.list[[i]], x.data[pred.mask, ], n.trees = n.trees)
+		pred.values[pred.mask] <- gbm::predict.gbm(model.list[[i]], x.data[pred.mask, ], n.trees = n.trees)
 		if (!is.null(offset)) pred.values[pred.mask] <- pred.values[pred.mask] + offset[pred.mask]
 		if (family == "bernoulli") pred.values[pred.mask] <- exp(pred.values[pred.mask])/(1 + exp(pred.values[pred.mask]))
 		if (family == "poisson") pred.values[pred.mask] <- exp(pred.values[pred.mask])
@@ -285,14 +285,14 @@ function (data,                             # the input dataframe
 			if (!is.null(offset)) {
 				offset.subset <- offset[model.mask] 
 			}
-			model.list[[i]] <- gbm.more(model.list[[i]], weights = weight.subset, step.size)
+			model.list[[i]] <- gbm::gbm.more(model.list[[i]], weights = weight.subset, step.size)
 
-			fitted.values <- model.list[[i]]$fit # predict.gbm(model.list[[i]],x.subset, type = "response", n.trees = n.fitted) 
+			fitted.values <- model.list[[i]]$fit # gbm::predict.gbm(model.list[[i]],x.subset, type = "response", n.trees = n.fitted) 
 			if (!is.null(offset)) fitted.values <- fitted.values + offset[model.mask]
 			if (family == "bernoulli") fitted.values <- exp(fitted.values)/(1 + exp(fitted.values))
 			if (family == "poisson") fitted.values <- exp(fitted.values)
 
-			pred.values[pred.mask] <- predict.gbm(model.list[[i]], x.data[pred.mask, ], n.trees = n.fitted)
+			pred.values[pred.mask] <- gbm::predict.gbm(model.list[[i]], x.data[pred.mask, ], n.trees = n.fitted)
 			if (!is.null(offset)) pred.values[pred.mask] <- pred.values[pred.mask] + offset[pred.mask]
 			if (family == "bernoulli") pred.values[pred.mask] <- exp(pred.values[pred.mask])/(1 + exp(pred.values[pred.mask]))
 			if (family == "poisson") pred.values[pred.mask] <- exp(pred.values[pred.mask])
@@ -393,13 +393,13 @@ function (data,                             # the input dataframe
     pred.mask <- selector == i   #used to identify the with-held subset
     model.mask <- selector != i  #used to fit model on majority of data
 
-    fits <- predict.gbm(model.list[[i]], x.data[model.mask, ], n.trees = target.trees)
+    fits <- gbm::predict.gbm(model.list[[i]], x.data[model.mask, ], n.trees = target.trees)
     if (!is.null(offset)) fits <- fits + offset[model.mask]
     if (family == "bernoulli") fits <- exp(fits)/(1 + exp(fits))
     if (family == "poisson") fits <- exp(fits)
     fitted.matrix[model.mask,i] <- fits
 
-    fits <- predict.gbm(model.list[[i]], x.data[pred.mask, ], n.trees = target.trees)
+    fits <- gbm::predict.gbm(model.list[[i]], x.data[pred.mask, ], n.trees = target.trees)
     if (!is.null(offset)) fits <- fits + offset[pred.mask]
     fold.fit[pred.mask] <- fits  # store the linear predictor values
     if (family == "bernoulli") fits <- exp(fits)/(1 + exp(fits))
@@ -475,7 +475,7 @@ function (data,                             # the input dataframe
   
   gbm.summary <- summary(gbm.object,n.trees = target.trees, plotit = FALSE)
 
-  fits <- predict.gbm(gbm.object,x.data,n.trees = target.trees)
+  fits <- gbm::predict.gbm(gbm.object,x.data,n.trees = target.trees)
   if (!is.null(offset)) fits <- fits + offset
   if (family == "bernoulli") fits <- exp(fits)/(1 + exp(fits))
   if (family == "poisson") fits <- exp(fits)
