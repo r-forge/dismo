@@ -41,9 +41,8 @@ function (data,                        # the input dataframe
 
 #  dataframe.name <- deparse(substitute(data))   # get the dataframe name
 
-  x.data <- eval(data[, gbm.x])                 #form the temporary datasets
-  names(x.data) <- names(data)[gbm.x]
-  y.data <- eval(data[, gbm.y])
+  x.data <- data[, gbm.x, drop=FALSE]                 #form the temporary datasets
+  y.data <- data[, gbm.y]
   sp.name <- names(data)[gbm.y]
     
 

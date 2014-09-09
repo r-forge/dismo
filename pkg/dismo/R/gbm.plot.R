@@ -58,12 +58,15 @@ function(gbm.object,                # a gbm object - could be one from gbm.step
 	for (j in c(1:n.plots)) {  #cycle through the first time and get the range of the functions
 		if (n.plots == 1) {
 			k <- variable.no
-		} else k <- match(gbm.object$contributions$var[j],pred.names)
-
-		if (is.null(x.label)) var.name <- gbm.call$predictor.names[k]
-		else var.name <- x.label
-
-		pred.data <- data[,gbm.call$gbm.x[k]]
+		} else {
+			k <- match(gbm.object$contributions$var[j],pred.names)
+		}
+		if (is.null(x.label)) {
+			var.name <- gbm.call$predictor.names[k]
+		} else {
+			var.name <- x.label
+		}
+		pred.data <- data[ , gbm.call$gbm.x[k]]
 
 		response.matrix <- gbm::plot.gbm(gbm.object, k, return.grid = TRUE)
 

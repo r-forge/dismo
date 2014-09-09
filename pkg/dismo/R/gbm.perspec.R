@@ -56,7 +56,7 @@ gbm.perspec <- function(gbm.object,
 	if (is.null(y.label)) {
 		y.label <- gbm.call$predictor.names[y]
 	}
-	data <- gbm.call$dataframe[,gbm.x]  
+	data <- gbm.call$dataframe[ , gbm.x, drop=FALSE]  
 	n.trees <- gbm.call$best.trees
 
 # if marginal variable is a vector then create intervals along the range
