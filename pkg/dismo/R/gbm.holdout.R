@@ -70,15 +70,13 @@ function (data,                        # the input data frame
     else {
       sort.vector <- sample(seq(1,n.rows),n.rows,replace=FALSE)
     }
-            
-    sort.data <- data[sort.vector,]
 
-    x.data <- eval(sort.data[, gbm.x])                 #form the temporary datasets
-    y.data <- eval(sort.data[, gbm.y])
-  }
-  else {
-    x.data <- eval(data[, gbm.x])                 #form the temporary datasets
-    y.data <- eval(data[, gbm.y])
+    sort.data <- data[sort.vector,]
+    x.data <- sort.data[, gbm.x, drop=FALSE]                 #form the temporary datasets
+    y.data <- sort.data[, gbm.y]
+  } else {
+    x.data <- data[, gbm.x, drop=FALSE]                 #form the temporary datasets
+    y.data <- data[, gbm.y]
   }
 
   names(x.data) <- names(data)[gbm.x]
@@ -122,8 +120,8 @@ function (data,                        # the input data frame
   if (refit) {  # we are refitting the model with fixed tree size
     print(paste("refitting the model to the full dataset using ",best.trees," trees",sep=""),quote=FALSE)
 
-    x.data <- eval(data[, gbm.x])                 #form the temporary datasets
-    y.data <- eval(data[, gbm.y])
+    x.data <- data[, gbm.x, drop=FALSE]                 #form the temporary datasets
+    y.data <- data[, gbm.y]
      
     gbm.call <- eval(paste("gbm(y.data ~ .,n.trees = best.trees, data=x.data, verbose = F, interaction.depth = tree.complexity, 
       weights = site.weights, shrinkage = learning.rate, cv.folds = 0, distribution = as.character(family),

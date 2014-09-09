@@ -101,8 +101,8 @@ gbm.step <- function (
 #  assign("x.data", x.data, env = globalenv())               #and assign them for later use
 #  assign("y.data", y.data, env = globalenv())
 
-	offset.name <- deparse(substitute(offset))   # get the dataframe name
-	offset <- eval(offset)
+	#offset.name <- deparse(substitute(offset))   # get the dataframe name
+	#offset <- eval(offset)
 
 	n.cases <- nrow(data)
 	n.preds <- length(gbm.x)
@@ -568,7 +568,7 @@ gbm.step <- function (
 # now assemble data to be returned
 
 	gbm.detail <- list(dataframe = data, gbm.x = gbm.x, predictor.names = names(x.data), 
-    gbm.y = gbm.y, response.name = sp.name, offset = offset.name, family = family, tree.complexity = tree.complexity, 
+    gbm.y = gbm.y, response.name = sp.name, offset = offset, family = family, tree.complexity = tree.complexity, 
     learning.rate = learning.rate, bag.fraction = bag.fraction, cv.folds = n.folds, 
     prev.stratification = prev.stratify, max.fitted = n.fitted, n.trees = target.trees, 
     best.trees = target.trees, train.fraction = 1.0, tolerance.method = tolerance.method, 
