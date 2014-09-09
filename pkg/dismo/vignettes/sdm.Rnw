@@ -44,7 +44,9 @@ In SDM, the following steps are usually taken: (1) locations of occurrence of a 
 
 We assume that you are familiar with most of the concepts in SDM. If in doubt, you could consult, for example, Richard Pearson's introduction to the subject: \url{http://biodiversityinformatics.amnh.org/index.php?section_id=111}, the book by Janet Franklin (2009), the somewhat more theoretical book by Peterson \textit{et al.} (2011), or the recent review article by Elith and Leathwick (2009). It is important to have a good understanding of the interplay of environmental (niche) and geographic (biotope) space – see Colwell and Rangel (2009) and Peterson \textit{et al.} (2011) for a discussion. SDM is a widely used approach but there is much debate on when and how to best use this method. While we refer to some of these issues, in this document we do not provide an in-depth discussion of this scientific debate. Rather, our objective is to provide practical guidance to implemeting the basic steps of SDM. We leave it to you to use other sources to determine the appropriate methods for your research; and to use the ample opportunities provided by the \R environment to improve existing approaches and to develop new ones. 
 
-We also assume that you are already somewhat familiar with the \R language and environment. It would be particularly useful if you already had some experience with statistical model fitting (e.g. the \texttt{glm} function) and with spatial data handling as implemented in the packages '\verb@raster@' and '\verb@sp@'. To familiarize yourself with model fitting see, for instance, the Documentation section on the CRAN webpage (http://cran.r-project.org/) and any introduction to \R txt. For the  '\verb@raster@' package you could consult its vignette (available at \url{http://cran.r-project.org/web/packages/raster/vignettes/Raster.pdf}). When we present \R code we will provide some explanation if we think it might be difficult or confusing. We will do more of this earlier on in this document, so if you are relatively inexperienced with \R and would like to ease into it, read this text in the presented order.   
+We also assume that you are already somewhat familiar with the \R language and environment. It would be particularly useful if you already had some experience with statistical model fitting (e.g. the \texttt{glm} function) and with spatial data handling as implemented in the packages '\verb@raster@' and '\verb@sp@'. To familiarize yourself with model fitting see, for instance, the Documentation section on the CRAN webpage (http://cran.r-project.org/) and any introduction to \R txt. For the  '\verb@raster@' package you could consult its vignette (available at \url{http://cran.r-project.org/web/packages/raster/vignettes/Raster.pdf}). 
+
+When we present \R code we will provide some explanation if we think it might be difficult or confusing. We will do more of this earlier on in this document, so if you are relatively inexperienced with \R and would like to ease into it, read this text in the presented order.   
 
 SDM have been implemented in \R in many different ways. Here we focus on the functions in the '\verb@dismo@' and the '\verb@raster@' packages (but we also refer to other packages). If you want to test, or build on, some of the examples presented here, make sure you have the latest versions of these packages, and their dependencies, installed. If you are using a recent version of \R, you can do that with: 
 
@@ -78,9 +80,9 @@ file <- paste(system.file(package="dismo"), "/ex/bradypus.csv", sep="")
 # this is the file we will use:
 file
 
-# let's read it
-bradypus <- read.table(file,  header=TRUE,  sep=',')
-# let’s inspect the values of the file
+# read it
+bradypus <- read.table(file,  header=TRUE,  sep=",")
+# inspect the values of the file
 # first rows
 head(bradypus)
 # we only need columns 2 and 3:
@@ -124,7 +126,7 @@ Below is a simple way to make a map of the occurrence localities of \textit{Sola
 library(maptools)
 data(wrld_simpl)
 plot(wrld_simpl, xlim=c(-80,70), ylim=c(-60,10), axes=TRUE, 
-        col='light yellow')
+        col="light yellow")
 
 # restore the box around the map
 box()
@@ -522,7 +524,7 @@ summary(sdmdata)
 
 There are alternative approaches possible here. For example, one could extract multiple points in a radius as a potential means for dealing with mismatch between location accuracy and grid cell size. If one would make 10 datasets that represent 10 equally valid "samples" of the environment in that radius, that could be then used to fit 10 models and explore the effect of uncertainty in location. 
 
-To visually investigate colinearity in the environmental data (at the presence and background points) you can use a pairs plot. See Dormann \textit{et al}. (2011) for a discussion of methods to remove colinearity. 
+To visually investigate colinearity in the environmental data (at the presence and background points) you can use a pairs plot. See Dormann \textit{et al}. (2013) for a discussion of methods to remove colinearity. 
 <<sdm24b, fig=TRUE>>=
 # pairs plot of the values of the climate data 
 # at the bradypus occurrence sites.
@@ -598,13 +600,13 @@ plot(p)
 
 It is much easier to create a model and make a prediction than to assess how good the model is, and whether it is can be used for a specific purpose. Most model types have different measures that can help to assess how good the model fits the data. It is worth becoming familiar with these and understanding their role, because they help you to assess whether there is anything substantially wrong with your model. Most statistics or machine learning texts will provide some details. For instance, for a GLM one can look at how much deviance is explained, whether there are patterns in the residuals, whether there are points with high leverage and so on. However, since many models are to be used for prediction, much evaluation is focused on how well the model predicts to points not used in model training (see following section on data partitioning).  Before we start to give some examples of statistics used for this evaluation, it is worth considering what else can be done to evaluate a model. Useful questions include:
 
-• does the model seem sensible, ecologically?
+- Does the model seem sensible, ecologically?
 
-• do the fitted functions (the shapes of the modeled relationships) make sense?
+- Do the fitted functions (the shapes of the modeled relationships) make sense?
 
-• do the predictions seem reasonable? (map them, and think about them)
+- Do the predictions seem reasonable? (map them, and think about them)?
 
-• are there any spatial patterns in model residuals? (see Leathwick and Whitehead 2001 for an interesting example)
+- Are there any spatial patterns in model residuals? (see Leathwick and Whitehead 2001 for an interesting example)
 
 
 Most modelers rely on cross-validation. This consists of creating a model with one 'training' data set, and testing it with another data set of known occurrences. Typically, training and testing data are created through random sampling (without replacement) from a single data set. Only in a few cases, e.g. Elith \textit{et al}., 2006, training and test data are from different sources and pre-defined.
@@ -1245,34 +1247,33 @@ You can ignore this chapter, it is the authors' to-do list.
 
 There are many sophistications that are required by the realities that (a) there are multiple end uses of models, and (b) there are numerous issues with ecological data that mean that the assumptions of the standard methods don't hold.  Could include:
 
-• spatial autocorrelation
+- spatial autocorrelation
 
-• imperfect detection
+- imperfect detection
 
-• mixed models (for nested data, hierarchical stuff)
+- mixed models (for nested data, hierarchical stuff)
 
-• Bayesian methods
+- Bayesian methods
 
-• resource selection functions
+- resource selection functions
 
-• measures of niche overlap, linked to thoughts about niche conservatism
+- measures of niche overlap, linked to thoughts about niche conservatism
 
-• link to phylogeography
+- link to phylogeography
 
-• additional predictors including remote sensing variables, thinking about extremes
+- additional predictors including remote sensing variables, thinking about extremes
 
-• species that don't "mix" with grids – freshwater systems etc.
+- species that don't "mix" with grids – freshwater systems etc.
 
-• quantile regression
+- quantile regression
 
-• model selection literature (AIC etc etc)
+- model selection literature (AIC etc etc)
 
-• multispecies modeling: Mars, gdm
+- multispecies modeling: Mars, gdm
 
-• SDMTools
+- SDMTools
 
-• Dealing with uncertainty 
-using uncertainty field in georeferences. How to target the "important" uncertainties (will vary with the application), an example of partial plots with standard errors, and predicting the upper and lower bounds; the idea of testing sensitivity to decisions made in the modeling process (including dropping out points etc.). 
+- Dealing with uncertainty; using uncertainty field in georeferences. How to target the "important" uncertainties (will vary with the application), an example of partial plots with standard errors, and predicting the upper and lower bounds; the idea of testing sensitivity to decisions made in the modeling process (including dropping out points etc.). 
 
 
 \part{References}
@@ -1283,9 +1284,9 @@ using uncertainty field in georeferences. How to target the "important" uncertai
 
 \noindent Austin, M.P., and T.M. Smith, 1989. A new model for the continuum concept. Vegetatio 83: 35-47.
 
-\noindent Bahn, V., and B.J. McGill, 2007. Can niche-based distribution models outperform spatial interpolation? Global Ecology and Biogeography 16: 733–742.
+\noindent Bahn, V., and B.J. McGill, 2007. Can niche-based distribution models outperform spatial interpolation? Global Ecology and Biogeography 16: 733-742.
 
-\noindent Booth, TH, HA Nix, JR Busby and MF Hutchinson, 2014. BIOCLIM: the ﬁrst species distribution modelling package, its early applications and relevance to most current MAXENT studies. Diversity and Distributions 20: 1-9.
+\noindent Booth, T.H., H.A. Nix, J.R. Busby and M.F. Hutchinson, 2014. BIOCLIM: the ﬁrst species distribution modelling package, its early applications and relevance to most current MAXENT studies. Diversity and Distributions 20: 1-9.
 
 \noindent Breiman, L., 2001a. Statistical Modeling: The Two Cultures. Statistical Science 16: 199-215.
 
@@ -1297,7 +1298,7 @@ using uncertainty field in georeferences. How to target the "important" uncertai
 
 \noindent Colwell R.K. and T.F. Rangel, 2009. Hutchinson's duality: The once and future niche. Proceedings of the National Academy of Sciences 106: 19651-19658.
 
-\noindent Dormann C.F., Elith J., Bacher S., Buchmann C., Carl G., Carré G., Diekötter T., García Marquéz J., Gruber B., Lafourcade B., Leitão P.J., Münkemüller T., McClean C., Osborne P., Reineking B., Schröder B., Skidmore A.K., Zurell D., Lautenbach S. (2011 in review) Collinearity: a review of methods to deal with it and a simulation study evaluating their performance.
+\noindent Dormann C.F., Elith J., Bacher S., Buchmann C., Carl G., Carré G., Diekötter T., García Marquéz J., Gruber B., Lafourcade B., Leitão P.J., Münkemüller T., McClean C., Osborne P., Reineking B., Schröder B., Skidmore A.K., Zurell D., Lautenbach S., 2013. Collinearity: a review of methods to deal with it and a simulation study evaluating their performance. Ecography 36: 27-46.
 
 \noindent Elith, J. and J.R. Leathwick, 2009. Species Distribution Models: Ecological Explanation and Prediction Across Space and Time. Annual Review of Ecology, Evolution, and Systematics 40: 677-697. \url{http://dx.doi.org/10.1146/annurev.ecolsys.110308.120159}
 
