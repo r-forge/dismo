@@ -39,7 +39,7 @@ gbm.interactions <- function(gbm.object,
   cat("gbm.interactions - version 2.9 \n")
   cat("Cross tabulating interactions for gbm model with ",n.preds," predictors","\n",sep="")
 
-  data <- eval(parse(text=gbm.call$dataframe))[,gbm.x]  
+  data <- gbm.call$dataframe[,gbm.x]  
 
   for (i in 1:(n.preds - 1)) {  # step through the predictor set
 

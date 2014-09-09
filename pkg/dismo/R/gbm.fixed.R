@@ -39,7 +39,7 @@ function (data,                        # the input dataframe
 
 # setup input data and assign to position one
 
-  dataframe.name <- deparse(substitute(data))   # get the dataframe name
+#  dataframe.name <- deparse(substitute(data))   # get the dataframe name
 
   x.data <- eval(data[, gbm.x])                 #form the temporary datasets
   names(x.data) <- names(data)[gbm.x]
@@ -118,7 +118,7 @@ function (data,                        # the input dataframe
   z2 <- unclass(Sys.time())
   elapsed.time.minutes <- round((z2 - z1)/ 60,2)  #calculate the total elapsed time
 
-  gbm.detail <- list(dataframe = dataframe.name, gbm.x = gbm.x, predictor.names = names(x.data), 
+  gbm.detail <- list(data = data, gbm.x = gbm.x, predictor.names = names(x.data), 
     gbm.y = gbm.y, reponse.name = names(y.data), family = family, tree.complexity = tree.complexity, 
     learning.rate = learning.rate, bag.fraction = bag.fraction, cv.folds = 0, n.trees = n.trees, best.trees = best.trees, 
     train.fraction = train.fraction, var.monotone = var.monotone, date = date(), elapsed.time.minutes = elapsed.time.minutes)

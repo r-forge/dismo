@@ -26,15 +26,15 @@ function(gbm.object,                # a gbm object - could be one from gbm.step
      )
 {
 
-  if (! require(gbm) ) { stop ('you need to install the gbm package to run this function') }
-  if (! require(splines) ) { stop ('you need to install the splines package to run this function') }
+	if (! require(gbm) ) { stop ('you need to install the gbm package to run this function') }
+	if (! require(splines) ) { stop ('you need to install the splines package to run this function') }
 
 	gbm.call <- gbm.object$gbm.call
 	gbm.x <- gbm.call$gbm.x
 	pred.names <- gbm.call$predictor.names
 	response.name <- gbm.call$response.name
-	dataframe.name <- gbm.call$dataframe
-	data <- eval(parse(text = dataframe.name))
+	
+	data <- gbm.call$dataframe
 
 	max.plots <- plot.layout[1] * plot.layout[2]
 	plot.count <- 0
