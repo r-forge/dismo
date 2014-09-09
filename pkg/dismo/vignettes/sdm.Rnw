@@ -159,7 +159,7 @@ lonzero = subset(acgeo, lon==0)
 lonzero[, 1:13]
 @
 
-The records are from Bolivia, Peru and Argentina, confirming that coordinates are in error. Alternatively, it could have been that the coordinates were correct, perhaps referring to a location in the Atlantic Ocean where a fish was caught rather than a place where \textit{S. acaule} was collected). Records with the wrong species name can be among the hardest to correct (e.g., distinguishing between brown bears and sasquatch, Lozier \textit{et al.}, 2009). The one record in Ecuador is like that, there is some debate whether that is actually a specimen of \texit{S. albicans} or an anomalous hexaploid variety of \texit{S. acaule}. 
+The records are from Bolivia, Peru and Argentina, confirming that coordinates are in error. Alternatively, it could have been that the coordinates were correct, perhaps referring to a location in the Atlantic Ocean where a fish was caught rather than a place where \textit{S. acaule} was collected). Records with the wrong species name can be among the hardest to correct (e.g., distinguishing between brown bears and sasquatch, Lozier \textit{et al.}, 2009). The one record in Ecuador is like that, there is some debate whether that is actually a specimen of \textit{S. albicans} or an anomalous hexaploid variety of \textit{S. acaule}. 
 
 
 \subsection{Duplicate records}
@@ -1272,7 +1272,7 @@ There are many sophistications that are required by the realities that (a) there
 • SDMTools
 
 • Dealing with uncertainty 
-using uncertainty field in georeferences. How to target the "important" uncertainties (will vary with the application), an example of partial plots with standard errors, and predicting the upper and lower bounds; the idea of testing sensitivity to decisions made in the modeling process (including dropping out points etc etc). 
+using uncertainty field in georeferences. How to target the "important" uncertainties (will vary with the application), an example of partial plots with standard errors, and predicting the upper and lower bounds; the idea of testing sensitivity to decisions made in the modeling process (including dropping out points etc.). 
 
 
 \part{References}
@@ -1285,7 +1285,7 @@ using uncertainty field in georeferences. How to target the "important" uncertai
 
 \noindent Bahn, V., and B.J. McGill, 2007. Can niche-based distribution models outperform spatial interpolation? Global Ecology and Biogeography 16: 733–742.
 
-\noindent Booth, TH, HA Nix, JR Busby and MF Hutchinson, 2014. BIOCLIM: the ﬁrst species distribution modelling package, its early applications and relevance to most current MAXENT studies. Diversity and Distributions 20: 1–9.
+\noindent Booth, TH, HA Nix, JR Busby and MF Hutchinson, 2014. BIOCLIM: the ﬁrst species distribution modelling package, its early applications and relevance to most current MAXENT studies. Diversity and Distributions 20: 1-9.
 
 \noindent Breiman, L., 2001a. Statistical Modeling: The Two Cultures. Statistical Science 16: 199-215.
 
