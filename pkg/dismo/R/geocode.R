@@ -94,7 +94,8 @@ geocode <- function(x, oneRecord=FALSE, extent=NULL, progress='', ...) {
 			viewport <- matrix(ncol=4, nrow=n)
 			bounds <- matrix(ncol=4, nrow=n)
 			for (i in 1:n) {
-				place[i] <- p[i+1]$result$formatted_address
+				plc <- p[i+1]$result$formatted_address
+				place[i] <- ifelse(is.null(plc), "", plc)
 				location[i,] <- as.numeric(c(p[i+1]$result$geometry$location$lng, p[i+1]$result$geometry$location$lat))
 				viewport[i,] <- as.numeric(c(p[i+1]$result$geometry$viewport$southwest$lng, p[i+1]$result$geometry$viewport$northeast$lng, p[i+1]$result$geometry$viewport$southwest$lat, p[i+1]$result$geometry$viewport$northeast$lat) )
 				bnds <- as.numeric(c(p[i+1]$result$geometry$bounds$southwest$lng, p[i+1]$result$geometry$bounds$northeast$lng, p[i+1]$result$geometry$bounds$southwest$lat, p[i+1]$result$geometry$bounds$northeast$lat) )
