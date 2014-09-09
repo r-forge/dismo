@@ -41,7 +41,6 @@ function (data,                        # the input data frame
 
 # setup input data and assign to position one
 
-  dataframe.name <- deparse(substitute(data))  # get the dataframe name
   cv.folds <- 0 
 
   if (permute) { 
@@ -167,7 +166,7 @@ function (data,                        # the input data frame
 
 # now assemble data to be returned
 
-  gbm.detail <- list(dataframe = dataframe.name, gbm.x = gbm.x, predictor.names = names(x.data), 
+  gbm.detail <- list(dataframe = data, gbm.x = gbm.x, predictor.names = names(x.data), 
     gbm.y = gbm.y, response.name = sp.name, tree.complexity = tree.complexity, n.trees = best.trees, 
     learning.rate = learning.rate, best.trees = best.trees, cv.folds = cv.folds, 
     family = family, train.fraction = train.fraction, var.monotone = var.monotone )
