@@ -1286,7 +1286,7 @@ There are many sophistications that are required by the realities that (a) there
 
 \noindent Bahn, V., and B.J. McGill, 2007. Can niche-based distribution models outperform spatial interpolation? Global Ecology and Biogeography 16: 733-742.
 
-\noindent Booth, T.H., H.A. Nix, J.R. Busby and M.F. Hutchinson, 2014. BIOCLIM: the ﬁrst species distribution modelling package, its early applications and relevance to most current MAXENT studies. Diversity and Distributions 20: 1-9.
+\noindent Booth, T.H., H.A. Nix, J.R. Busby and M.F. Hutchinson, 2014. BIOCLIM: the first species distribution modelling package, its early applications and relevance to most current MAXENT studies. Diversity and Distributions 20: 1-9.
 
 \noindent Breiman, L., 2001a. Statistical Modeling: The Two Cultures. Statistical Science 16: 199-215.
 
@@ -1360,7 +1360,7 @@ There are many sophistications that are required by the realities that (a) there
 
 \noindent Mahalanobis, P.C., 1936. On the generalised distance in statistics. Proceedings of the National Institute of Sciences of India 2: 49-55.
 
-\noindent Mellert K.H., V. Fensterer, H. Küchenhoff, B. Reger, C. Kölling, H.J. Klemmt, and J. Ewald, 2011. Hypothesis-driven species distribution models for tree species in the Bavarian Alps. Journal of Vegetation Science 22: 635–646.
+\noindent Mellert K.H., V. Fensterer, H. Küchenhoff, B. Reger, C. Kölling, H.J. Klemmt, and J. Ewald, 2011. Hypothesis-driven species distribution models for tree species in the Bavarian Alps. Journal of Vegetation Science 22: 635-646.
 
 \noindent Nix, H.A., 1986. A biogeographic analysis of Australian elapid snakes. In: Atlas of Elapid Snakes of Australia. (Ed.) R. Longmore, pp. 4-15. Australian Flora and Fauna Series Number 7. Australian Government Publishing Service: Canberra.
 
