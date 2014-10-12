@@ -63,7 +63,7 @@
 	}
 
 	pols <- SpatialPolygons(pols)
-	projection(pols) <- CRS(crs)
+	projection(pols) <- crs
 	return( pols )
 }
 
@@ -114,7 +114,7 @@ setMethod('circles', signature(p='data.frame'),
 		
 		ci@polygons <- .generateCircles(p, d=d, lonlat=lonlat, crs=crs, ...)
 		if (require(rgeos)) {
-			ci@polygons <- rgeos::gUnionCascaded(ci@polygons)
+			ci@polygons <- rgeos::gUnaryUnion(ci@polygons)
 		}
 		return(ci)
 	}
