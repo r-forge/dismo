@@ -113,7 +113,7 @@ setMethod('circles', signature(p='data.frame'),
 		}
 		
 		ci@polygons <- .generateCircles(p, d=d, lonlat=lonlat, crs=crs, ...)
-		if (require(rgeos)) {
+		if (requireNamespace('rgeos')) {
 			ci@polygons <- rgeos::gUnaryUnion(ci@polygons)
 		}
 		return(ci)
