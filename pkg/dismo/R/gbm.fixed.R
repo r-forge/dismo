@@ -35,7 +35,7 @@ function (data,                        # the input dataframe
 {
     train.fraction = 1
 
-    if (! require(gbm) ) { stop ('you need to install the gbm package to run this function') }
+  #  if (! requireNamespace('gbm') ) { stop ('you need to install the gbm package to run this function') }
 
 # setup input data and assign to position one
 
@@ -53,7 +53,7 @@ function (data,                        # the input dataframe
 
   z1 <- unclass(Sys.time())
 
-  gbm.call <- paste("gbm(y.data ~ .,n.trees = n.trees, data=x.data, verbose = F, interaction.depth = tree.complexity, 
+  gbm.call <- paste("gbm::gbm(y.data ~ .,n.trees = n.trees, data=x.data, verbose = F, interaction.depth = tree.complexity, 
     weights = site.weights, shrinkage = learning.rate, distribution = as.character(family),
     var.monotone = var.monotone, bag.fraction = bag.fraction, keep.data = keep.data)", sep="")
 

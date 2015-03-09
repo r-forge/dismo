@@ -1,4 +1,4 @@
-import("raster", "sp", "methods")
+import("raster", "sp", "gbm", "methods")
 importFrom("graphics", points)
 exportMethods("predict")
 exportPattern("^[^\\.]")
