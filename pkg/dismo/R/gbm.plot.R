@@ -26,8 +26,7 @@ function(gbm.object,                # a gbm object - could be one from gbm.step
      )
 {
 
-	if (! require(gbm) ) { stop ('you need to install the gbm package to run this function') }
-	if (! require(splines) ) { stop ('you need to install the splines package to run this function') }
+#	if (! requireNamespace('gbm') ) { stop ('you need to install the gbm package to run this function') }
 
 	gbm.call <- gbm.object$gbm.call
 	gbm.x <- gbm.call$gbm.x
