@@ -35,8 +35,9 @@ function (data,                        # the input dataframe
 {
     train.fraction = 1
 
-  #  if (! requireNamespace('gbm') ) { stop ('you need to install the gbm package to run this function') }
-
+    if (! require('gbm') ) { stop ('you need to install the gbm package to run this function') }
+	
+	
 # setup input data and assign to position one
 
 #  dataframe.name <- deparse(substitute(data))   # get the dataframe name

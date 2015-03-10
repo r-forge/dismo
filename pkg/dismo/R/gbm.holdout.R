@@ -37,8 +37,8 @@ function (data,                        # the input data frame
    keep.data = TRUE)                   # keep copy of the data
 {
 #
-#    if (! requireNamespace('gbm') ) { stop ('you need to install the gbm package to run this function') }
-
+    if (! require('gbm') ) { stop ('you need to install the gbm package to run this function') }
+	requireNamespace('splines')
 # setup input data and assign to position one
 
   cv.folds <- 0 
