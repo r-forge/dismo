@@ -77,8 +77,9 @@ gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, rem
 	}
 
 	start <- max(1, start)
+	stopifnot(start <= end)
+
 	nrecs <- min(max(nrecs, 1), 300)
-	
 	url1 <- paste(base, "scientificname=", spec, '&limit=', format(nrecs, scientific=FALSE), cds, ex, args, sep='')
 
 	
@@ -86,7 +87,14 @@ gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, rem
 	breakout <- FALSE
 	np <- i <- 1
 	while (TRUE) {
+		if (start+nrecs >= end) {
+			nrecs <- end - start + 1
+			url1 <- paste(base, "scientificname=", spec, '&limit=', format(nrecs, scientific=FALSE), cds, ex, args, sep='')
+			breakout <- TRUE
+		}	
+		
 		aurl <- paste(url1, '&offset=', format(start-1, scientific=FALSE), sep='')
+		
 		if (np > 20) {
 			np <- 1
 			cat('\n')
@@ -127,14 +135,17 @@ gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, rem
 	    }
 		start <- start + nrecs
 		i <- i + 1
-
 		if (breakout) break
 		if (x$endOfRecords) break
 	}
 	
-	cat(x$count, ' records\n') 
+	cat(min(end, x$count), 'records\n') 
 
-	z <- do.call(bind, g)
+	if (length(g) == 1) {
+		z <- g[[1]]
+	} else {
+		z <- do.call(bind, g)
+	}
 	cn <- colnames(z)
 	cn <- gsub('decimalLatitude', 'lat', cn)
 	cn <- gsub('decimalLongitude', 'lon', cn)
@@ -167,13 +178,18 @@ gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, rem
 		i <- match(z$ISO2, iso[, 'ISO2'])
 		z$country <- iso[i, 1]
 		
-		fullloc <- trim(as.matrix(z[, c('locality', 'adm1', 'adm2', 'country', 'continent')]))
-		fullloc <- apply(fullloc, 1, function(x) paste(x, collapse=', '))
-		fullloc <- gsub("NA, ", "", fullloc)
-		fullloc <- gsub(", NA", "", fullloc)
-		fullloc <- gsub('\"', "", fullloc)
-		z$cloc <- fullloc
-
+		vrs <- c('locality', 'adm1', 'adm2', 'country', 'continent') 
+		vrs <- vrs[vrs %in% colnames(z)]
+		if (length(vrs) > 0) {
+			fullloc <- trim(as.matrix(z[, vrs]))
+			fullloc <- apply(fullloc, 1, function(x) paste(x, collapse=', '))
+			fullloc <- gsub("NA, ", "", fullloc)
+			fullloc <- gsub(", NA", "", fullloc)
+			fullloc <- gsub('\"', "", fullloc)
+			z$cloc <- fullloc
+		} else {
+			z$cloc <- NA
+		}
 		if (sp) {
 			coordinates(z) <- ~lon+lat
 		}
