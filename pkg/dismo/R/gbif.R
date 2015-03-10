@@ -99,7 +99,7 @@ gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, rem
 			np <- 1
 			cat('\n')
 		}
-		cat(paste(start, '-', sep='')) 
+		cat(paste(start-1, '-', sep='')) 
 		flush.console()
 		tries <- 0
         #======= if download fails due to server problems, keep trying  =======#
@@ -119,9 +119,10 @@ gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, rem
 				json <- chartr('\a\v', '  ', json)
 				x <- jsonlite::fromJSON(json)
 				if (is.null(x$count)) {
+					x$count <- 0
 					if (i == 1) {
 						warning('no records found')
-						return(NULL)
+						break
 					} else {
 						break
 					}
@@ -141,7 +142,9 @@ gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, rem
 	
 	cat(min(end, x$count), 'records\n') 
 
-	if (length(g) == 1) {
+	if (length(g) == 0) {
+		return(NULL)
+	} else if (length(g) == 1) {
 		z <- g[[1]]
 	} else {
 		z <- do.call(bind, g)
