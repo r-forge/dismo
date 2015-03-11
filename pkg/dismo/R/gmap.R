@@ -7,7 +7,7 @@
 # by Markus Loecher, Sense Networks <markus at sensenetworks.com>
 
 # October 2012
-# Updated with contributions by Sébastien Rochette
+# Updated with contributions by Sebastien Rochette
 
 gmap <- function(x, exp=1, type='terrain', filename='', style=NULL, scale=1, zoom=NULL, size=c(640, 640), rgb=FALSE, lonlat=FALSE, ...) {
 
