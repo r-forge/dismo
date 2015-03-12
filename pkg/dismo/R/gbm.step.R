@@ -76,7 +76,7 @@ gbm.step <- function (
   ...)                                      # allows for any additional plotting parameters
 {
 
-	if (! require('gbm') ) { stop ('you need to install the gbm package to run this function') }
+	if (! requireNamespace('gbm') ) { stop ('you need to install the gbm package to run this function') }
 	requireNamespace('splines')
 
 	if (silent) verbose <- FALSE
