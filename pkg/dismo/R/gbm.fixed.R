@@ -35,7 +35,7 @@ function (data,                        # the input dataframe
 {
     train.fraction = 1
 
-    if (! require('gbm') ) { stop ('you need to install the gbm package to run this function') }
+    if (! requireNamespace('gbm') ) { stop ('you need to install the gbm package to run this function') }
 	
 	
 # setup input data and assign to position one

@@ -32,7 +32,7 @@ gbm.perspec <- function(gbm.object,
                            # and cex for controlling text size - cex.axis and cex.lab have no effect
 {
 
-	if (! require('gbm') ) { stop('you need to install the gbm package to use this function') }
+	if (! requireNamespace('gbm') ) { stop('you need to install the gbm package to use this function') }
 	requireNamespace('splines')
 #get the boosting model details
 
