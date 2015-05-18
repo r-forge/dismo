@@ -107,7 +107,7 @@ setMethod('circles', signature(p='data.frame'),
 		if (inherits(p, 'SpatialPoints')) {
 			crs <- projection(p)
 		} else if (lonlat) {
-			crs <- '+proj=longlat'		
+			crs <- '+proj=longlat +datum=WGS84'		
 		} else {
 			crs <- NA
 		}
