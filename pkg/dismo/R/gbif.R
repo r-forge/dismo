@@ -175,7 +175,7 @@ gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, rem
 		z[k, c('lat', 'lon')] <- NA 
 	}
 		
-	if (dim(z)[1] > 0) {
+	if (nrow(z) > 0) {
 	
 		iso <- ccodes()
 		i <- match(z$ISO2, iso[, 'ISO2'])
@@ -194,7 +194,10 @@ gbif <- function(genus, species='', ext=NULL, args=NULL, geo=TRUE, sp=FALSE, rem
 			z$cloc <- NA
 		}
 		if (sp) {
-			coordinates(z) <- ~lon+lat
+			z <- z[!(is.na(z$lon) | is.na(z$lat)), ]
+			if (nrow(z) > 0 ) {
+				coordinates(z) <- ~lon+lat
+			}
 		}
 	}	
 
