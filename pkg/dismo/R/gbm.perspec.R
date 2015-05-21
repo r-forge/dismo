@@ -136,7 +136,7 @@ gbm.perspec <- function(gbm.object,
 # report the maximum value and set up realistic ranges for z
 
 	max.pred <- max(prediction)
-	cat("maximum value = ",round(max.pred,2),"\n")
+	message("maximum value = ",round(max.pred,2),"\n")
 
 	if (is.null(z.range)) {
 		if (family == "bernoulli") {
