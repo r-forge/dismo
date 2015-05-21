@@ -81,7 +81,7 @@ geocode <- function(x, oneRecord=FALSE, extent=NULL, progress='', ...) {
 			}
 			
 			if (status != "OK") {
-				cat(status, ':', r, '\n')
+				message(status, ':', r)
 				w <- res1 
 				w[1] <- z
 				res <- rbind(res, w)

@@ -146,7 +146,7 @@ gmap <- function(x, exp=1, type='terrain', filename='', style=NULL, scale=1, zoo
 			style <- gsub(" ", "", style)
 			gurl <- paste(gurl, '&style=', style, sep='')
 		}
-#		cat(gurl, "\n")
+#		message(gurl, "\n")
 	
 	filename <- trim(filename)
 	if (filename == '') {
