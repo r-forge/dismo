@@ -37,7 +37,7 @@ gbm.interactions <- function(gbm.object,
 
   if (use.weights) mask.trees <- mask.object$gbm.call$best.trees
 
-  message("gbm.interactions - version 2.9\n, Cross tabulating interactions for gbm model with ", n.preds, " predictors")
+  message("gbm.interactions - version 2.9\nCross tabulating interactions for gbm model with ", n.preds, " predictors")
 
   data <- gbm.call$dataframe[,gbm.x]  
 

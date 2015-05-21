@@ -83,7 +83,7 @@ gbm.simplify <- function(
 			message("value of n.drops (",n.drops,") is greater than permitted\nresetting value to ",start.preds - 2)
 			n.drops <- start.preds - 2
 		} else {
-			message("a fixed number of", n.drops, "drops will be tested")
+			message("a fixed number of ", n.drops, " drops will be tested")
 		}
 	}
 
