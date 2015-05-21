@@ -81,6 +81,12 @@ setClass('CirclesRange',
 )
 
 
+setMethod("geometry", "CirclesRange",
+	function(obj) {
+		obj@polygons
+	}
+)
+
 setMethod("polygons", "CirclesRange",
 	function(obj) {
 		obj@polygons

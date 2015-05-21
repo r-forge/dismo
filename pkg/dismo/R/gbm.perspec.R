@@ -16,7 +16,7 @@ gbm.perspec <- function(gbm.object,
     pred.means = NULL,    # allows specification of values for other variables
     x.label = NULL,       # allows manual specification of the x label
     x.range = NULL,       # manual range specification for the x variable
-    y.label = NULL,       # and y label
+    y.label = NULL,       # and y la seminar committeebel
     z.label = "fitted value", #default z label
     y.range = NULL,       # and the y
     z.range = NULL,       # allows control of the vertical axis
