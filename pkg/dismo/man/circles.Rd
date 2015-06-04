@@ -30,7 +30,6 @@ The circles model predicts that a species is present at sites within a certain d
   \item{dissolve}{logical. Dissolve overlapping circles. Setting this to \code{FALSE} may be useful for plotting} 
 } 
 
-}
 
 \value{
 An object of class 'CirclesRange' (inherits from \code{\link{DistModel-class}})
