@@ -143,7 +143,7 @@ setMethod('circles', signature(p='SpatialPoints'),
 		}
 		p <- coordinates(p)
 		if (missing(d)) { 
-			d <- .avgDist(p, lonlat=lonlat, r=r) / 2	}
+			d <- .avgDist(p, lonlat=lonlat, r=r) / 2	
 		}
 		circles(p, d=d, lonlat=lonlat, n=n, r=r, ...)
 	}
