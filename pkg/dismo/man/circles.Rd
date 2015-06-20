@@ -27,7 +27,8 @@ The circles model predicts that a species is present at sites within a certain d
  \item{lonlat}{logical. Are these longitude/latitude data? If missing this is taken from the \code{p} if it is a SpatialPoints* object}
  \item{n}{integer. How many vertices in the circle? Default is 360}
   \item{r}{numeric. Radius of the earth. Only relevant for longitude/latitude data. Default is 6378137 m}
-  \item{dissolve}{logical. Dissolve overlapping circles. Setting this to \code{FALSE} may be useful for plotting} 
+  \item{dissolve}{logical. Dissolve overlapping circles. Setting this to \code{FALSE} may be useful for plotting overlapping circles} 
+  \item{...}{additional arguments, none implemented}
 } 
 
 
