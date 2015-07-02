@@ -18,8 +18,8 @@ evaluateROCR <- function(model, p, a, x) {
 		p <- predict(model, data.frame(p))
 		a <- predict(model, data.frame(a))
 	}
-	p <- na.omit(p)
-	a <- na.omit(a)
+	p <- stats::na.omit(p)
+	a <- stats::na.omit(a)
 	if (length(p) < 1) { stop('no valid presence (p) values') }
 	if (length(a) < 1) { stop('no valid absence (a) values') }
 	predictions = c(p, a)
@@ -49,8 +49,8 @@ evaluate <- function(p, a, model, x, tr, ...) {
 		p <- predict(model, data.frame(p), ...)
 		a <- predict(model, data.frame(a), ...)
 	}
-	p <- na.omit(p)
-	a <- na.omit(a)
+	p <- stats::na.omit(p)
+	a <- stats::na.omit(a)
 	np <- length(p)
 	na <- length(a)
 	if (na == 0 | np == 0) {
