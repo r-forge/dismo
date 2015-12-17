@@ -81,7 +81,7 @@ evaluate <- function(p, a, model, x, tr, ...) {
 	xc@absence = a
 		
 	R <- sum(rank(c(p, a))[1:np]) - (np*(np+1)/2)
-	xc@auc <- R / (na * np)
+	xc@auc <- R / (as.numeric(na) * as.numeric(np))
 	
 	cr <- try( cor.test(c(p,a), c(rep(1, length(p)), rep(0, length(a))) ), silent=TRUE )
 	if (class(cr) != 'try-error') {
