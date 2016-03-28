@@ -28,7 +28,7 @@ voronoi <- function(xy){
 		xy <- unique(xy)
 	}
 	
-	z <- deldir::deldir(xy[,1], xy[,2])
+	z <- deldir::deldir(xy[,1], xy[,2], suppressMsge=TRUE)
 	w <- deldir::tile.list(z)
 	polys <- vector(mode='list', length=length(w))
 	for (i in seq(along=polys)) {
