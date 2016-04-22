@@ -394,12 +394,7 @@ We first create a 'circles' model (see the chapter about geographic models), usi
 x <- circles(ac, d=50000, lonlat=TRUE)
 @
 
-Now we use the \texttt{rgeos} library to 'dissolve' the circles (remove boundaries were circles overlap). 
-
-<<sdm18>>=
-library(rgeos)
-pol <-  gUnaryUnion(x@polygons)
-@ 
+Note that you need to have the \texttt{rgeos} package to 'dissolve' the circles (remove boundaries were circles overlap). 
 
 And then we take a random sample of points within the polygons. We only want one point per grid cell.
 
