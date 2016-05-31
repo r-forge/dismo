@@ -392,6 +392,7 @@ We first create a 'circles' model (see the chapter about geographic models), usi
 <<sdm17>>=
 # circles with a radius of 50 km
 x <- circles(ac, d=50000, lonlat=TRUE)
+pol <- polygons(x)
 @
 
 Note that you need to have the \texttt{rgeos} package to 'dissolve' the circles (remove boundaries were circles overlap). 
