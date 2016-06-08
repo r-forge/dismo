@@ -132,7 +132,7 @@ setMethod('circles', signature(p='matrix'),
 		if (missing(d)) { 
 			d <- .avgDist(p, lonlat=lonlat, r=r) / 2 
 		}
-		circles(data.frame(p), d=d, lonlat=lonlat, n=n, r=r, ...)
+		circles(data.frame(p), d=d, lonlat=lonlat, n=n, r=r, dissolve=dissolve, ...)
 	}
 )
 
@@ -145,7 +145,7 @@ setMethod('circles', signature(p='SpatialPoints'),
 		if (missing(d)) { 
 			d <- .avgDist(p, lonlat=lonlat, r=r) / 2	
 		}
-		circles(p, d=d, lonlat=lonlat, n=n, r=r, ...)
+		circles(p, d=d, lonlat=lonlat, n=n, r=r, dissolve=dissolve, ...)
 	}
 )
 
