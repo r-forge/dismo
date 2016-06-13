@@ -17,7 +17,7 @@ voronoi(xy)
 }
 
 \arguments{
- \item{xy}{SpatialPoints* or two column matrix}
+ \item{xy}{SpatialPoints* or two column matrix with x and y coordinates}
 }
 
 \value{
