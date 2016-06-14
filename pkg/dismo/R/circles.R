@@ -81,15 +81,15 @@ setClass('CirclesRange',
 )
 
 
-setMethod("geometry", "CirclesRange",
+setMethod("polygons", "CirclesRange",
 	function(obj) {
 		obj@polygons
 	}
 )
 
-setMethod("polygons", "CirclesRange",
+setMethod("geometry", "CirclesRange",
 	function(obj) {
-		obj@polygons
+		geometry(obj@polygons)
 	}
 )
 
