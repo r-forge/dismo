@@ -1,12 +1,12 @@
 Package: dismo
 Type: Package
 Title: Species Distribution Modeling
-Version: 1.0-16
-Date: 2016-5-31
+Version: 1.1-0
+Date: 2016-6-14
 Depends: R (>= 2.13.0), methods, raster (>= 2.3-40), sp (>= 1.0-13)
 Suggests: rJava (>= 0.5-0), rgdal, rgeos, XML, ROCR, deldir, gstat, randomForest, kernlab, maptools, jsonlite, gbm (>= 2.1.1)
 Author: Robert J. Hijmans, Steven Phillips, John Leathwick and Jane Elith
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com> 
-Description: Functions for species distribution modeling, that is, predicting entire geographic distributions form occurrences at a number of sites.
+Description: Functions for species distribution modeling, that is, predicting entire geographic distributions form occurrences at a number of sites and the environment at these sites.
 License: GPL (>=3)
 LazyLoad: yes

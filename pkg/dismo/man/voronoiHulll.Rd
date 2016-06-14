@@ -14,13 +14,15 @@ Voronoi polygons for presence/absence data
 }
 
 \usage{
-voronoiHull(p, a, ...)
+voronoiHull(p, a, ext=NULL, dissolve=FALSE, ...)
 }
 
 \arguments{
- \item{p}{Presence points. Two column matrix, data.frame, or a SpatialPoints* object}
- \item{a}{Absence points. Must be of the same class as p}
- \item{...}{Addtional arguments}
+ \item{p}{Presence points. Two column \code{matrix}, \code{data.frame}, or a \code{SpatialPoints*} object}
+ \item{a}{Absence points. Must be of the same class as \code{p}}
+ \item{ext}{Extent to limit or expand the area of interest}
+ \item{dissolve}{Boolean. Dissolve (aggregate) polygons?}
+ \item{...}{Additional arguments passed to \code{\link{voronoi}}}
 }
 
 \value{
@@ -31,10 +33,10 @@ A VoronoiHull object (inherits from \code{\link{DistModel-class}})
 This function is only correct when using a planar coordinate reference system (not longitude/latitude).
 }
 
-\seealso{\code{\link[dismo]{convexHull}}}
+\seealso{\code{\link{convexHull}}, \code{\link{voronoi}}}
 
 \author{
-Robert J. Hijmans. Adapted from code by Carson Farmer: \url{http://www.carsonfarmer.com/?p=455}
+Robert J. Hijmans
 }
 
 \examples{

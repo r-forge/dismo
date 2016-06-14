@@ -23,6 +23,13 @@ setMethod("polygons", "ConvexHull",
 	}
 )
 
+setMethod("geometry", "ConvexHull",
+	function(obj) {
+		geometry(obj@polygons)
+	}
+)
+
+
 if (!isGeneric("convHull")) {
 	setGeneric("convHull", function(p, ...)
 		standardGeneric("convHull"))

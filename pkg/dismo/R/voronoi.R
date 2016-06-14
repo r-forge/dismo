@@ -49,7 +49,7 @@ voronoi <- function(xy, ext=NULL, eps=1e-09, ...){
 	}
 
 	if (is.null(dat)) {
-		dat <- data.frame(id=index, xy)
+		dat <- data.frame(id=index)
 	} else {
 		dat <- dat[index, ,drop=FALSE]
 	}
