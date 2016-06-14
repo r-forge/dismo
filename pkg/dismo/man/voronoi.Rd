@@ -13,11 +13,13 @@ Voronoi polygons
 }
 
 \usage{
-voronoi(xy)
+voronoi(xy, ext, eps=1e-09, ...)
 }
 
 \arguments{
  \item{xy}{SpatialPoints* or two column matrix with x and y coordinates}
+ \item{ext}{Extent. Can be used to set the corners of the rectangular window enclosing the triangulation. Any data points. If this argument is omitted, it defaults to values given by the range of the data, plus and minus 10 percent. See \code{link[deldir]{deldir}}
+  \item{eps}{Numerical tolerance used in triangulation. See \code{link[deldir]{deldir}}
 }
 
 \value{
@@ -25,7 +27,7 @@ SpatialPolygonsDataFrame
 }
 
 \author{
-Adapted from code by Carson Farmer: \url{http://www.carsonfarmer.com/?p=455}
+This is based on the \code{link[deldir]{deldir}} function by Rolf Turner and code by Carson Farmer: \url{http://www.carsonfarmer.com/?p=455}
 }
 
 
