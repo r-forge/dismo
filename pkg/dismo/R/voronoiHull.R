@@ -22,7 +22,7 @@ if (!isGeneric("voronoiHull")) {
 }	
 
 setMethod('voronoiHull', signature(p='matrix', a='matrix'), 
-	function(p, a, ext=NULL, dissolve=FALSE, ...) {
+	function(p, a, ext=NULL, dissolve=FALSE, crs=NA, ...) {
 		v <- new('VoronoiHull')
 		
 		p <- stats::na.omit(unique(p))
@@ -44,12 +44,11 @@ setMethod('voronoiHull', signature(p='matrix', a='matrix'),
 		vor$pa <- pa
 		vor$id <- NULL
 		
-		dissolve <- list(...)$dissolve
-		if (is.null(dissolve)) { dissolve <- FALSE }
 		if (dissolve) { 
 			vor <- aggregate(vor, 'pa')
 		}
 		
+		crs(vor) <- crs
 		v@polygons <- vor
 		return(v)
 	}
@@ -57,16 +56,18 @@ setMethod('voronoiHull', signature(p='matrix', a='matrix'),
 
 
 setMethod('voronoiHull', signature(p='data.frame', a='data.frame'), 
-	function(p, a, ...) {
-		voronoiHull(as.matrix(p), as.matrix(a), ...)
+	function(p, a, ext=NULL, dissolve=FALSE, crs=NA, ...) {
+		voronoiHull(as.matrix(p), as.matrix(a), ext=ext, dissolve=dissolve, crs=crs, ...)
 	}
 )
 
 
 setMethod('voronoiHull', signature(p='SpatialPoints', a='SpatialPoints'), 
-	function(p, a, ...) {
-		v <- voronoiHull(coordinates(p), coordinates(a), ...)
-		crs(v) <- crs(p)
+	function(p, a, ext=NULL, dissolve=FALSE, ...) {
+		v <- voronoiHull(coordinates(p), coordinates(a), ext=ext, dissolve=dissolve, ...)
+		if (is.null(list(...)$crs)) {
+			crs(v) <- crs(p)
+		}
 		v
 	}
 )
@@ -75,7 +76,7 @@ setMethod('voronoiHull', signature(p='SpatialPoints', a='SpatialPoints'),
 setMethod("plot", signature(x='VoronoiHull', y='missing'), 
 	function(x, ...) {
 		sp <- x@polygons
-		sp::plot( sp, ... )
+		sp::plot(sp, ...)
 	}
 )
 

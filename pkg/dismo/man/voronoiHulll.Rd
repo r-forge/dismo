@@ -14,7 +14,9 @@ Voronoi polygons for presence/absence data
 }
 
 \usage{
-voronoiHull(p, a, ext=NULL, dissolve=FALSE, ...)
+\S4method{voronoiHull}{matrix,matrix}(p, a, ext=NULL, dissolve=FALSE, crs=NA, ...)
+\S4method{voronoiHull}{data.frame,data.frame}(p, a, ext=NULL, dissolve=FALSE, crs=NA, ...)
+\S4method{voronoiHull}{SpatialPoints,SpatialPoints}(p, a, ext=NULL, dissolve=FALSE, ...)
 }
 
 \arguments{
@@ -22,6 +24,7 @@ voronoiHull(p, a, ext=NULL, dissolve=FALSE, ...)
  \item{a}{Absence points. Must be of the same class as \code{p}}
  \item{ext}{Extent to limit or expand the area of interest}
  \item{dissolve}{Boolean. Dissolve (aggregate) polygons?}
+ \item{crs}{character or CRS object. PROJ.4 notation coordinate reference system} 
  \item{...}{Additional arguments passed to \code{\link{voronoi}}}
 }
 
