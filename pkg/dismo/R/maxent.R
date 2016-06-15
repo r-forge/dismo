@@ -254,7 +254,7 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 
 
 .getreps <- function(args) {
-	if (is.null(args)) { return(1) }
+	if (is.null(args)) { return(1) } 
 	args <- trim(args)
 	i <- which(substr(args,1,10) == 'replicates')
 	if (! isTRUE(i > 0)) {
@@ -322,7 +322,7 @@ setMethod('maxent', signature(x='data.frame', p='vector'),
 
 		mxe <- rJava::.jnew("mebridge")
 		
-		
+		names(args) = NULL
 		replicates <- .getreps(args) 
 		args <- c("-z", args)
 

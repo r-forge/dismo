@@ -33,7 +33,7 @@ A VoronoiHull object (inherits from \code{\link{DistModel-class}})
 This function is only correct when using a planar coordinate reference system (not longitude/latitude).
 }
 
-\seealso{\code{\link{convexHull}}, \code{\link{voronoi}}}
+\seealso{\code{\link[dismo]{convexHull}}, \code{\link[dismo]{voronoi}}}
 
 \author{
 Robert J. Hijmans
