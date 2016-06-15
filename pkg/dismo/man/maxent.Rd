@@ -23,7 +23,7 @@ This function uses the MaxEnt species distribution model software, which is a ja
 \S4method{maxent}{Raster,ANY}(x, p, a=NULL, factors=NULL, removeDuplicates=TRUE, nbg=10000, ...)
 \S4method{maxent}{SpatialGridDataFrame,ANY}(x, p, a=NULL, removeDuplicates=TRUE, nbg=10000, ...)
 \S4method{maxent}{data.frame,vector}(x, p, args=NULL, path, silent=FALSE, ...)
-\S4method{maxent}{missing,missing}(x, p, ...)
+\S4method{maxent}{missing,missing}(x, p, silent=FALSE, ...)
 }
 
 \arguments{
@@ -44,6 +44,8 @@ If \code{x} is a data.frame, \code{p} should be a vector with a length equal to 
 \item{removeDuplicates}{Boolean. If \code{TRUE}, duplicate presence points (that fall in the same grid cell) are removed}
 
 \item{path}{character. Optional argument to set where you want the MaxEnt output files to be stored. This allows you to permanently keep these files. If not supplied the MaxEnt files will be stored in a temporary file. These are the files that are shown in a browser when typing the model name or when you use "show(model)"}
+
+\item{silent}{Boolean. If \code{TRUE} a message is printed}
 
 \item{...}{Additional arguments}
 }
@@ -68,7 +70,7 @@ This is a known problem with certain Java applications on Macs. There are two wo
 
 
 \value{
-An object of class 'MaxEnt' (inherits from \code{\link{DistModel-class}}). Or a 'MaxEntReplicates' object if you use 'replicates=' as part of the \code{args} argument.
+An object of class 'MaxEnt' (inherits from \code{\link{DistModel-class}}). Or a 'MaxEntReplicates' object if you use 'replicates=' as part of the \code{args} argument. If the function is run without any arguments a boolean value is returned (\code{TRUE} if maxent.jar was found).
 }
 
 \seealso{

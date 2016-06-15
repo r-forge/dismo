@@ -137,7 +137,7 @@ setMethod('maxent', signature(x='missing', p='missing'),
 )
 
 setMethod('maxent', signature(x='SpatialGridDataFrame', p='ANY'), 
-	function(x, p, a=NULL,...) {
+	function(x, p, a=NULL, removeDuplicates=TRUE, nbg=10000, ...) {
 		factors = NULL
 		for (i in 1:ncol(x@data)) {
 			if (is.factor(x@data[,i]) | is.character(x@data[,i])) { 
@@ -150,7 +150,7 @@ setMethod('maxent', signature(x='SpatialGridDataFrame', p='ANY'),
 			a <- .getMatrix(a) 
 		}
 		# Signature = raster, ANY
-		maxent(x, p, a, factors=factors, ...)
+		maxent(x, p, a, factors=factors, removeDuplicates=removeDuplicates, nbg=nbg, ...)
 	}
 )
 
