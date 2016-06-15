@@ -2,7 +2,12 @@
 #based on code by whuber and Bangyou
 #http://gis.stackexchange.com/questions/22895/how-to-find-the-minimum-area-rectangle-for-given-points/181883#181883
 
-boundRect <- function(p) {
+.boundingRectangle <- function(p) {
+	if (inherits(p, 'Spatial')) {
+		crs <- crs(p)
+	} else {
+		crs <- NA	
+	}
 	ch <- convHull(p)
 	xy <- geom(polygons(ch))[, c('x', 'y')]
 	edges <- cbind(xy[-nrow(xy), ], xy[-1,])
@@ -19,7 +24,9 @@ boundRect <- function(p) {
     k <- which.min(areas)                          # Index of the best edge (smallest area)
 
     # Form a rectangle from the extremes of the best edge
-    data.frame(cbind(x[c(1,2,2,1,1),k], y[c(1,1,2,2,1),k]) %*% rbind(v[k,], w[k,]))
+    r <- cbind(x[c(1,2,2,1,1),k], y[c(1,1,2,2,1),k]) %*% rbind(v[k,], w[k,])
+	
+	spPolygons(r, crs=crs)
 }
 
 

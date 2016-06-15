@@ -22,7 +22,7 @@ if (!isGeneric("voronoiHull")) {
 }	
 
 setMethod('voronoiHull', signature(p='matrix', a='matrix'), 
-	function(p, a, ...) {
+	function(p, a, ext=NULL, dissolve=FALSE, ...) {
 		v <- new('VoronoiHull')
 		
 		p <- stats::na.omit(unique(p))
@@ -36,7 +36,7 @@ setMethod('voronoiHull', signature(p='matrix', a='matrix'),
 		v@presence <- data.frame(paxy[paxy[,1]==1, -1])
 		v@absence <- data.frame(paxy[paxy[,1]==0, -1])
 	
-		vor <- voronoi(paxy[, -1, drop=FALSE], ...)
+		vor <- voronoi(paxy[, -1, drop=FALSE], ext=ext, dissolve=dissolve, ...)
 
 		absence <- which(paxy[,1] == 0)
 		pa <- rep(1, length(vor))
