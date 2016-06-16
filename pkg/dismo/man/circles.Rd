@@ -23,7 +23,7 @@ The Circles Range model predicts that a species is present at sites within a cer
  
 \arguments{
   \item{p}{point locations (presence). Two column matrix, data.frame or SpatialPoints* object}
- \item{d}{numeric. The radius of each circle in meters. A single number of a vector with elements corresponding to rows in \code{p}. If missing the diameter is computed from the mean inter-point distance}
+ \item{d}{numeric. The radius of each circle in meters. A single number or a vector with elements corresponding to rows in \code{p}. If missing the diameter is computed from the mean inter-point distance}
  \item{lonlat}{logical. Are these longitude/latitude data? If missing this is taken from the \code{p} if it is a SpatialPoints* object}
  \item{n}{integer. How many vertices in the circle? Default is 360}
   \item{r}{numeric. Radius of the earth. Only relevant for longitude/latitude data. Default is 6378137 m}
