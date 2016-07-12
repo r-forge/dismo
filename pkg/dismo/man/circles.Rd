@@ -72,6 +72,19 @@ points(train, col='red', pch=20, cex=2)
 # to get the polygons:
 p <- polygons(cc)
 p
+
+# to compute the Circular Area Range of a species (see Hijmans and Spooner, 2001)
+pts <- train*10
+ca100 <- polygons(circles(pts, d=100, lonlat=FALSE))
+ca150 <- polygons(circles(pts, d=150, lonlat=FALSE))
+sum(area(ca150)) / (pi*150^2)
+sum(area(ca100)) / (pi*100^2)
+par(mfrow=c(1,2))
+plot(ca100); points(pts)
+plot(ca150); points(pts)
+
+
+
 }
 
 \keyword{spatial}
