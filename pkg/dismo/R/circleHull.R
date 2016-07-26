@@ -1,5 +1,10 @@
+# Author: Robert J. Hijmans
+# Date : July 2016
+# Version 0.1
+# Licence GPL v3
 
-circleHull <- function(xy, lonlat, ...) {
+
+.generateCircleHull <- function(xy, lonlat, ...) {
 
 	crs  <- crs(xy)
 	
@@ -15,13 +20,11 @@ circleHull <- function(xy, lonlat, ...) {
 	}
 	
 	xy <- na.omit(unique(.pointsToMatrix(xy, checkLonLat=lonlat)))
-	
-	# arbitrary threshold to decide to simplify by 
+	stopifnot(nrow(xy) > 1)
+
 	# first getting the points on the covex hull
-	if (nrow(xy) > 25) {
-		xy <- geom(polygons(covHull(xy)))[,5:6]
-	}
-	
+	xy <- xy[chull(xy),]
+
 	f <- function(p) { max(pointDistance(rbind(p), xy, lonlat=lonlat)) }
 	p <- optim(colMeans(xy), f)
 	if (is.na(crs)) crs <- CRS(as.character(NA))
@@ -29,5 +32,74 @@ circleHull <- function(xy, lonlat, ...) {
 	SpatialPolygonsDataFrame(b, data.frame(x=p$par[1], y=p$par[2], r=p$value), match.ID = FALSE)
 	
 }
+
+
+
+setClass('CircleHull',
+	contains = 'DistModel',
+	representation (
+		polygons='SpatialPolygonsDataFrame'
+	),	
+	prototype (	
+	),
+	validity = function(object)	{
+		return(TRUE)
+	}
+)
+
+
+setMethod("polygons", "CircleHull",
+	function(obj) {
+		obj@polygons
+	}
+)
+
+setMethod("geometry", "CircleHull",
+	function(obj) {
+		geometry(obj@polygons)
+	}
+)
+
+setMethod("plot", signature(x='CircleHull', y='missing'), 
+	function(x, ...) {
+		sp::plot(x@polygons, ...)
+	}
+)
+
+
+
+if (!isGeneric("convHull")) {
+	setGeneric("convHull", function(p, ...)
+		standardGeneric("convHull"))
+}	
+
+
+setMethod('convHull', signature(p='matrix'), 
+	function(p, crs=NA, ...) {
+		ch <- new('CircleHull')
+		ch@presence <- data.frame(p)
+		lonlat <- isLonLat(crs)
+		if (is.na(lonlat)) {
+			ch@polygons <- .generateCircleHull(p)
+		} else {
+			ch@polygons <- .generateCircleHull(p, lonlat=lonlat)		
+		}
+		crs(ch) <- crs
+		return(ch)
+	}
+)
+
+
+setMethod('convHull', signature(p='data.frame'), 
+	function(p, ...) {
+		convHull(as.matrix(p), ...)
+	}
+)
+
+setMethod('convHull', signature(p='SpatialPoints'), 
+	function(p, ...) {
+		convHull(coordinates(p), crs=p@proj4string, ...)
+	}
+)
 
 
