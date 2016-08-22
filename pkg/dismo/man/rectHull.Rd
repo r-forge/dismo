@@ -40,7 +40,7 @@ Robert J. Hijmans. Using an algorithm by whuber and Bangyou on gis.stackexchange
 }
 
 \seealso{
-\code{\link[dismo]{predict}, \link[dismo]{circHull}, \link[dismo]{convHull}, \link[dismo]{maxent}, \link[dismo]{domain}, \link[dismo]{mahal}}
+\code{\link[dismo]{predict}, \link[dismo]{circleHull}, \link[dismo]{convHull}, \link[dismo]{maxent}, \link[dismo]{domain}, \link[dismo]{mahal}}
 }
 
 

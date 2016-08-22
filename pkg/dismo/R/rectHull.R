@@ -82,7 +82,7 @@ setMethod('rectHull', signature(p='SpatialPoints'),
 	subp <- list()
 	for (i in clusters) {
 		pts <- xy[cl==i, ]
-		h <- dismo:::.boundingRectangle(pts)
+		h <- .boundingRectangle(pts)
 		subp <- c(subp, h)
 	}
 	aggregate(do.call(bind, subp), dissolve=dissolve)
