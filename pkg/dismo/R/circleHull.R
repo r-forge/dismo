@@ -26,12 +26,13 @@
 	xy <- xy[chull(xy),]
 
 	f <- function(p) { max(pointDistance(rbind(p), xy, lonlat=lonlat)) }
-	p <- optim(colMeans(xy), f)
+	p <- stats::optim(colMeans(xy), f)
 	if (is.na(crs)) crs <- CRS(as.character(NA))
 	b <- buffer(SpatialPoints(rbind(p$par), proj4string=crs), width=p$value, quadsegs=45)
 	SpatialPolygonsDataFrame(b, data.frame(x=p$par[1], y=p$par[2], r=p$value), match.ID = FALSE)
-	
 }
+
+
 
 
 
@@ -68,13 +69,13 @@ setMethod("plot", signature(x='CircleHull', y='missing'),
 
 
 
-if (!isGeneric("convHull")) {
-	setGeneric("convHull", function(p, ...)
-		standardGeneric("convHull"))
+if (!isGeneric("circleHull")) {
+	setGeneric("circleHull", function(p, ...)
+		standardGeneric("circleHull"))
 }	
 
 
-setMethod('convHull', signature(p='matrix'), 
+setMethod('circleHull', signature(p='matrix'), 
 	function(p, crs=NA, ...) {
 		ch <- new('CircleHull')
 		ch@presence <- data.frame(p)
@@ -84,21 +85,21 @@ setMethod('convHull', signature(p='matrix'),
 		} else {
 			ch@polygons <- .generateCircleHull(p, lonlat=lonlat)		
 		}
-		crs(ch) <- crs
+		crs(ch@polygons) <- crs
 		return(ch)
 	}
 )
 
 
-setMethod('convHull', signature(p='data.frame'), 
+setMethod('circleHull', signature(p='data.frame'), 
 	function(p, ...) {
-		convHull(as.matrix(p), ...)
+		circleHull(as.matrix(p), ...)
 	}
 )
 
-setMethod('convHull', signature(p='SpatialPoints'), 
+setMethod('circleHull', signature(p='SpatialPoints'), 
 	function(p, ...) {
-		convHull(coordinates(p), crs=p@proj4string, ...)
+		circleHull(coordinates(p), crs=p@proj4string, ...)
 	}
 )
 
