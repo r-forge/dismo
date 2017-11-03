@@ -110,17 +110,17 @@ if (!isGeneric("maxent")) {
 .getMeVersion <- function() {
 	jar <- paste(system.file(package="dismo"), "/java/maxent.jar", sep='')
 	if (!file.exists(jar)) {
-		stop('file missing:\n', jar, '.\nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/')
+		stop('file missing:\n', jar, '.\nPlease download it here: http://biodiversityinformatics.amnh.org/open_source/maxent/')
 	}
 	.rJava()
 	mxe <- rJava::.jnew("meversion") 
 	v <- try(rJava::.jcall(mxe, "S", "meversion") )
 	if (class(v) == 'try-error') {
-		stop('"dismo" needs a more recent version of Maxent (3.3.3b or later) \nPlease download it here: http://www.cs.princeton.edu/~schapire/maxent/
+		stop('"dismo" needs a more recent version of Maxent (3.3.3b or later) \nPlease download it here: http://biodiversityinformatics.amnh.org/open_source/maxent/
 		\n and put it in this folder:\n',
 		system.file("java", package="dismo"))
 	} else if (v == '3.3.3a') { 
-		stop("please update your maxent program to version 3.3.3b or later. This version is no longer supported. \nYou can download it here: http://www.cs.princeton.edu/~schapire/maxent/'")
+		stop("please update your maxent program to version 3.3.3b or later. This version is no longer supported. \nYou can download it here: http://biodiversityinformatics.amnh.org/open_source/maxent/")
 	}
 	return(v)
 }
