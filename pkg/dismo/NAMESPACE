@@ -6,4 +6,4 @@ importFrom("utils", "browseURL", "download.file", "flush.console", "data", "pack
 exportMethods("predict")
 exportPattern("^[^\\.]")
 exportClasses(DistModel,MaxEnt)
-useDynLib(dismo)
+useDynLib(dismo, .registration = TRUE)
