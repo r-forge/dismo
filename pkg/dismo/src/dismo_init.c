@@ -8,10 +8,10 @@
 */
 
 /* .Call calls */
-extern SEXP percRank(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _percRank(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"percRank", (DL_FUNC) &percRank, 7},
+    {"_percRank", (DL_FUNC) &_percRank, 7},
     {NULL, NULL, 0}
 };
 
