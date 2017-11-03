@@ -16,7 +16,7 @@ Build a "MaxEnt" (Maximum Entropy) species distribution model (see references be
 
 Background points are sampled randomly from the cells that are not \code{NA} in the first predictor variable, unless background points are specified with argument \code{a}. 
 
-This function uses the MaxEnt species distribution model software, which is a java program that you can download \href{http://www.cs.princeton.edu/~schapire/maxent/}{here}. Put the file 'maxent.jar' in the 'java' folder of this package. That is the folder returned by \code{system.file("java", package="dismo")}. You need MaxEnt version 3.3.3b or higher. Please note that this program (maxent.jar) cannot be redistributed or used for commercial or for-profit purposes.
+This function uses the MaxEnt species distribution model software, which is a java program that you can download \href{http://biodiversityinformatics.amnh.org/open_source/maxent/}{here}. Put the file 'maxent.jar' in the 'java' folder of this package. That is the folder returned by \code{system.file("java", package="dismo")}. You need MaxEnt version 3.3.3b or higher. Please note that this program (maxent.jar) cannot be redistributed or used for commercial or for-profit purposes.
 }
 
 \usage{
@@ -81,7 +81,7 @@ An object of class 'MaxEnt' (inherits from \code{\link{DistModel-class}}). Or a 
 
 \references{
 
-\url{http://www.cs.princeton.edu/~schapire/maxent/}
+\url{http://biodiversityinformatics.amnh.org/open_source/maxent/}
 
 Steven J. Phillips, Miroslav Dudik, Robert E. Schapire, 2004.  A maximum entropy approach to species distribution modeling. Proceedings of the Twenty-First International Conference on Machine Learning. p. 655-662.
 
