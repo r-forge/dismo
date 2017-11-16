@@ -29,8 +29,9 @@ voronoi <- function(xy, ext=NULL, eps=1e-09, ...){
 		xy <- unique(xy)
 	}
 	
+	
 	if (!is.null(ext)) {
-		ext <- as.vector(ext)
+		ext <- as.vector(extent(ext))
 	}
 	
 	z <- deldir::deldir(xy[,1], xy[,2], rw=ext, eps=eps, suppressMsge=TRUE)
