@@ -173,15 +173,21 @@ setMethod('maxent', signature(x='SpatialGridDataFrame', p='ANY'),
 
 
 setMethod('maxent', signature(x='Raster', p='ANY'), 
-	function(x, p, a=NULL, factors=NULL, removeDuplicates=TRUE, nbg=10000, ...) {
+test =	function(x, p, a=NULL, factors=NULL, removeDuplicates=TRUE, nbg=10000, ...) {
 
 		p <- .getMatrix(p)
 		if (removeDuplicates) {
 			cells <- unique(cellFromXY(x, p))
-			pv <- data.frame(extract(x, cells))
+			pv <- extract(x, cells)
 		} else {
-			pv <- data.frame(extract(x, p))
+			pv <- extract(x, p)
 		}
+		if (is.null(dim(pv))) {
+			pv <- matrix(pv, ncol=1)
+			colnames(pv) <- names(x)
+		}
+		pv <- data.frame(pv)
+		
 
 		lpv <- nrow(pv)
 		pv <- stats::na.omit(pv)
@@ -196,7 +202,13 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 		
 		if (! is.null(a) ) {
 			a <- .getMatrix(a)
-			av <- data.frame(extract(x, a))
+			av <- extract(x, a)
+			if (is.null(dim(av))) {
+				av <- matrix(av, ncol=1)
+				colnames(av) <- names(x)
+			}
+			av <- data.frame(av)
+			
 			avr <- nrow(av)
 			av <- stats::na.omit(av)
 			nas <- length(as.vector(attr(av, "na.action")))
@@ -224,7 +236,14 @@ setMethod('maxent', signature(x='Raster', p='ANY'),
 			} else {
 				xy <- randomPoints(x, nbg, p, warn=0 )			
 			}
-			av <- data.frame(extract(x, xy))
+			av <- extract(x, xy)
+			if (is.null(dim(av))) {
+				av <- matrix(av, ncol=1)
+				colnames(av) <- names(x)
+			}
+			av <- data.frame(av)
+			
+			
 			av <- stats::na.omit(av)
 			if (nrow(av) == 0) {
 				stop('could not get valid background point values; is there a layer with only NA values?')
