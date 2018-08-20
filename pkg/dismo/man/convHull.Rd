@@ -1,22 +1,23 @@
-\name{circleHull}
+\name{Convex Hull}
 
-\alias{circleHull}
-\alias{circleHull,SpatialPoints-method}
-\alias{circleHull,matrix-method}
-\alias{circleHull,data.frame-method}
-\alias{CircleHull-class}
+\alias{convHull}
+\alias{convHull,SpatialPoints-method}
+\alias{convHull,matrix-method}
+\alias{convHull,data.frame-method}
+\alias{ConvexHull-class}
 
 
-\title{Circle hull model}
+\title{Convex hull model}
 
 
 \description{
-The Circle hull model predicts that a species is present at sites inside the smallest circle that can contain a set of training points, and absent outside that circle.
+The Convex hull model predicts that a species is present at sites inside the convex hull of a set of training points, and absent outside that hull.
+I.e. this is the spatial convex hull, not an environmental hull.
 }
 
 
 \usage{
-circleHull(p, ...)
+convHull(p, ...)
 }
  
 \arguments{
@@ -25,8 +26,13 @@ circleHull(p, ...)
 }
 
 
+\details{
+You can supply an argument n (>= 1) to get n convex hulls around subsets of the points. You can also set n=1:x, to get a set of overlapping polygons consisting of 1 to x parts. I.e. the first polygon has 1 part, the second has 2 parts, and x has x parts.
+}
+
+
 \value{
-An object of class 'CircleHull' (inherits from \code{\link{DistModel-class}})
+An object of class 'ConvexHull' (inherits from \code{\link{DistModel-class}})
 }
 
 
@@ -35,7 +41,7 @@ Robert J. Hijmans
 }
 
 \seealso{
-\code{\link[dismo]{circles}, \link[dismo]{convHull}, \link[dismo]{rectHull}, \link[dismo]{predict}}
+\code{\link[dismo]{predict}, \link[dismo]{geoDist}, \link[dismo]{maxent}, \link[dismo]{domain}, \link[dismo]{mahal}}
 }
 
 
@@ -47,7 +53,7 @@ pts <- matrix(c(17, 42, 85, 70, 19, 53, 26, 84, 84, 46, 48, 85, 4, 95, 48, 54, 6
 train <- pts[1:12, ]
 test <- pts[13:20, ]
 				 
-ch <- circleHull(train)
+ch <- convHull(train)
 predict(ch, test)
 
 plot(r)

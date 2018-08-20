@@ -173,7 +173,7 @@ setMethod('maxent', signature(x='SpatialGridDataFrame', p='ANY'),
 
 
 setMethod('maxent', signature(x='Raster', p='ANY'), 
-test =	function(x, p, a=NULL, factors=NULL, removeDuplicates=TRUE, nbg=10000, ...) {
+	function(x, p, a=NULL, factors=NULL, removeDuplicates=TRUE, nbg=10000, ...) {
 
 		p <- .getMatrix(p)
 		if (removeDuplicates) {
